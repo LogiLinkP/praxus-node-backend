@@ -3,7 +3,7 @@ export {};
 const {Model, DataTypes} = require('sequelize');
 const sequelize = require('../db');
 
-const respuesta_informe = sequelize.define('respuesta_informe ', {
+const respuesta_informe = sequelize.define('respuesta_informe', {
     // Model attributes are defined here
     id: {
         type: DataTypes.INTEGER,
@@ -27,4 +27,4 @@ const respuesta_informe = sequelize.define('respuesta_informe ', {
     timestamps: false //no agrega los atributos de timestamp a las tablas
   });
 
-module.exports = respuesta_informe ;
+module.exports = respuesta_informe;

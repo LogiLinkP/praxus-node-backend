@@ -1,23 +1,3 @@
-/*
-import expres:anys, { Expres:anys, req:anyuest, res:anyponse } from 'expres:anys';
-import dotenv from 'dotenv';
-
-dotenv.config();
-
-const app: Expres:anys = expres:anys();
-const port = process.env.PORT;
-
-app.get('/', (req:any: req:anyuest, res:any: res:anyponse) => {
-  res:any.send('Expres:anys + TypeScript Server');
-});
-
-app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
-});
-*/
-
-//export {};
-
 require('dotenv').config();
 const express = require('express');
 const app = express();
@@ -25,7 +5,7 @@ const PORT = 3000;
 const sequelize = require('./database/db');
 
 app.get('/', (req:any, res:any) => {
-  res.send("GET req:anyuest Called")
+  res.send("GET request Called")
 })
 
 //Mostrar tablas en base de datos
@@ -41,11 +21,15 @@ app.get('/tablas', (req:any, res:any) => {
 })
 
 //importar modelos
-const estudiante = require('./dist/database/models/estudiante');
-//const estudiante_cursa_practica = req:anyuire('./database/models/estudiante_cursa_practica');
-//const usuario = req:anyuire('./database/models/usuario');
-//const practica = req:anyuire('./database/models/practica');
+//const estudiante = require('./dist/database/models/estudiante');
 
+const estudiante_cursa_practica = require('./database/models/estudiante_cursa_practica');
+const estudiante = require('./database/models/estudiante');
+const informe = require('./database/models/informe');
+const practica = require('./database/models/practica');
+const pregunta = require('./database/models/pregunta');
+const respuesta_informe = require('./database/models/respuesta_informe');
+const usuario = require('./database/models/usuario');
 
 //Mostrar tabla estudiantes
 app.get('/estudiantes', (req:any, res:any) => {
@@ -62,7 +46,7 @@ app.get('/estudiantes', (req:any, res:any) => {
 })
 
 //agregar un estudiante
-app.get('/agregares:anytudiante', (req:any, res:any) => {
+app.get('/agregarestudiante', (req:any, res:any) => {
   res.send("Agregando estudiante a la base de datos")
   estudiante.create({
     nombre: 'Vicente',
@@ -81,7 +65,7 @@ app.get('/agregares:anytudiante', (req:any, res:any) => {
 })
 
 //obtener estudiante con id 1
-app.get('/obteneres:anytudiante', (req:any, res:any) => {
+app.get('/obtenerestudiante', (req:any, res:any) => {
   res.send("Obteniendo estudiante con id 1")
   estudiante.findOne({
     where: {
@@ -99,7 +83,7 @@ app.get('/obteneres:anytudiante', (req:any, res:any) => {
 })
 
 //actualizar nombre de estudiante con id 1
-app.get('/actualizares:anytudiante', (req:any, res:any) => {
+app.get('/actualizarestudiante', (req:any, res:any) => {
   res.send("Actualizando estudiante con id 1")
   estudiante.update({
     nombre: 'Juan Carlos'
@@ -119,7 +103,7 @@ app.get('/actualizares:anytudiante', (req:any, res:any) => {
 })
 
 //eliminar estudiante con id 1
-app.get('/eliminares:anytudiante', (req:any, res:any) => {
+app.get('/eliminarestudiante', (req:any, res:any) => {
   res.send("Eliminando estudiante con id 1")
   estudiante.destroy({
     where: {
