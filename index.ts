@@ -1,15 +1,18 @@
-import express, { Express, Request, Response } from 'express';
-import dotenv from 'dotenv';
+require('dotenv').config();
+const express = require('express');
+const app = express();
+const PORT = 3000;
+const sequelize = require('./db');
 
-dotenv.config();
+//USAR ROUTES
+app.use("/", require("./routes"));
 
-const app: Express = express();
-const port = process.env.PORT;
-
-app.get('/', (req: Request, res: Response) => {
-  res.send('Express + TypeScript Server');
-});
-
-app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+app.listen(PORT, function (err:any) {
+  if (err) console.log(err);
+  console.log("Server listening on PORT", PORT);
+  sequelize.sync({force: false}).then(() => { // sync() se conecta con las tablas existentes, sino las crea
+    console.log('Database connected...');
+  }).catch((err:any) => {
+    console.log('Error: ', err);
+  })
 });
