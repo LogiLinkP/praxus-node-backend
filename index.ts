@@ -4,11 +4,20 @@ const app = express();
 const PORT = 3000;
 const sequelize = require('./db');
 
+//USAR ROUTES
+app.use("/", require("./routes"));
+
+
+
+/*
 app.get('/', (req:any, res:any) => {
   res.send("GET request Called")
 })
+*/
 
 
+
+/*
 //Mostrar tablas en base de datos
 app.get('/tablas', (req:any, res:any) => {
   res.send("Mostrando tablas en consola")
@@ -49,7 +58,7 @@ app.get('/agregarestudiante', (req:any, res:any) => {
   }
   )
 })
-
+*/
 
 
 
