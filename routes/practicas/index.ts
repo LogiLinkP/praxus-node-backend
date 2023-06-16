@@ -9,7 +9,25 @@ const sequelize = require('../../db');
 // Import the axios library
 const axios = require('axios');
 
-// post para recibir request de calculo de consistencia desde el front
+//[GET] obtener todas las practicas
+routerPracticas.get('/practica/:tagId', (req: any, res: any) => {
+    console.log("Obteniendo practica con id: ", req.params.tagId)
+    sequelize.practica.findOne({
+        where: {
+            id: req.params.tagId
+        }
+    })
+        .then((resultados: any) => {
+            console.log(resultados);
+        }
+        )
+        .catch((err: any) => {
+            console.log('Error al obtener practica', err);
+        }
+        )
+})
+
+//[POST] para recibir request de calculo de consistencia desde el front
 routerPracticas.post('/crearPractica', jsonParser, (req: any, res: any) => {
     const {nombre, tipo_practica, num_informes, cantidad_horas, modalidad} = req.body;
     console.log("Request de creacion de practica recibida");

@@ -8,6 +8,24 @@ routerEstudiante.get('/hola', (req: any, res: any) => {
     res.send("Hola desde estudiantes")
 })
 
+//para obtener un estudiante con su ID
+routerEstudiante.get('/estudiante/:tagId', (req: any, res: any) => {
+    console.log("Obteniendo estudiante")
+    sequelize.estudiante.findOne({
+        where: {
+            id: req.params.tagId
+        }
+    })
+        .then((resultados: any) => {
+            console.log(resultados);
+        }
+        )
+        .catch((err: any) => {
+            console.log('Error al obtener estudiante', err);
+        }
+        )
+})
+
 //const estudiante = require('../../models/estudiante')(sequelize);
 
 //const estudiante = sequelize.import('../../models/estudiante');
@@ -33,7 +51,7 @@ routerEstudiante.get('/mostrartodos', (req:any, res:any) => {
     )
 })
 
-//agregar un estudiante
+//agregar un estudiante -CAMBIAR A POST-
 routerEstudiante.get('/agregar', (req:any, res:any) => {
     res.send("Agregando estudiante a la base de datos")
     sequelize.estudiante.create({
@@ -70,7 +88,7 @@ routerEstudiante.get('/obtener1estudiante', (req:any, res:any) => {
     )
 })
 
-//actualizar nombre de estudiante con id 1
+//actualizar nombre de estudiante con id 1 ¿PUT?
 routerEstudiante.get('/actualizar1estudiante', (req:any, res:any) => {
     res.send("Actualizando estudiante con id 1")
     sequelize.estudiante.update({
@@ -91,7 +109,7 @@ routerEstudiante.get('/actualizar1estudiante', (req:any, res:any) => {
     )
 })
 
-//eliminar estudiante con id 1
+//eliminar estudiante con id 1 ¿DELETE?
 routerEstudiante.get('/eliminar1estudiante', (req:any, res:any) => {
     res.send("Eliminando estudiante con id 1")
     sequelize.estudiante.destroy({
