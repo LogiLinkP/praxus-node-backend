@@ -8,9 +8,9 @@ routerEstudiante.get('/hola', (req: any, res: any) => {
     res.send("Hola desde estudiantes")
 })
 
-//para obtener un estudiante con su ID
+//[GET] para obtener un estudiante con su ID
 routerEstudiante.get('/estudiante/:tagId', (req: any, res: any) => {
-    console.log("Obteniendo estudiante")
+    console.log("Obteniendo estudiante de id: ", req.params.tagId)
     sequelize.estudiante.findOne({
         where: {
             id: req.params.tagId
