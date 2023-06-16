@@ -9,4 +9,8 @@ router.post('/upload', upload.single("file"), (req: any, res: any) => {
     res.json({ message: "Archivo subido correctamente" });
 });
 
+router.get('/hola', (req: any, res: any) => {
+    res.send("Hola desde files")
+})
+
 module.exports = router;
