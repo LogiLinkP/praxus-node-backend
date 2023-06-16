@@ -16,9 +16,15 @@ module.exports = (sequelize, DataTypes) => {
   estudiante_cursa_practica.init({
     estado: DataTypes.STRING,
     nombre_supervisor: DataTypes.STRING,
+    correo_supervisor: DataTypes.STRING,
     nombre_empresa: DataTypes.STRING,
-    nota: DataTypes.INTEGER,
-    consistencia: DataTypes.INTEGER
+    rut_empresa: DataTypes.STRING,
+    fecha_incio: DataTypes.STRING,
+    fecha_termino: DataTypes.STRING,
+    nota_evaluacion: DataTypes.INTEGER,
+    consistencia_informe: DataTypes.INTEGER,
+    consistencia_nota: DataTypes.INTEGER,
+    key_informe_supervisor: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'estudiante_cursa_practica',

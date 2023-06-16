@@ -10,13 +10,16 @@ routerEstudiante.get('/hola', (req: any, res: any) => {
 
 //mostrar tabla estudiantes
 routerEstudiante.get('/mostrartodos', (req:any, res:any) => {
-    res.send("Mostrando tabla estudiantes en consola")
+    //res.send("Mostrando tabla estudiantes en consola")
+    console.log("Mostrando tabla estudiantes en consola")
     sequelize.estudiante.findAll().then((resultados:any) => {
-      console.log(resultados);
+      //console.log(resultados);
+      res.send(resultados)
     }
     )
     .catch((err:any) => {
-      console.log('Error al mostrar estudiantes',err);
+      //console.log('Error al mostrar estudiantes',err);
+      res.send('Error al mostrar estudiantes',err)
     }
     )
 })

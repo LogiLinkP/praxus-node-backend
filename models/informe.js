@@ -15,8 +15,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   informe.init({
     tipo_informe: DataTypes.STRING,
-    periodicidad: DataTypes.STRING,
-    hora: DataTypes.STRING
+    hora: DataTypes.BOOLEAN,
+    fecha: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'informe',
