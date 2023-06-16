@@ -3,6 +3,9 @@ const express = require('express');
 const app = express();
 const PORT = 3000;
 const sequelize = require('./database/db');
+let cors = require('cors')
+
+app.use(cors());
 
 app.get('/', (req: any, res: any) => {
   res.send("GET request Called")

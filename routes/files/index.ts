@@ -6,7 +6,7 @@ const router = new Router();
 
 router.post('/upload', upload.single("file"), (req: any, res: any) => {
     console.log(req.file);
-    res.send("Archivo subido correctamente");
+    res.json({ message: "Archivo subido correctamente" });
 });
 
 module.exports = router;
