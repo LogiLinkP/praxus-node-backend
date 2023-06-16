@@ -32,15 +32,14 @@ module.exports = {
         type: Sequelize.STRING
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE
       }
       //namtener nombre de la tabla
     });
+    
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('estudiante');

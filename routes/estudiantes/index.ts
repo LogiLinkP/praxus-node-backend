@@ -8,7 +8,13 @@ routerEstudiante.get('/hola', (req: any, res: any) => {
     res.send("Hola desde estudiantes")
 })
 
-//import { estudiante } from '../../models';
+//const estudiante = require('../../models/estudiante')(sequelize);
+
+//const estudiante = sequelize.import('../../models/estudiante');
+
+//const { estudiante } = require('../../models/estudiante');
+
+//const estudiante = require('../../models');
 
 //mostrar tabla estudiantes
 routerEstudiante.get('/mostrartodos', (req:any, res:any) => {
@@ -31,8 +37,10 @@ routerEstudiante.get('/mostrartodos', (req:any, res:any) => {
 routerEstudiante.get('/agregar', (req:any, res:any) => {
     res.send("Agregando estudiante a la base de datos")
     sequelize.estudiante.create({
+    //estudiante.create({
       nombre: 'Vicente',
-      rol: '201804585-3'
+      rol: '201804585-3',
+      id_usuario: 1
     })
     .then((resultados:any) => {
       console.log(resultados);
