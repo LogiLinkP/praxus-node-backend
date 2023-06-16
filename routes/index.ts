@@ -1,6 +1,7 @@
 let { Router } = require('express');
 const estudiantes = require('./estudiantes');
 const files = require('./files');
+const similitud = require('./similitud');
 
 const router = new Router();
 
@@ -11,5 +12,6 @@ router.get('/', (req:any, res:any) => {
 // Rutas
 router.use('/file', files);
 router.use('/estudiante', estudiantes);
+router.use('/similitud', similitud);
 
 module.exports = router;
