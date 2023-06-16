@@ -3,14 +3,14 @@ export { };
 const { Router } = require('express');
 var bodyParser = require('body-parser');
 
-const routerConsistencia = new Router();
+const routerSimilitud = new Router();
 const jsonParser = bodyParser.json();
 
 // Import the axios library
 const axios = require('axios');
 
 // post para recibir request de calculo de consistencia desde el front
-routerConsistencia.post('/consistencia', jsonParser, (req: any, res: any) => {
+routerSimilitud.post('/consistencia', jsonParser, (req: any, res: any) => {
     const {texto1, texto2, id_alumno_practica} = req.body;
     console.log("Request de calculo de consistencia recibida");
     console.log(req.body);
@@ -31,7 +31,7 @@ routerConsistencia.post('/consistencia', jsonParser, (req: any, res: any) => {
     // GUARDAR CONSISTENCIA EN LA BASE DE DATOS?
 })
 
-routerConsistencia.post('/comparacion_keywords', jsonParser, (req: any, res: any) => {
+routerSimilitud.post('/comparacion_keywords', jsonParser, (req: any, res: any) => {
   const {texto1, texto2, id_alumno_practica} = req.body;
   console.log("Request de calculo con keywords recibida");
   console.log(req.body);
@@ -52,8 +52,8 @@ routerConsistencia.post('/comparacion_keywords', jsonParser, (req: any, res: any
   // GUARDAR CONSISTENCIA EN LA BASE DE DATOS?
 })
 
-routerConsistencia.post('/consistencia_evaluacion_informe', jsonParser, (req: any, res: any) => {
-  const {texto, puntaje, puntaje_min, puntaje_max} = req.body;
+routerSimilitud.post('/consistencia_evaluacion_informe', jsonParser, (req: any, res: any) => {
+  const {texto, puntaje, puntaje_min, puntaje_max, id_alumno_practica} = req.body;
   console.log("Request de calculo de consistencia_evaluacion_informe recibida");
   console.log(req.body);
   // hacer post a python backend
@@ -75,4 +75,4 @@ routerConsistencia.post('/consistencia_evaluacion_informe', jsonParser, (req: an
   // GUARDAR CONSISTENCIA EN LA BASE DE DATOS?
 })
 
-module.exports = routerConsistencia;
+module.exports = routerSimilitud;
