@@ -11,11 +11,13 @@ module.exports = {
       },
       id_practica: {
         allowNull: false,
-        type: Sequelize.INTEGER,
+        type: Sequelize.INTEGER
+        /*
         references: {
           model: 'practica',
           key: 'id'
         }
+        */
       },
       enunciado: {
         type: Sequelize.STRING

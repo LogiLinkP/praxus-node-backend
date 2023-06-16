@@ -30,10 +30,4 @@ sequelize.pregunta_supervisor = require('../models/pregunta_supervisor')(sequeli
 sequelize.pregunta_practica = require('../models/pregunta_practica')(sequelize, DataTypes);
 sequelize.documento = require('../models/documento')(sequelize, DataTypes);
 
-
-//opcion relaciones (al parcer tambien se puede hacer en los modelos)
-//sequelize.estudiante.belongsToMany(sequelize.practica, { through: 'estudiante_cursa_practica' });
-
-//sequelize.usuario.hasOne(sequelize.estudiante, { foreignKey: 'id_usuario' });
-
 module.exports = sequelize;

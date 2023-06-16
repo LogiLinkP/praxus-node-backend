@@ -8,11 +8,14 @@ routerEstudiante.get('/hola', (req: any, res: any) => {
     res.send("Hola desde estudiantes")
 })
 
+//import { estudiante } from '../../models';
+
 //mostrar tabla estudiantes
 routerEstudiante.get('/mostrartodos', (req:any, res:any) => {
     //res.send("Mostrando tabla estudiantes en consola")
     console.log("Mostrando tabla estudiantes en consola")
     sequelize.estudiante.findAll().then((resultados:any) => {
+    //estudiante.findAll().then((resultados:any) => {  
       //console.log(resultados);
       res.send(resultados)
     }

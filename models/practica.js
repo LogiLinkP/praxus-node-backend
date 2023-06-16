@@ -14,6 +14,8 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       practica.hasMany(models.pregunta_practica, {foreignKey: 'id_practica',as: 'pregunta_practica'});
       practica.hasMany(models.pregunta_supervisor, {foreignKey: 'id_practica',as: 'pregunta_supervisor'});
+      practica.hasMany(models.informe, {foreignKey: 'id_practica',as: 'informe'});
+      practica.hasMany(models.estudiante_cursa_practica, {foreignKey: 'id_practica',as: 'estudiante_cursa_practica'});
     }
   }
   practica.init({

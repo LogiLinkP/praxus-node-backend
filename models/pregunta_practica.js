@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     //sirve para hacer pregunta_practica.get.practica() y obtener la practica asociada
   }
   pregunta_practica.init({
+    id_practica: DataTypes.INTEGER,
     enunciado: DataTypes.STRING,
     tipo_pregunta: DataTypes.STRING
   }, {
