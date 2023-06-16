@@ -2,30 +2,41 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('pregunta', {
+    await queryInterface.createTable('informe', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      enunciado: {
+      id_practica: {
+        allowNull: false,
+        type: Sequelize.INTEGER
+        /*
+        references: {
+          model: 'practica',
+          key: 'id'
+        }
+        */
+      },
+      tipo_informe: {
         type: Sequelize.STRING
       },
-      tipo_respuesta: {
-        type: Sequelize.STRING
+      hora: {
+        type: Sequelize.BOOLEAN
+      },
+      fecha: {
+        type: Sequelize.BOOLEAN
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE
       }
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('pregunta');
+    await queryInterface.dropTable('informe');
   }
 };

@@ -9,6 +9,16 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      id_usuario: {
+        allowNull: false,
+        type: Sequelize.INTEGER
+        /*
+        references: {
+          model: 'usuario',
+          key: 'id'
+        }
+        */
+      },
       nombre: {
         type: Sequelize.STRING
       },
@@ -22,15 +32,14 @@ module.exports = {
         type: Sequelize.STRING
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE
       }
       //namtener nombre de la tabla
     });
+    
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('estudiante');

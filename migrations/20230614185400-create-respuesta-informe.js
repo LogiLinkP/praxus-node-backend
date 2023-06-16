@@ -9,15 +9,33 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      id_informe: {
+        allowNull: false,
+        type: Sequelize.INTEGER
+        /*
+        references: {
+          model: 'informe',
+          key: 'id'
+        }
+        */
+      },
+      id_estudiante_cursa_practica: {
+        allowNull: false,
+        type: Sequelize.INTEGER
+        /*
+        references: {
+          model: 'estudiante_cursa_practica',
+          key: 'id'
+        }
+        */
+      },
       key: {
         type: Sequelize.STRING
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE
       }
     });

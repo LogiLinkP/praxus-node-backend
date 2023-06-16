@@ -8,15 +8,27 @@ routerEstudiante.get('/hola', (req: any, res: any) => {
     res.send("Hola desde estudiantes")
 })
 
+//const estudiante = require('../../models/estudiante')(sequelize);
+
+//const estudiante = sequelize.import('../../models/estudiante');
+
+//const { estudiante } = require('../../models/estudiante');
+
+//const estudiante = require('../../models');
+
 //mostrar tabla estudiantes
 routerEstudiante.get('/mostrartodos', (req:any, res:any) => {
-    res.send("Mostrando tabla estudiantes en consola")
+    //res.send("Mostrando tabla estudiantes en consola")
+    console.log("Mostrando tabla estudiantes en consola")
     sequelize.estudiante.findAll().then((resultados:any) => {
-      console.log(resultados);
+    //estudiante.findAll().then((resultados:any) => {  
+      //console.log(resultados);
+      res.send(resultados)
     }
     )
     .catch((err:any) => {
-      console.log('Error al mostrar estudiantes',err);
+      //console.log('Error al mostrar estudiantes',err);
+      res.send('Error al mostrar estudiantes',err)
     }
     )
 })
@@ -25,8 +37,10 @@ routerEstudiante.get('/mostrartodos', (req:any, res:any) => {
 routerEstudiante.get('/agregar', (req:any, res:any) => {
     res.send("Agregando estudiante a la base de datos")
     sequelize.estudiante.create({
+    //estudiante.create({
       nombre: 'Vicente',
-      rol: '201804585-3'
+      rol: '201804585-3',
+      id_usuario: 1
     })
     .then((resultados:any) => {
       console.log(resultados);
