@@ -11,7 +11,7 @@ const axios = require('axios');
 
 // post para recibir request de calculo de consistencia desde el front
 routerPracticas.post('/crearPractica', jsonParser, (req: any, res: any) => {
-    const {nombre, tipo_practica, num_informes, cantidad_horas, modalidad} = req.body;
+    const {nombre, tipo_practica, num_informes, horas, modalidad} = req.body;
     console.log("Request de creacion de practica recibida");
     console.log(req.body);
     // hacer post a python backend
@@ -19,7 +19,7 @@ routerPracticas.post('/crearPractica', jsonParser, (req: any, res: any) => {
         nombre: nombre,
         tipo_practica: tipo_practica,
         num_informes: num_informes,
-        horas: cantidad_horas,
+        horas: horas,
         modalidad: modalidad
     })
     .then((resultados:any) => {

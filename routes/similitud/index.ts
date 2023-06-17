@@ -1,5 +1,7 @@
 export { };
 
+require('dotenv').config()
+
 const { Router } = require('express');
 var bodyParser = require('body-parser');
 
@@ -19,7 +21,7 @@ routerSimilitud.post('/consistencia', jsonParser, (req: any, res: any) => {
         texto1: texto1,
         texto2: texto2
       };
-    axios.post('http://localhost:5000/nlp/consistencia', payload)
+    axios.post(process.env.PYTHONBE_CONSISTENCY, payload)
     .then((response: any) => {
       console.log("Respuesta recibida desde python backend");
       res.status(200).send(response.data);
@@ -40,7 +42,7 @@ routerSimilitud.post('/comparacion_keywords', jsonParser, (req: any, res: any) =
       texto1: texto1,
       texto2: texto2
     };
-  axios.post('http://localhost:5000/nlp/comparacion_keywords', payload)
+  axios.post(process.env.PYTHONBE_KEYWORDS, payload)
   .then((response: any) => {
     console.log("Respuesta recibida desde python backend");
     res.status(200).send(response.data);
@@ -63,7 +65,7 @@ routerSimilitud.post('/consistencia_evaluacion_informe', jsonParser, (req: any, 
       puntaje_min: puntaje_min,
       puntaje_max: puntaje_max
     };
-  axios.post('http://localhost:5000/nlp/consistencia_evaluacion_informe', payload)
+  axios.post(process.env.PYTHONBE_EVAL_INFORME, payload)
   .then((response: any) => {
     console.log("Respuesta recibida desde python backend");
     res.status(200).send(response.data);
