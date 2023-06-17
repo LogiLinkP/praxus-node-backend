@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
 
+
 //[GET] para obtener una practica con su ID
 routerPracticas.get('', (req: any, res: any) => {
     console.log("Obteniendo practica con id: ", req.query.id)
