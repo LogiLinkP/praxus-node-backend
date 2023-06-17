@@ -1,24 +1,23 @@
 export { };
 
 const { Router } = require('express');
+const sequelize = require('../../db');
 const routerPracticas = new Router();
+
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
-const sequelize = require('../../db');
 
-// Import the axios library
-const axios = require('axios');
 
-//[GET] obtener todas las practicas
-routerPracticas.get('/practica/:tagId', (req: any, res: any) => {
-    console.log("Obteniendo practica con id: ", req.params.tagId)
+//[GET] para obtener una practica con su ID
+routerPracticas.get('', (req: any, res: any) => {
+    console.log("Obteniendo practica con id: ", req.query.id)
     sequelize.practica.findOne({
         where: {
-            id: req.params.tagId
+            id: req.query.id
         }
     })
         .then((resultados: any) => {
-            console.log(resultados);
+            res.send(resultados);
         }
         )
         .catch((err: any) => {
@@ -27,11 +26,44 @@ routerPracticas.get('/practica/:tagId', (req: any, res: any) => {
         )
 })
 
-//[POST] para recibir request de calculo de consistencia desde el front
-routerPracticas.post('/crearPractica', jsonParser, (req: any, res: any) => {
+//[GET] mostrar todas las practicas
+routerPracticas.get('/todas', (req:any, res:any) => {
+    console.log("Obteniendo todos los practica")
+    sequelize.practica.findAll().then((resultados:any) => {
+      res.send(resultados)
+    }
+    )
+    .catch((err:any) => {
+      console.log('Error al mostrar practica', err);
+      res.send('Error al mostrar practica', err)
+    }
+    )
+})
+
+//[DELETE] Eliminar estudiante con su ID
+routerPracticas.delete('/eliminar', (req:any, res:any) => {
+    console.log("Eliminando practica con id: ", req.query.id)
+    sequelize.practica.destroy({
+      where: {
+        id: req.query.id
+      }
+    })
+    .then((resultados:any) => {
+      console.log(resultados);
+      res.sendStatus(200);
+    }
+    )
+    .catch((err:any) => {
+      res.send(500)
+      console.log('Error al eliminar practica', err);
+    }
+    )
+  })
+
+//[POST] Crear una practica con los datos recibidos
+routerPracticas.post('/crear', jsonParser, (req: any, res: any) => {
     const {nombre, tipo_practica, num_informes, cantidad_horas, modalidad} = req.body;
     console.log("Request de creacion de practica recibida");
-    console.log(req.body);
     // hacer post a python backend
     sequelize.practica.create({
         nombre: nombre,
@@ -42,13 +74,13 @@ routerPracticas.post('/crearPractica', jsonParser, (req: any, res: any) => {
     })
     .then((resultados:any) => {
         console.log(resultados);
+        res.send("Practica creada");
     }
     )
     .catch((err:any) => {
         console.log('Error al crear practica',err);
     }
     )
-    res.send("Practica creada");
 })
 
 module.exports = routerPracticas;
