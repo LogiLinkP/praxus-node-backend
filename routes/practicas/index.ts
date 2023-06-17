@@ -8,6 +8,17 @@ var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
 
+//[GET] mostrar todas las practicas
+routerPracticas.get('/todas', (req:any, res:any) => {
+  console.log("Obteniendo todos los practica")
+  sequelize.practica.findAll().then((resultados:any) => {
+    res.send(resultados)
+  })
+  .catch((err:any) => {
+    console.log('Error al mostrar practica', err);
+    res.send('Error al mostrar practica', err)
+  })
+})
 
 //[GET] para obtener una practica con su ID
 routerPracticas.get('', (req: any, res: any) => {
@@ -19,26 +30,10 @@ routerPracticas.get('', (req: any, res: any) => {
     })
         .then((resultados: any) => {
             res.send(resultados);
-        }
-        )
+        })
         .catch((err: any) => {
             console.log('Error al obtener practica', err);
-        }
-        )
-})
-
-//[GET] mostrar todas las practicas
-routerPracticas.get('/todas', (req:any, res:any) => {
-    console.log("Obteniendo todos los practica")
-    sequelize.practica.findAll().then((resultados:any) => {
-      res.send(resultados)
-    }
-    )
-    .catch((err:any) => {
-      console.log('Error al mostrar practica', err);
-      res.send('Error al mostrar practica', err)
-    }
-    )
+        })
 })
 
 //[DELETE] Eliminar practica con su ID
@@ -52,13 +47,11 @@ routerPracticas.delete('/eliminar', (req:any, res:any) => {
     .then((resultados:any) => {
       console.log(resultados);
       res.sendStatus(200);
-    }
-    )
+    })
     .catch((err:any) => {
       res.send(500)
       console.log('Error al eliminar practica', err);
-    }
-    )
+    })
   })
 
 //[POST] Crear una practica con los datos recibidos
@@ -76,12 +69,10 @@ routerPracticas.post('/crear', jsonParser, (req: any, res: any) => {
     .then((resultados:any) => {
         console.log(resultados);
         res.send("Practica creada");
-    }
-    )
+    })
     .catch((err:any) => {
         console.log('Error al crear practica',err);
-    }
-    )
+    })
 })
 
 module.exports = routerPracticas;

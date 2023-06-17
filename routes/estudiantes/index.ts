@@ -18,12 +18,10 @@ routerEstudiante.get('', (req: any, res: any) => {
     })
         .then((resultados: any) => {
             res.send(resultados);
-        }
-        )
+        })
         .catch((err: any) => {
             console.log('Error al obtener estudiante', err);
-        }
-        )
+        })
 })
 
 //[GET] mostrar todos los estudiantes
@@ -31,33 +29,29 @@ routerEstudiante.get('/todos', (req:any, res:any) => {
     console.log("Obteniendo todos los estudiantes")
     sequelize.estudiante.findAll().then((resultados:any) => {
       res.send(resultados)
-    }
-    )
+    })
     .catch((err:any) => {
       console.log('Error al mostrar estudiantes', err);
       res.send('Error al mostrar estudiantes', err)
-    }
-    )
+    })
 })
 
 //[DELETE] Eliminar estudiante con su ID
 routerEstudiante.delete('/eliminar', (req:any, res:any) => {
-  console.log("Eliminando estudiante con id: ", req.query.id)
-  sequelize.estudiante.destroy({
-    where: {
-      id: req.query.id
-    }
-  })
-  .then((resultados:any) => {
-    console.log(resultados);
-    res.sendStatus(200);
-  }
-  )
-  .catch((err:any) => {
-    res.send(500);
-    console.log('Error al eliminar estudiante', err);
-  }
-  )
+    console.log("Eliminando estudiante con id: ", req.query.id)
+    sequelize.estudiante.destroy({
+        where: {
+          id: req.query.id
+        }
+    })
+    .then((resultados:any) => {
+        console.log(resultados);
+        res.sendStatus(200);
+    })
+    .catch((err:any) => {
+        res.send(500);
+        console.log('Error al eliminar estudiante', err);
+    })
 })
 
 //[POST] Crear un estudiante con los datos recibidos
@@ -75,12 +69,10 @@ routerEstudiante.post('/crear', jsonParser, (req: any, res: any) => {
   .then((resultados:any) => {
       console.log(resultados);
       res.send("Estudiante creado");
-  }
-  )
+  })
   .catch((err:any) => {
       console.log('Error al crear estudiante',err);
-  }
-  )
+  })
 })
 
 //actualizar nombre de estudiante con id 1 ¿PUT?
@@ -96,12 +88,10 @@ routerEstudiante.get('/actualizar1estudiante', (req:any, res:any) => {
     })
     .then((resultados:any) => {
         console.log(resultados);
-    }
-    )
+    })
     .catch((err:any) => {
         console.log('Error al actualizar estudiante',err);
-    }
-    )
+    })
 })
 
 module.exports = routerEstudiante;

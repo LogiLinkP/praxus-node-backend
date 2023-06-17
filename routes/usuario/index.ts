@@ -41,7 +41,7 @@ routerUsuario.post('/crear', jsonParser, (req: any, res: any) => {
     console.log("Request de creacion de usuario recibida");
     // hacer post a python backend
     sequelize.usuario.create({
-        tipo_usuario: tipo,
+        tipo: tipo,
         nombre_usuario: nombre,
         password: pass
     })
