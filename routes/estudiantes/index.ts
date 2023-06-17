@@ -54,7 +54,7 @@ routerEstudiante.delete('/eliminar', (req:any, res:any) => {
   }
   )
   .catch((err:any) => {
-    res.send(500)
+    res.send(500);
     console.log('Error al eliminar estudiante', err);
   }
   )
@@ -63,7 +63,7 @@ routerEstudiante.delete('/eliminar', (req:any, res:any) => {
 //[POST] Crear un estudiante con los datos recibidos
 routerEstudiante.post('/crear', jsonParser, (req: any, res: any) => {
   const {id_usuario, nombre, rol, rut, correo} = req.body;
-  console.log("Request de creacion de practica recibida");
+  console.log("Request de creacion de estudiante recibida");
   // hacer post a python backend
   sequelize.estudiante.create({
       id_usuario: id_usuario,
@@ -81,25 +81,6 @@ routerEstudiante.post('/crear', jsonParser, (req: any, res: any) => {
       console.log('Error al crear estudiante',err);
   }
   )
-})
-
-//agregar un estudiante -CAMBIAR A POST-
-routerEstudiante.get('/agregar', (req:any, res:any) => {
-    res.send("Agregando estudiante a la base de datos")
-    sequelize.estudiante.create({
-    //estudiante.create({
-      nombre: 'Vicente',
-      rol: '201804585-3',
-      id_usuario: 1
-    })
-    .then((resultados:any) => {
-      console.log(resultados);
-    }
-    )
-    .catch((err:any) => {
-      console.log('Error al crear estudiante',err);
-    }
-    )
 })
 
 //actualizar nombre de estudiante con id 1 ¿PUT?

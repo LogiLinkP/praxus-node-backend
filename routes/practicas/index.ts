@@ -41,7 +41,7 @@ routerPracticas.get('/todas', (req:any, res:any) => {
     )
 })
 
-//[DELETE] Eliminar estudiante con su ID
+//[DELETE] Eliminar practica con su ID
 routerPracticas.delete('/eliminar', (req:any, res:any) => {
     console.log("Eliminando practica con id: ", req.query.id)
     sequelize.practica.destroy({
