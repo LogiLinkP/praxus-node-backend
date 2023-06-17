@@ -14,6 +14,6 @@ router.get('/', (req:any, res:any) => {
 router.use('/file', files);
 router.use('/estudiante', estudiantes);
 router.use('/similitud', similitud);
-router.use('/practicas', practicas)
+router.use('/practica', practicas)
 
 module.exports = router;
