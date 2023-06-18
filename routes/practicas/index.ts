@@ -58,7 +58,6 @@ routerPracticas.delete('/eliminar', (req:any, res:any) => {
 routerPracticas.post('/crear', jsonParser, (req: any, res: any) => {
     const {nombre, tipo_practica, num_informes, cantidad_horas, modalidad} = req.body;
     console.log("Request de creacion de practica recibida");
-    // hacer post a python backend
     sequelize.practica.create({
         nombre: nombre,
         tipo_practica: tipo_practica,
