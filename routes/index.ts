@@ -1,7 +1,10 @@
 let { Router } = require('express');
+
 const router = new Router();
 
 // Rutas
+router.use('/supervisor', require('./supervisor'));
+router.use('/file', require('./files'));
 router.use('/config_informe', require('./config_informe'))
 router.use('/config_practica', require('./config_practica'))
 router.use('/documento', require('./documento'));
