@@ -1,7 +1,3 @@
-//EX "RESPUESTA INFORME"
-//AHORA "INFORME" SOLAMENTE
-//CAMBIAR EN BDD
-
 export { };
 
 const { Router } = require('express');
@@ -15,7 +11,7 @@ const jsonParser = bodyParser.json();
 //[GET] para obtener uno
 routerInforme.get('', (req: any, res: any) => {
     console.log("Obteniendo informe con id: ", req.query.id)
-    sequelize.respuesta_informe.findOne({
+    sequelize.informe.findOne({
         where: {
             id: req.query.id
         }
@@ -31,7 +27,7 @@ routerInforme.get('', (req: any, res: any) => {
 //[GET] mostrar todos
 routerInforme.get('/todos', (req:any, res:any) => {
     console.log("Obteniendo todos los informe")
-    sequelize.respuesta_informe.findAll().then((resultados:any) => {
+    sequelize.informe.findAll().then((resultados:any) => {
       res.send(resultados)
     })
     .catch((err:any) => {
@@ -43,7 +39,7 @@ routerInforme.get('/todos', (req:any, res:any) => {
 //[DELETE] Eliminar
 routerInforme.delete('/eliminar', (req:any, res:any) => {
   console.log("Eliminando informe con id: ", req.query.id)
-  sequelize.respuesta_informe.destroy({
+  sequelize.informe.destroy({
     where: {
       id: req.query.id
     }
@@ -60,19 +56,19 @@ routerInforme.delete('/eliminar', (req:any, res:any) => {
 
 //[POST] Crear uno
 routerInforme.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_practica, tipo, hora, fecha} = req.body;
+  const {id_practica, id_config_informe, key} = req.body;
   console.log("Request de creacion de informe");
-  sequelize.respuesta_informe.create({
+  sequelize.informe.create({
     id_practica: id_practica,
-    tipo: tipo,
-    hora: hora,
-    fecha: fecha
+    id_config_informe: id_config_informe,
+    key: key
   })
   .then((resultados:any) => {
       console.log(resultados);
       res.send("informe creado");
   })
   .catch((err:any) => {
+      res.sendStatus(500)
       console.log('Error al crear informe',err);
   })
 })
@@ -80,9 +76,9 @@ routerInforme.post('/crear', jsonParser, (req: any, res: any) => {
 
 //[PUT]
 routerInforme.put('/actualizar', jsonParser, async (req:any, res:any) => {
-    const estuCursaPract = await sequelize.respuesta_informe.findOne({ where: { id: req.body.id } })
-    if (estuCursaPract){
-      estuCursaPract.update(req.body)
+    const informe = await sequelize.informe.findOne({ where: { id: req.body.id } })
+    if (informe){
+      informe.update(req.body)
       .then((resultados:any) => {
         console.log(resultados);
         res.sendStatus(200);

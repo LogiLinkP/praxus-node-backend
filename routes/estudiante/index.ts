@@ -66,7 +66,6 @@ routerEstudiante.post('/crear', jsonParser, (req: any, res: any) => {
       correo: correo
   })
   .then((resultados:any) => {
-      console.log(resultados);
       res.send("Estudiante creado");
   })
   .catch((err:any) => {
@@ -74,23 +73,23 @@ routerEstudiante.post('/crear', jsonParser, (req: any, res: any) => {
   })
 })
 
-//actualizar nombre de estudiante con id 1 ¿PUT?
-routerEstudiante.get('/actualizar1estudiante', (req:any, res:any) => {
-    res.send("Actualizando estudiante con id 1")
-    sequelize.estudiante.update({
-        nombre: 'Vicente Balbontin'
-    },
-    {
-        where: {
-            id: 1
-        }
-    })
-    .then((resultados:any) => {
+//[PUT]
+routerEstudiante.put('/actualizar', jsonParser, async (req:any, res:any) => {
+    const estudiante = await sequelize.estudiante.findOne({ where: { id: req.body.id } })
+    if (estudiante){
+      estudiante.update(req.body)
+      .then((resultados:any) => {
         console.log(resultados);
-    })
-    .catch((err:any) => {
-        console.log('Error al actualizar estudiante',err);
-    })
+        res.sendStatus(200);
+      })
+      .catch((err:any) => {
+        res.send(500)
+        console.log('Error al actualizar de estudiante', err);
+      })
+    } else {
+        console.log("No existe estudiante con id: ", req.query.id)
+        res.sendStatus(404)
+    }
 })
 
 module.exports = routerEstudiante;

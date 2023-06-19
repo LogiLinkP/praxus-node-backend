@@ -11,11 +11,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      pregunta_supervisor.belongsTo(models.practica, {foreignKey: 'id_practica',as: 'practica'});
+      pregunta_supervisor.belongsTo(models.config_practica, {foreignKey: 'id_config_practica',as: 'config_practica'});
     }
   }
   pregunta_supervisor.init({
-    id_practica: DataTypes.INTEGER,
+    id_config_practica: DataTypes.INTEGER,
     enunciado: DataTypes.STRING,
     tipo_pregunta: DataTypes.STRING
   }, {

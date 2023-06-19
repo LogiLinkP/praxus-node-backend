@@ -9,12 +9,12 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      id_estudiante_cursa_practica: {
+      id_practica: {
         allowNull: false,
         type: Sequelize.INTEGER
         /*
         references: {
-          model: 'estudiante_cursa_practica',
+          model: 'practica',
           key: 'id'
         }
         */

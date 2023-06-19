@@ -2,14 +2,15 @@ let { Router } = require('express');
 const router = new Router();
 
 // Rutas
-router.use('/file', require('./files'));
-router.use('/estudiante', require('./estudiantes'));
+router.use('/config_informe', require('./config_informe'))
+router.use('/config_practica', require('./config_practica'))
+router.use('/documento', require('./documento'));
+router.use('/estudiante', require('./estudiante'));
+router.use('/informe', require('./informe'))
+router.use('/practica', require('./practica'));
 router.use('/similitud', require('./similitud'));
-router.use('/practica', require('./practicas'))
 router.use('/usuario', require('./usuario'))
-router.use('/estudiante_cursa_practica', require('./estudiante_cursa_practica'))
-//router.use('/informe', require('./informes'))
 //router.use('/pregunta_supervisor', require('./pregunta_supervisor'))
-//router.use('/respuesta_informe', require('./respuesta_informe'))
+//router.use('/pregunta_informe', require('./pregunta_informe'))
 
 module.exports = router;

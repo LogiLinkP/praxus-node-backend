@@ -72,4 +72,23 @@ routerUsuario.delete('/eliminar', (req:any, res:any) => {
     })
 })
 
+//[PUT]
+routerUsuario.put('/actualizar', jsonParser, async (req:any, res:any) => {
+  const usuario = await sequelize.usuario.findOne({ where: { id: req.body.id } })
+  if (usuario){
+    usuario.update(req.body)
+    .then((resultados:any) => {
+      console.log(resultados);
+      res.sendStatus(200);
+    })
+    .catch((err:any) => {
+      res.send(500)
+      console.log('Error al actualizar usuario', err);
+    })
+  } else {
+      console.log("No existe usuario con id: ", req.query.id)
+      res.sendStatus(404)
+  }
+})
+
 module.exports = routerUsuario;

@@ -2,14 +2,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('respuesta_informe', {
+    await queryInterface.createTable('informe', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      id_informe: {
+      id_config_informe: {
         allowNull: false,
         type: Sequelize.INTEGER
         /*
@@ -19,12 +19,12 @@ module.exports = {
         }
         */
       },
-      id_estudiante_cursa_practica: {
+      id_practica: {
         allowNull: false,
         type: Sequelize.INTEGER
         /*
         references: {
-          model: 'estudiante_cursa_practica',
+          model: 'practica',
           key: 'id'
         }
         */
@@ -43,6 +43,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('respuesta_informe');
+    await queryInterface.dropTable('informe');
   }
 };

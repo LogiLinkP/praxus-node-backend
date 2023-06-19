@@ -2,7 +2,6 @@
 const {
   Model
 } = require('sequelize');
-const pregunta_practica = require('./pregunta_practica');
 module.exports = (sequelize, DataTypes) => {
   class practica extends Model {
     /**
@@ -12,18 +11,26 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      practica.hasMany(models.pregunta_practica, {foreignKey: 'id_practica',as: 'pregunta_practica'});
-      practica.hasMany(models.pregunta_supervisor, {foreignKey: 'id_practica',as: 'pregunta_supervisor'});
       practica.hasMany(models.informe, {foreignKey: 'id_practica',as: 'informe'});
-      practica.hasMany(models.estudiante_cursa_practica, {foreignKey: 'id_practica',as: 'estudiante_cursa_practica'});
+      practica.belongsTo(models.config_practica, {foreignKey: 'id_config_practica', as: 'config_practica'});
+      practica.belongsTo(models.estudiante, {foreignKey: 'id_estudiante',as: 'estudiante'});
+      practica.hasMany(models.documento, {foreignKey: 'id_practica',as: 'documentos'});
     }
   }
   practica.init({
-    tipo: DataTypes.STRING,
-    modalidad: DataTypes.STRING,
-    nombre: DataTypes.STRING,
-    num_informes: DataTypes.INTEGER,
-    cantidad_horas: DataTypes.INTEGER
+    id_estudiante: DataTypes.INTEGER,
+    id_config_practica: DataTypes.INTEGER,
+    estado: DataTypes.STRING,
+    nombre_supervisor: DataTypes.STRING,
+    correo_supervisor: DataTypes.STRING,
+    nombre_empresa: DataTypes.STRING,
+    rut_empresa: DataTypes.STRING,
+    fecha_inicio: DataTypes.STRING,
+    fecha_termino: DataTypes.STRING,
+    nota_evaluacion: DataTypes.INTEGER,
+    consistencia_informe: DataTypes.FLOAT,
+    consistencia_nota: DataTypes.FLOAT,
+    key_informe_supervisor: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'practica',
