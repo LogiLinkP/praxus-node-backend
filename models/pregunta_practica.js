@@ -10,12 +10,12 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      pregunta_practica.belongsTo(models.practica, {foreignKey: 'id_practica',as: 'practica'});
+      pregunta_practica.belongsTo(models.config_practica, {foreignKey: 'id_config_practica',as: 'config_practica'});
     }
     //sirve para hacer pregunta_practica.get.practica() y obtener la practica asociada
   }
   pregunta_practica.init({
-    id_practica: DataTypes.INTEGER,
+    id_config_practica: DataTypes.INTEGER,
     enunciado: DataTypes.STRING,
     tipo_pregunta: DataTypes.STRING
   }, {

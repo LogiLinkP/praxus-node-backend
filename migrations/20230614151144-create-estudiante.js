@@ -39,7 +39,6 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.fn('NOW')
       }
-      //namtener nombre de la tabla
     });
     
   },

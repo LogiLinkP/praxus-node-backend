@@ -9,6 +9,16 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      id_config_informe: {
+        allowNull: false,
+        type: Sequelize.INTEGER
+        /*
+        references: {
+          model: 'informe',
+          key: 'id'
+        }
+        */
+      },
       id_practica: {
         allowNull: false,
         type: Sequelize.INTEGER
@@ -19,18 +29,12 @@ module.exports = {
         }
         */
       },
-      tipo_informe: {
+      key: {
         type: Sequelize.STRING
-      },
-      hora: {
-        type: Sequelize.BOOLEAN
-      },
-      fecha: {
-        type: Sequelize.BOOLEAN
       },
       createdAt: {
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
         type: Sequelize.DATE,

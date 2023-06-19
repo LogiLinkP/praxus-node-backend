@@ -2,14 +2,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('practica', {
+    await queryInterface.createTable('config_practica', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      tipo_practica: {
+      tipo: {
         type: Sequelize.STRING
       },
       modalidad: {
@@ -21,7 +21,7 @@ module.exports = {
       num_informes: {
         type: Sequelize.INTEGER
       },
-      horas: {
+      cantidad_horas: {
         type: Sequelize.INTEGER
       },
       createdAt: {
@@ -35,6 +35,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('practica');
+    await queryInterface.dropTable('config_practica');
   }
 };
