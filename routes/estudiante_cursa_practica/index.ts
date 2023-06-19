@@ -28,7 +28,7 @@ routerEstuCursaPract.get('', (req: any, res: any) => {
 
 //[GET] mostrar todos
 routerEstuCursaPract.get('/todos', (req:any, res:any) => {
-    console.log("Obteniendo todos los estudiantes")
+    console.log("Obteniendo todos los estudiante_cursa_practica")
     sequelize.estudiante_cursa_practica.findAll().then((resultados:any) => {
       res.send(resultados)
     })
@@ -40,7 +40,7 @@ routerEstuCursaPract.get('/todos', (req:any, res:any) => {
 
 //[DELETE] Eliminar
 routerEstuCursaPract.delete('/eliminar', (req:any, res:any) => {
-  console.log("Eliminando estudiante con id: ", req.query.id)
+  console.log("Eliminando estudiante_cursa_practica con id: ", req.query.id)
   sequelize.estudiante_cursa_practica.destroy({
     where: {
       id: req.query.id
@@ -88,15 +88,20 @@ routerEstuCursaPract.post('/crear', jsonParser, (req: any, res: any) => {
 
 
 //[PUT]
-routerEstuCursaPract.put('/actualizar', (req:any, res:any) => {
+routerEstuCursaPract.put('/actualizar', jsonParser, async (req:any, res:any) => {
     // buscar estudiante_cursa_practica por id
-    const estuCursaPract = sequelize.estudiante_cursa_practica.findOne({ where: { id: req.query.id } })
+    const estuCursaPract = await sequelize.estudiante_cursa_practica.findOne({ where: { id: req.body.id } })
     if (estuCursaPract){
         // actualizar estudiante_cursa_practica
-        estuCursaPract.then((estuCursaPract:any) => {
-            estuCursaPract.update(req.body)
-            res.sendStatus(200)
-        })
+      estuCursaPract.update(req.body)
+      .then((resultados:any) => {
+        console.log(resultados);
+        res.sendStatus(200);
+      })
+      .catch((err:any) => {
+        res.send(500)
+        console.log('Error al actualizar estudiante_cursa_practica', err);
+      })
     } else {
         console.log("No existe estudiante_cursa_practica con id: ", req.query.id)
         res.sendStatus(404)
