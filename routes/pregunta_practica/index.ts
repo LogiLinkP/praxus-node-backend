@@ -2,27 +2,27 @@ export { };
 
 const { Router } = require('express');
 const sequelize = require('../../db');
-const routerUsuario = new Router();
+const routerPregPractica = new Router();
 
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
-//[GET] mostrar todos los usuarios
-routerUsuario.get('/todos', (req:any, res:any) => {
-    console.log("Obteniendo todos los usuarios")
-    sequelize.usuario.findAll().then((resultados:any) => {
+//[GET] mostrar todas las preguntas de practica
+routerPregPractica.get('/todos', (req:any, res:any) => {
+    console.log("Obteniendo todas las preguntas de practica")
+    sequelize.preguntas_practicas.findAll().then((resultados:any) => {
       res.send(resultados)
     })
     .catch((err:any) => {
-      console.log('Error al mostrar usuarios', err);
-      res.send('Error al mostrar usuarios', err);
+      console.log('Error al mostrar todas las preguntas de practica', err);
+      res.send('Error al mostrar todas las preguntas de practica', err);
     })
 })
 
-//[GET] para obtener un usuario con su ID
-routerUsuario.get('', (req: any, res: any) => {
-    console.log("Obteniendo usuario de id: ", req.query.id)
-    sequelize.usuario.findOne({
+//[GET] para obtener una pregunta de practica con su ID
+routerPregPractica.get('', (req: any, res: any) => {
+    console.log("Obteniendo preguntas de practica de id: ", req.query.id)
+    sequelize.preguntas_practicas.findOne({
         where: {
             id: req.query.id
         }
@@ -31,33 +31,32 @@ routerUsuario.get('', (req: any, res: any) => {
             res.send(resultados);
         })
         .catch((err: any) => {
-            console.log('Error al obtener usuario', err);
+            console.log('Error al obtener preguntas de practica', err);
         })
 })
 
-//[POST] Crear un usuario con los datos recibidos
-routerUsuario.post('/crear', jsonParser, (req: any, res: any) => {
-    const {tipo, nombre, pass} = req.body;
-    console.log("Request de creacion de usuario recibida");
+//[POST] Crear preguntas de practica con los datos recibidos
+routerPregPractica.post('/crear', jsonParser, (req: any, res: any) => {
+    const {enunciado, tipo} = req.body;
+    console.log("Request de creacion de preguntas de practica recibida");
     // hacer post a python backend
-    sequelize.usuario.create({
-        tipo: tipo,
-        nombre_usuario: nombre,
-        password: pass
+    sequelize.preguntas_practicas.create({
+        enunciado: enunciado,
+        tipo: tipo
     })
     .then((resultados:any) => {
         console.log(resultados);
-        res.send("Usuario creado");
+        res.send("preguntas de practica creado");
     })
     .catch((err:any) => {
-        console.log('Error al crear usuario',err);
+        console.log('Error al crear preguntas de practica',err);
     })
 })
 
-//[DELETE] Eliminar usuario con su ID
-routerUsuario.delete('/eliminar', (req:any, res:any) => {
-    console.log("Eliminando usuario con id: ", req.query.id)
-    sequelize.usuario.destroy({
+//[DELETE] Eliminar preguntas de practica con su ID
+routerPregPractica.delete('/eliminar', (req:any, res:any) => {
+    console.log("Eliminando preguntas de practica con id: ", req.query.id)
+    sequelize.preguntas_practicas.destroy({
       where: {
         id: req.query.id
       }
@@ -68,8 +67,8 @@ routerUsuario.delete('/eliminar', (req:any, res:any) => {
     })
     .catch((err:any) => {
       res.send(500);
-      console.log('Error al eliminar usuario', err);
+      console.log('Error al eliminar preguntas de practica', err);
     })
 })
 
-module.exports = routerUsuario;
+module.exports = routerPregPractica;

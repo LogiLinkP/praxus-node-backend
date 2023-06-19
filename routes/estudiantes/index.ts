@@ -58,7 +58,6 @@ routerEstudiante.delete('/eliminar', (req:any, res:any) => {
 routerEstudiante.post('/crear', jsonParser, (req: any, res: any) => {
   const {id_usuario, nombre, rol, rut, correo} = req.body;
   console.log("Request de creacion de estudiante recibida");
-  // hacer post a python backend
   sequelize.estudiante.create({
       id_usuario: id_usuario,
       nombre: nombre,
