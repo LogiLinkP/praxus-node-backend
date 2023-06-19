@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     correo_supervisor: DataTypes.STRING,
     nombre_empresa: DataTypes.STRING,
     rut_empresa: DataTypes.STRING,
-    fecha_incio: DataTypes.STRING,
+    fecha_inicio: DataTypes.STRING,
     fecha_termino: DataTypes.STRING,
     nota_evaluacion: DataTypes.INTEGER,
     consistencia_informe: DataTypes.INTEGER,

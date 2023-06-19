@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      tipo_practica: {
+      tipo: {
         type: Sequelize.STRING
       },
       modalidad: {
@@ -21,7 +21,7 @@ module.exports = {
       num_informes: {
         type: Sequelize.INTEGER
       },
-      horas: {
+      cantidad_horas: {
         type: Sequelize.INTEGER
       },
       createdAt: {

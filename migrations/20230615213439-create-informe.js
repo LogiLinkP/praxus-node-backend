@@ -19,7 +19,7 @@ module.exports = {
         }
         */
       },
-      tipo_informe: {
+      tipo: {
         type: Sequelize.STRING
       },
       hora: {

@@ -22,7 +22,7 @@ module.exports = {
       tipo: {
         type: Sequelize.STRING
       },
-      key_documento: {
+      key: {
         type: Sequelize.STRING
       },
       createdAt: {

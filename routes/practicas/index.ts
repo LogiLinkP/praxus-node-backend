@@ -9,7 +9,7 @@ const jsonParser = bodyParser.json();
 
 
 //[GET] mostrar todas las practicas
-routerPracticas.get('/todas', (req:any, res:any) => {
+routerPracticas.get('/todos', (req:any, res:any) => {
   console.log("Obteniendo todos los practica")
   sequelize.practica.findAll().then((resultados:any) => {
     res.send(resultados)
@@ -62,7 +62,7 @@ routerPracticas.post('/crear', jsonParser, (req: any, res: any) => {
         nombre: nombre,
         tipo_practica: tipo_practica,
         num_informes: num_informes,
-        horas: cantidad_horas,
+        cantidad_horas: cantidad_horas,
         modalidad: modalidad
     })
     .then((resultados:any) => {

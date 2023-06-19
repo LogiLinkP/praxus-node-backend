@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   informe.init({
     id_practica: DataTypes.INTEGER,
-    tipo_informe: DataTypes.STRING,
+    tipo: DataTypes.STRING,
     hora: DataTypes.BOOLEAN,
     fecha: DataTypes.BOOLEAN
   }, {

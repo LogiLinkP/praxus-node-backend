@@ -44,7 +44,7 @@ module.exports = {
       rut_empresa: {
         type: Sequelize.STRING
       },
-      fecha_incio: {
+      fecha_inicio: {
         type: Sequelize.STRING
       },
       fecha_termino: {
