@@ -11,8 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      config_informe.belongsTo(models.config_practica, {foreignKey: 'id_config_practica',as: 'config_practica'});
-      config_informe.hasMany(models.respuesta_informe, {foreignKey: 'id_informe',as: 'informe'});
+      config_informe.belongsTo(models.config_practica, { foreignKey: 'id_config_practica', as: 'config_practica' });
+      // config_informe.hasMany(models.respuesta_informe, {foreignKey: 'id_informe',as: 'informe'});
     }
   }
   config_informe.init({

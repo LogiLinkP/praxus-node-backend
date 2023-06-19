@@ -1,10 +1,13 @@
 export { };
 
 import { sendMail } from '../../utils/email';
+import { upload } from '../../utils/uploadDocBd';
+const { sequelize, practica } = require('../../models');
 
 const { Router, json, urlencoded } = require('express');
-const jwt = require('jsonwebtoken');
+// const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const fs = require('fs');
 dotenv.config();
 
 const router = new Router() // /supervisor
@@ -30,10 +33,60 @@ router.post("/gen_token", (req: any, res: any) => {
     }
 });
 
-router.post("/respuesta", (req: any, res: any) => {
+router.post("/respuesta", async (req: any, res: any) => {
     try {
-        console.log(req.body);
+        if (typeof req.body !== "object") {
+            res.status(406).json({ message: "Se requiere un objeto" });
+            return;
+        }
+        if (!("respuestas" in req.body) || (typeof req.body.respuestas !== "object")) {
+            res.status(406).json({ message: "se requieren respuestas en un objeto en el campo 'respuestas'" });
+            return;
+        }
+        if (!("id_estudiante" in req.body) || !("id_config_practica" in req.body)) {
+            res.status(406).json({ message: "Se requiere ingresar id_estudiante e id_config_practica" });
+            return;
+        }
+        let key = `${Date.now()}-supervisor`;
+        await practica.update({
+            key_informe_supervisor: key,
+            estado: "Listeilor"
+        }, {
+            where: {
+                id_estudiante: req.body.id_estudiante,
+                id_config_practica: req.body.id_config_practica,
+            }
+        });
+        upload(`./tmp/${key}`, JSON.stringify(req.body.respuestas));
         res.status(200).json({ message: "Data recibida" });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Error interno" });
+    }
+});
+
+
+router.get("/respuesta", async (req: any, res: any) => {
+    try {
+        if (!("id_estudiante" in req.query) || !("id_config_practica" in req.query)) {
+            res.status(406).json({ message: "Se requiere ingresar id_estudiante e id_config_practica" });
+            return;
+        }
+        const _practica = await practica.findAll(
+            {
+                where: {
+                    id_estudiante: req.query.id_estudiante,
+                    id_config_practica: req.query.id_config_practica,
+                }
+            })
+        console.log(_practica)
+        // const files = fs.readdirSync("./tmp");
+        // const data = files.map((file: any) => {
+        //     let data = fs.readFileSync(`./tmp/${file}`, { encoding: "utf-8" });
+        //     return JSON.parse(data);
+        // });
+        res.status(200).json({ _practica });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Error interno" });
