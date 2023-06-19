@@ -1,5 +1,3 @@
-import { existsSync } from "fs";
-
 export { };
 
 const { Router } = require('express');
@@ -60,7 +58,7 @@ routerEstuCursaPract.delete('/eliminar', (req:any, res:any) => {
 routerEstuCursaPract.post('/crear', jsonParser, (req: any, res: any) => {
   const {id_estudiante, id_practica, estado, nombre_supervisor, correo_supervisor, 
     nombre_empresa, rut_empresa, fecha_inicio, fecha_termino, nota_evaluacion,
-    consistencia_informe, consistencia_nota, key_informe_supervisor} = req.body; //CAMBIAR ESTO
+    consistencia_informe, consistencia_nota, key_informe_supervisor} = req.body;
   console.log("Request de creacion de practica recibida");
   sequelize.estudiante_cursa_practica.create({
       id_estudiante: id_estudiante,

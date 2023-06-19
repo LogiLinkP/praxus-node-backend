@@ -54,10 +54,10 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       consistencia_informe: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       consistencia_nota: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       key_informe_supervisor: {
         type: Sequelize.STRING
