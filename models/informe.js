@@ -11,12 +11,14 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      informe.belongsTo(models.config_informe, {foreignKey: 'id_config_informe',as: 'config_informe'});
+      informe.belongsTo(models.practica, {foreignKey: 'id_practica',as: 'practica'});
     }
   }
   informe.init({
-    tipo_informe: DataTypes.STRING,
-    periodicidad: DataTypes.STRING,
-    hora: DataTypes.STRING
+    id_config_informe: DataTypes.INTEGER,
+    id_practica: DataTypes.INTEGER,
+    key: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'informe',

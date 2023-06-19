@@ -2,47 +2,47 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('estudiante', {
+    await queryInterface.createTable('informe', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      id_usuario: {
+      id_config_informe: {
         allowNull: false,
         type: Sequelize.INTEGER
         /*
         references: {
-          model: 'usuario',
+          model: 'informe',
           key: 'id'
         }
         */
       },
-      nombre: {
-        type: Sequelize.STRING
+      id_practica: {
+        allowNull: false,
+        type: Sequelize.INTEGER
+        /*
+        references: {
+          model: 'practica',
+          key: 'id'
+        }
+        */
       },
-      rol: {
-        type: Sequelize.STRING
-      },
-      rut: {
-        type: Sequelize.STRING
-      },
-      correo: {
+      key: {
         type: Sequelize.STRING
       },
       createdAt: {
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.fn('NOW')
       }
     });
-    
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('estudiante');
+    await queryInterface.dropTable('informe');
   }
 };
