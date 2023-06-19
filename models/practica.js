@@ -19,11 +19,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   practica.init({
-    tipo_practica: DataTypes.STRING,
+    tipo: DataTypes.STRING,
     modalidad: DataTypes.STRING,
     nombre: DataTypes.STRING,
     num_informes: DataTypes.INTEGER,
-    horas: DataTypes.INTEGER
+    cantidad_horas: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'practica',

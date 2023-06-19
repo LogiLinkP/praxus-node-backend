@@ -5,6 +5,8 @@ require('dotenv').config()
 const { Router } = require('express');
 var bodyParser = require('body-parser');
 
+const sequelize = require('../../db');
+
 const routerSimilitud = new Router();
 const jsonParser = bodyParser.json();
 
@@ -30,7 +32,8 @@ routerSimilitud.post('/consistencia', jsonParser, (req: any, res: any) => {
       console.error(error);
       res.status(500).send('Error occurred');
     });
-    // GUARDAR CONSISTENCIA EN LA BASE DE DATOS?
+    // guardar en la BD
+    //sequelize.consistencia
 })
 
 routerSimilitud.post('/comparacion_keywords', jsonParser, (req: any, res: any) => {
@@ -51,7 +54,7 @@ routerSimilitud.post('/comparacion_keywords', jsonParser, (req: any, res: any) =
     console.error(error);
     res.status(500).send('Error occurred');
   });
-  // GUARDAR CONSISTENCIA EN LA BASE DE DATOS?
+  // guardar en la BD
 })
 
 routerSimilitud.post('/consistencia_evaluacion_informe', jsonParser, (req: any, res: any) => {
@@ -74,7 +77,7 @@ routerSimilitud.post('/consistencia_evaluacion_informe', jsonParser, (req: any, 
     console.error(error);
     res.status(500).send('Error occurred');
   });
-  // GUARDAR CONSISTENCIA EN LA BASE DE DATOS?
+  // guardar en la BD
 })
 
 module.exports = routerSimilitud;
