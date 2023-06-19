@@ -28,8 +28,8 @@ module.exports = (sequelize, DataTypes) => {
     fecha_inicio: DataTypes.STRING,
     fecha_termino: DataTypes.STRING,
     nota_evaluacion: DataTypes.INTEGER,
-    consistencia_informe: DataTypes.INTEGER,
-    consistencia_nota: DataTypes.INTEGER,
+    consistencia_informe: DataTypes.FLOAT,
+    consistencia_nota: DataTypes.FLOAT,
     key_informe_supervisor: DataTypes.STRING
   }, {
     sequelize,
