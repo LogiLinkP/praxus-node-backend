@@ -11,7 +11,7 @@ const jsonParser = bodyParser.json();
 // Import the axios library
 const axios = require('axios');
 
-// post para recibir request de calculo de consistencia desde el front
+// [POST] Recibir request de calculo de consistencia desde el front
 routerSimilitud.post('/consistencia', jsonParser, (req: any, res: any) => {
     const {texto1, texto2, id_alumno_practica} = req.body;
     console.log("Request de calculo de consistencia recibida");
