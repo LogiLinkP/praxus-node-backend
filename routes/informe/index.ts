@@ -93,4 +93,22 @@ routerInforme.put('/actualizar', jsonParser, async (req:any, res:any) => {
     }
 })
 
+//[GET] mostrar todos los informes asociados a un id_practica
+routerInforme.get('/todos_practica', (req:any, res:any) => {
+  console.log("Obteniendo todos los informes")
+  sequelize.informe.findAll({
+      where: {
+        id_practica: req.query.id_practica
+      }
+    }
+  ).then((resultados:any) => {
+    res.send(resultados)
+  })
+  .catch((err:any) => {
+    console.log('Error al mostrar informe', err);
+    res.send('Error al mostrar informe', err)
+  })
+})
+
+
 module.exports = routerInforme;
