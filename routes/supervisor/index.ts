@@ -12,7 +12,7 @@ dotenv.config();
 
 const router = new Router() // /supervisor
 router.use(json());
-router.use(urlencoded());
+router.use(urlencoded({ extended: true }));
 
 router.post("/gen_token", (req: any, res: any) => {
     try {
