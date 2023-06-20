@@ -123,4 +123,20 @@ routerPractica.put('/actualizar', jsonParser, async (req: any, res: any) => {
   }
 })
 
+//[GET] para obtener una practica de acuerdo al id del estudiante (por ahora se asume que tiene una práctica)
+routerPractica.get('/get', (req: any, res: any) => {
+  console.log("Obteniendo practica con id de estudiante: ", req.query.id_estudiante)
+  practica.findOne({
+      where: {
+          id_estudiante: req.query.id_estudiante
+      }
+  })
+      .then((resultados: any) => {
+          res.send(resultados);
+      })
+      .catch((err: any) => {
+          console.log('Error al obtener practica', err);
+      })
+})
+
 module.exports = routerPractica;
