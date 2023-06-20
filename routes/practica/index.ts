@@ -52,6 +52,37 @@ routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
   }
 });
 
+routerPractica.put("/finalizar", async (req: any, res: any) => {
+  try {
+    let { id_estudiante, id_practica, estado } = req.body;
+    if (typeof id_estudiante === "undefined" || typeof id_practica === "undefined" || typeof estado === "undefined") {
+      res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_practica y estado" });
+      return;
+    }
+    switch (estado) {
+      case "Revisión solicitada":
+      case "Finalizada":
+      case "Observaciones":
+        break;
+      default:
+        res.status(406).json({ message: "Estado inválido" });
+        return;
+    }
+    const data = await practica.update({
+      estado
+    }, {
+      where: {
+        id_estudiante, id_config_practica: id_practica
+      }
+    });
+    console.log(data);
+    res.status(200).json({ message: "Estado actualizado" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
 //[DELETE] Eliminar
 routerPractica.delete('/eliminar', (req: any, res: any) => {
   console.log("Eliminando practica con id: ", req.query.id)
