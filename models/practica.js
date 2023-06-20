@@ -11,10 +11,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      practica.hasMany(models.informe, {foreignKey: 'id_practica',as: 'informe'});
-      practica.belongsTo(models.config_practica, {foreignKey: 'id_config_practica', as: 'config_practica'});
-      practica.belongsTo(models.estudiante, {foreignKey: 'id_estudiante',as: 'estudiante'});
-      practica.hasMany(models.documento, {foreignKey: 'id_practica',as: 'documentos'});
+      practica.hasMany(models.informe, { foreignKey: 'id_practica', as: 'informe' });
+      practica.belongsTo(models.config_practica, { foreignKey: 'id_config_practica' });
+      practica.belongsTo(models.estudiante, { foreignKey: 'id_estudiante' });
+      practica.hasMany(models.documento, { foreignKey: 'id_practica', as: 'documentos' });
     }
   }
   practica.init({
