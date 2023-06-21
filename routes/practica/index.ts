@@ -143,11 +143,11 @@ routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
     key_informe_supervisor: key_informe_supervisor
   })
     .then((resultados: any) => {
-      res.sendStatus(200)
+      res.status(200).json({mensaje:"ok"});
       console.log("practica creada");
     })
     .catch((err: any) => {
-      res.sendStatus(500)
+      res.status(500).json({mensaje:"error"});
       console.log('Error al crear practica');
     })
 })
