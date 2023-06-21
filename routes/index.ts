@@ -4,12 +4,12 @@ const router = new Router();
 
 // Rutas
 router.use('/supervisor', require('./supervisor'));
-router.use('/file', require('./files'));
-router.use('/config_informe', require('./config_informe'))
-router.use('/config_practica', require('./config_practica'))
+//router.use('/file', require('./files'));
+router.use('/config_informe', require('./config_informe'));
+router.use('/config_practica', require('./config_practica'));
 router.use('/documento', require('./documento'));
 router.use('/estudiante', require('./estudiante'));
-router.use('/informe', require('./informe'))
+router.use('/informe', require('./informe'));
 router.use('/practica', require('./practica'));
 router.use('/similitud', require('./similitud'));
 router.use('/usuario', require('./usuario'))
