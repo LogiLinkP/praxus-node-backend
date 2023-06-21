@@ -2,14 +2,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('estudiante_cursa_practica', {
+    await queryInterface.createTable('practica', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      id_practica: {
+      id_config_practica: {
         allowNull: false,
         type: Sequelize.INTEGER
         /*
@@ -44,7 +44,7 @@ module.exports = {
       rut_empresa: {
         type: Sequelize.STRING
       },
-      fecha_incio: {
+      fecha_inicio: {
         type: Sequelize.STRING
       },
       fecha_termino: {
@@ -54,14 +54,25 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       consistencia_informe: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       consistencia_nota: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       key_informe_supervisor: {
         type: Sequelize.STRING
       },
+      //nuevos
+      horas: {
+        type: Sequelize.INTEGER
+      },
+      interpretacion_informe: {
+        type: Sequelize.STRING
+      },
+      interpretacion_nota: {
+        type: Sequelize.STRING
+      },
+      //fin nuevos
       createdAt: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.fn('NOW')
@@ -73,6 +84,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('estudiante_cursa_practica');
+    await queryInterface.dropTable('practica');
   }
 };

@@ -18,12 +18,10 @@ routerEstudiante.get('', (req: any, res: any) => {
     })
         .then((resultados: any) => {
             res.send(resultados);
-        }
-        )
+        })
         .catch((err: any) => {
             console.log('Error al obtener estudiante', err);
-        }
-        )
+        })
 })
 
 //[GET] mostrar todos los estudiantes
@@ -31,40 +29,35 @@ routerEstudiante.get('/todos', (req:any, res:any) => {
     console.log("Obteniendo todos los estudiantes")
     sequelize.estudiante.findAll().then((resultados:any) => {
       res.send(resultados)
-    }
-    )
+    })
     .catch((err:any) => {
       console.log('Error al mostrar estudiantes', err);
       res.send('Error al mostrar estudiantes', err)
-    }
-    )
+    })
 })
 
 //[DELETE] Eliminar estudiante con su ID
 routerEstudiante.delete('/eliminar', (req:any, res:any) => {
-  console.log("Eliminando estudiante con id: ", req.query.id)
-  sequelize.estudiante.destroy({
-    where: {
-      id: req.query.id
-    }
-  })
-  .then((resultados:any) => {
-    console.log(resultados);
-    res.sendStatus(200);
-  }
-  )
-  .catch((err:any) => {
-    res.send(500)
-    console.log('Error al eliminar estudiante', err);
-  }
-  )
+    console.log("Eliminando estudiante con id: ", req.query.id)
+    sequelize.estudiante.destroy({
+        where: {
+          id: req.query.id
+        }
+    })
+    .then((resultados:any) => {
+        console.log(resultados);
+        res.sendStatus(200);
+    })
+    .catch((err:any) => {
+        res.send(500);
+        console.log('Error al eliminar estudiante', err);
+    })
 })
 
 //[POST] Crear un estudiante con los datos recibidos
 routerEstudiante.post('/crear', jsonParser, (req: any, res: any) => {
   const {id_usuario, nombre, rol, rut, correo} = req.body;
-  console.log("Request de creacion de practica recibida");
-  // hacer post a python backend
+  console.log("Request de creacion de estudiante recibida");
   sequelize.estudiante.create({
       id_usuario: id_usuario,
       nombre: nombre,
@@ -73,54 +66,30 @@ routerEstudiante.post('/crear', jsonParser, (req: any, res: any) => {
       correo: correo
   })
   .then((resultados:any) => {
-      console.log(resultados);
       res.send("Estudiante creado");
-  }
-  )
+  })
   .catch((err:any) => {
       console.log('Error al crear estudiante',err);
-  }
-  )
+  })
 })
 
-//agregar un estudiante -CAMBIAR A POST-
-routerEstudiante.get('/agregar', (req:any, res:any) => {
-    res.send("Agregando estudiante a la base de datos")
-    sequelize.estudiante.create({
-    //estudiante.create({
-      nombre: 'Vicente',
-      rol: '201804585-3',
-      id_usuario: 1
-    })
-    .then((resultados:any) => {
-      console.log(resultados);
-    }
-    )
-    .catch((err:any) => {
-      console.log('Error al crear estudiante',err);
-    }
-    )
-})
-
-//actualizar nombre de estudiante con id 1 ¿PUT?
-routerEstudiante.get('/actualizar1estudiante', (req:any, res:any) => {
-    res.send("Actualizando estudiante con id 1")
-    sequelize.estudiante.update({
-        nombre: 'Vicente Balbontin'
-    },
-    {
-        where: {
-            id: 1
-        }
-    })
-    .then((resultados:any) => {
+//[PUT]
+routerEstudiante.put('/actualizar', jsonParser, async (req:any, res:any) => {
+    const estudiante = await sequelize.estudiante.findOne({ where: { id: req.body.id } })
+    if (estudiante){
+      estudiante.update(req.body)
+      .then((resultados:any) => {
         console.log(resultados);
+        res.sendStatus(200);
+      })
+      .catch((err:any) => {
+        res.send(500)
+        console.log('Error al actualizar de estudiante', err);
+      })
+    } else {
+        console.log("No existe estudiante con id: ", req.query.id)
+        res.sendStatus(404)
     }
-    )
-    .catch((err:any) => {
-        console.log('Error al actualizar estudiante',err);
-    }
-    )
 })
 
 module.exports = routerEstudiante;

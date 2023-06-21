@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 let cors = require('cors')
 const sequelize = require('./db');
 app.use(cors());
@@ -9,12 +9,12 @@ app.use(cors());
 //USAR ROUTES
 app.use("/", require("./routes"));
 
-app.listen(PORT, function (err:any) {
+app.listen(PORT, function (err: any) {
   if (err) console.log(err);
   console.log("Server listening on PORT", PORT);
-  sequelize.sync({force: false}).then(() => { // sync() se conecta con las tablas existentes, sino las crea
+  sequelize.sync({ force: false }).then(() => { // sync() se conecta con las tablas existentes, sino las crea
     console.log('Database connected...');
-  }).catch((err:any) => {
+  }).catch((err: any) => {
     console.log('Error: ', err);
   })
 });

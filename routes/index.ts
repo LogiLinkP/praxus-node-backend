@@ -1,19 +1,19 @@
 let { Router } = require('express');
-const estudiantes = require('./estudiantes');
-const files = require('./files');
-const similitud = require('./similitud');
-const practicas = require('./practicas');
 
 const router = new Router();
 
-router.get('/', (req:any, res:any) => {
-    res.send("GET request Called")
-  })
-
 // Rutas
-router.use('/file', files);
-router.use('/estudiante', estudiantes);
-router.use('/similitud', similitud);
-router.use('/practica', practicas)
+router.use('/supervisor', require('./supervisor'));
+//router.use('/file', require('./files'));
+router.use('/config_informe', require('./config_informe'));
+router.use('/config_practica', require('./config_practica'));
+router.use('/documento', require('./documento'));
+router.use('/estudiante', require('./estudiante'));
+router.use('/informe', require('./informe'));
+router.use('/practica', require('./practica'));
+router.use('/similitud', require('./similitud'));
+router.use('/usuario', require('./usuario'))
+//router.use('/pregunta_supervisor', require('./pregunta_supervisor'))
+//router.use('/pregunta_informe', require('./pregunta_informe'))
 
 module.exports = router;
