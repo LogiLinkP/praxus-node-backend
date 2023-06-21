@@ -83,6 +83,26 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
   }
 });
 
+routerPractica.put("/aprobar", async (req: any, res: any) => {
+  try {
+    let { id_estudiante, id_config_practica, aprobacion } = req.body;
+    if (typeof id_estudiante === "undefined" || typeof id_config_practica === "undefined" || typeof aprobacion === "undefined") {
+      res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_config_practica y aprobacion" });
+      return;
+    }
+    const data = await practica.update({
+      estado: aprobacion == 1 ? "Aprobada" : "Reprobada"
+    }, {
+      where: {
+        id_estudiante, id_config_practica
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
 //[DELETE] Eliminar
 routerPractica.delete('/eliminar', (req: any, res: any) => {
   console.log("Eliminando practica con id: ", req.query.id)
