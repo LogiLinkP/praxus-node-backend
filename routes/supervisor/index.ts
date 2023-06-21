@@ -83,7 +83,7 @@ router.post("/respuesta", async (req: any, res: any) => {
             texto1: informes,
             texto2: respuesta_completa
         });
-
+        console.log(consistencia_informe.data);
         await practica.update({
             key_informe_supervisor: key,
             estado: "Evaluada",
