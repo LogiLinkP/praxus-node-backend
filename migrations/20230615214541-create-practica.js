@@ -62,6 +62,17 @@ module.exports = {
       key_informe_supervisor: {
         type: Sequelize.STRING
       },
+      //nuevos
+      horas: {
+        type: Sequelize.INTEGER
+      },
+      interpretacion_informe: {
+        type: Sequelize.STRING
+      },
+      interpretacion_nota: {
+        type: Sequelize.STRING
+      },
+      //fin nuevos
       createdAt: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.fn('NOW')

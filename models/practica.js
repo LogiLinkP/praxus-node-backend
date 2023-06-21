@@ -30,7 +30,11 @@ module.exports = (sequelize, DataTypes) => {
     nota_evaluacion: DataTypes.INTEGER,
     consistencia_informe: DataTypes.FLOAT,
     consistencia_nota: DataTypes.FLOAT,
-    key_informe_supervisor: DataTypes.STRING
+    key_informe_supervisor: DataTypes.STRING,
+    //nuevos
+    horas: DataTypes.INTEGER,
+    interpretacion_informe: DataTypes.STRING,
+    interpretacion_nota: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'practica',
