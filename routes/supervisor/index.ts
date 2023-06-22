@@ -16,12 +16,16 @@ router.use(urlencoded({ extended: true }));
 
 router.post("/gen_token", (req: any, res: any) => {
     try {
+        console.log("gen token");
         console.log(req.body);
         if ("correo" in req.body && "nom_sup" in req.body && "nom_estudiante" in req.body) {
             const { correo, nom_sup, nom_estudiante } = req.body;
             // const token = jwt.sign({ correo }, process.env.TOKEN_SECRET, { expiresIn: '7 days', algorithm: 'RS256' });
             // console.log(token);
-            sendMail(correo, `Revisión de práctica de ${nom_estudiante}`, "Texto de ejemplo", nom_sup);
+            //correo que se envia al supervisor
+            //console.log("enviando correo");
+            sendMail(correo, `Revisión de práctica de ${nom_estudiante}`, "Para evaluar al practicante debe acceder a " + process.env.URL_FRONTEND +"/supervisor/evaluacion", nom_sup);
+            //console.log("correo enviado correctamente");
             res.status(200).json({ message: "Correo enviado" });
         } else {
             res.status(406).json({ message: "Se requiere ingresar correo, el nombre del supervisor y nombre del estudiante" });
