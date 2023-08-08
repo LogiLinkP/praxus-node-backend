@@ -56,14 +56,14 @@ routerConfigPracticas.delete('/eliminar', (req:any, res:any) => {
 
 //[POST] Crear una config_practica con los datos recibidos
 routerConfigPracticas.post('/crear', jsonParser, (req: any, res: any) => {
-    const {nombre, tipo, num_informes, cantidad_horas, modalidad} = req.body;
+    const {nombre, modalidad, cantidad_tiempo, frecuencia_informes,informe_final} = req.body;
     console.log("Request de creacion de config_practica recibida");
     sequelize.config_practica.create({
         nombre: nombre,
-        tipo: tipo,
-        num_informes: num_informes,
-        cantidad_horas: cantidad_horas,
-        modalidad: modalidad
+        modalidad: modalidad,
+        cantidad_tiempo: cantidad_tiempo,
+        frecuencia_informes: frecuencia_informes,
+        informe_final: informe_final
     })
     .then((resultados:any) => {
         console.log(resultados);

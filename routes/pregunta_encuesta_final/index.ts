@@ -2,27 +2,27 @@ export { };
 
 const { Router } = require('express');
 const sequelize = require('../../db');
-const routerPregPractica = new Router();
+const routerPregEncuesta = new Router();
 
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
 //[GET] mostrar todas las preguntas de practica
-routerPregPractica.get('/todos', (req:any, res:any) => {
+routerPregEncuesta.get('/todos', (req:any, res:any) => {
     console.log("Obteniendo todas las preguntas de practica")
-    sequelize.preguntas_practicas.findAll().then((resultados:any) => {
+    sequelize.pregunta_encuesta_final.findAll().then((resultados:any) => {
       res.send(resultados)
     })
     .catch((err:any) => {
-      console.log('Error al mostrar todas las preguntas de practica', err);
-      res.send('Error al mostrar todas las preguntas de practica', err);
+      console.log('Error al mostrar todas las preguntas de encuesta final', err);
+      res.send('Error al mostrar todas las preguntas de encuesta final', err);
     })
 })
 
 //[GET] para obtener una pregunta de practica con su ID
-routerPregPractica.get('', (req: any, res: any) => {
+routerPregEncuesta.get('', (req: any, res: any) => {
     console.log("Obteniendo preguntas de practica de id: ", req.query.id)
-    sequelize.preguntas_practicas.findOne({
+    sequelize.pregunta_encuesta_final.findOne({
         where: {
             id: req.query.id
         }
@@ -36,13 +36,13 @@ routerPregPractica.get('', (req: any, res: any) => {
 })
 
 //[POST] Crear preguntas de practica con los datos recibidos
-routerPregPractica.post('/crear', jsonParser, (req: any, res: any) => {
-    const {enunciado, tipo} = req.body;
+routerPregEncuesta.post('/crear', jsonParser, (req: any, res: any) => {
+    const {enunciado, tipo_respuesta} = req.body;
     console.log("Request de creacion de preguntas de practica recibida");
     // hacer post a python backend
-    sequelize.preguntas_practicas.create({
+    sequelize.pregunta_encuesta_final.create({
         enunciado: enunciado,
-        tipo: tipo
+        tipo_respuesta: tipo_respuesta
     })
     .then((resultados:any) => {
         console.log(resultados);
@@ -54,9 +54,9 @@ routerPregPractica.post('/crear', jsonParser, (req: any, res: any) => {
 })
 
 //[DELETE] Eliminar preguntas de practica con su ID
-routerPregPractica.delete('/eliminar', (req:any, res:any) => {
+routerPregEncuesta.delete('/eliminar', (req:any, res:any) => {
     console.log("Eliminando preguntas de practica con id: ", req.query.id)
-    sequelize.preguntas_practicas.destroy({
+    sequelize.pregunta_encuesta_final.destroy({
       where: {
         id: req.query.id
       }
@@ -71,4 +71,4 @@ routerPregPractica.delete('/eliminar', (req:any, res:any) => {
     })
 })
 
-module.exports = routerPregPractica;
+module.exports = routerPregEncuesta;
