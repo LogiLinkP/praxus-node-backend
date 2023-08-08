@@ -23,7 +23,11 @@ module.exports = (sequelize, DataTypes) => {
     fecha_termino: DataTypes.DATE,
     nota_eval: DataTypes.FLOAT,
     consistencia_informe: DataTypes.FLOAT,
-    consistencia_nota: DataTypes.FLOAT
+    consistencia_nota: DataTypes.FLOAT,
+    resumen: DataTypes.STRING,
+    indice_repeticion: DataTypes.FLOAT,
+    key_repeticiones: DataTypes.STRING,
+    key_fragmentos: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'practica',

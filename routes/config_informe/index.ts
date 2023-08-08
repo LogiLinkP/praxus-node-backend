@@ -56,13 +56,11 @@ routerConfigInforme.delete('/eliminar', (req:any, res:any) => {
 
 //[POST] Crear uno
 routerConfigInforme.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_config_practica, tipo, hora, fecha} = req.body;
+  const {id_config_practica, tipo_informe} = req.body;
   console.log("Request de config_informe");
   sequelize.config_informe.create({
     id_config_practica: id_config_practica,
-    tipo: tipo,
-    hora: hora,
-    fecha: fecha
+    tipo_informe: tipo_informe,
   })
   .then((resultados:any) => {
       console.log(resultados);

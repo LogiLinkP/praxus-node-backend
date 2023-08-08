@@ -56,14 +56,13 @@ routerEstudiante.delete('/eliminar', (req:any, res:any) => {
 
 //[POST] Crear un estudiante con los datos recibidos
 routerEstudiante.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_usuario, nombre, rol, rut, correo} = req.body;
+  const {id_usuario, nombre_id_org, id_org, rut} = req.body;
   console.log("Request de creacion de estudiante recibida");
   sequelize.estudiante.create({
       id_usuario: id_usuario,
-      nombre: nombre,
-      rol: rol,
-      rut: rut,
-      correo: correo
+      nombre_id_org: nombre_id_org,
+      id_org : id_org,
+      rut: rut
   })
   .then((resultados:any) => {
       res.send("Estudiante creado");

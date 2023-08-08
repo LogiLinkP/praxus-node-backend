@@ -39,6 +39,18 @@ module.exports = {
       consistencia_nota: {
         type: Sequelize.FLOAT
       },
+      resumen: {
+        type: Sequelize.STRING
+      },
+      indice_repeticion: {
+        type: Sequelize.FLOAT
+      },
+      key_repeticiones: {
+        type: Sequelize.STRING
+      },
+      key_fragmentos: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
