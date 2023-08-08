@@ -29,7 +29,6 @@ sequelize.config_practica = require('../models/config_practica')(sequelize, Data
 sequelize.informe = require('../models/informe')(sequelize, DataTypes);
 sequelize.usuario = require('../models/usuario')(sequelize, DataTypes);
 sequelize.pregunta_supervisor = require('../models/pregunta_supervisor')(sequelize, DataTypes);
-sequelize.pregunta_practica = require('../models/pregunta_practica')(sequelize, DataTypes);
 sequelize.documento = require('../models/documento')(sequelize, DataTypes);
 
 
