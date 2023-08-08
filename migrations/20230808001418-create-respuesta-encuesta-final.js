@@ -2,33 +2,30 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('usuario', {
+    await queryInterface.createTable('respuesta_encuesta_final', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      tipo: {
-        type: Sequelize.STRING
+      id_pregunta_encuesta_final: {
+        type: Sequelize.INTEGER
       },
-      nombre: {
-        type: Sequelize.STRING
-      },
-      password: {
+      respuesta: {
         type: Sequelize.STRING
       },
       createdAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        type: Sequelize.DATE
       },
       updatedAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        type: Sequelize.DATE
       }
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('usuario');
+    await queryInterface.dropTable('respuesta_encuesta_final');
   }
 };

@@ -11,30 +11,19 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      practica.hasMany(models.informe, { foreignKey: 'id_practica', as: 'informe' });
-      practica.belongsTo(models.config_practica, { foreignKey: 'id_config_practica' });
-      practica.belongsTo(models.estudiante, { foreignKey: 'id_estudiante' });
-      practica.hasMany(models.documento, { foreignKey: 'id_practica', as: 'documentos' });
     }
   }
   practica.init({
     id_estudiante: DataTypes.INTEGER,
     id_config_practica: DataTypes.INTEGER,
+    id_supervisor: DataTypes.INTEGER,
+    id_empresa: DataTypes.INTEGER,
     estado: DataTypes.STRING,
-    nombre_supervisor: DataTypes.STRING,
-    correo_supervisor: DataTypes.STRING,
-    nombre_empresa: DataTypes.STRING,
-    rut_empresa: DataTypes.STRING,
-    fecha_inicio: DataTypes.STRING,
-    fecha_termino: DataTypes.STRING,
-    nota_evaluacion: DataTypes.INTEGER,
+    fecha_inicio: DataTypes.DATE,
+    fecha_termino: DataTypes.DATE,
+    nota_eval: DataTypes.FLOAT,
     consistencia_informe: DataTypes.FLOAT,
-    consistencia_nota: DataTypes.FLOAT,
-    key_informe_supervisor: DataTypes.STRING,
-    //nuevos
-    horas: DataTypes.INTEGER,
-    interpretacion_informe: DataTypes.STRING,
-    interpretacion_nota: DataTypes.STRING
+    consistencia_nota: DataTypes.FLOAT
   }, {
     sequelize,
     modelName: 'practica',

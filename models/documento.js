@@ -11,12 +11,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      documento.belongsTo(models.practica, {foreignKey: 'id_practica',as: 'practica'});
     }
   }
   documento.init({
     id_practica: DataTypes.INTEGER,
-    tipo: DataTypes.STRING,
+    id_solicitud_documento: DataTypes.INTEGER,
     key: DataTypes.STRING
   }, {
     sequelize,

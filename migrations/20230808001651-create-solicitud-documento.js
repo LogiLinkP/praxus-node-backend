@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('config_informe', {
+    await queryInterface.createTable('solicitud_documento', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -10,35 +10,28 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       id_config_practica: {
-        allowNull: false,
         type: Sequelize.INTEGER
-        /*
-        references: {
-          model: 'practica',
-          key: 'id'
-        }
-        */
       },
-      tipo: {
+      tipo_archivo: {
         type: Sequelize.STRING
       },
-      hora: {
-        type: Sequelize.BOOLEAN
+      nombre_solicitud: {
+        type: Sequelize.STRING
       },
-      fecha: {
-        type: Sequelize.BOOLEAN
+      descripcion: {
+        type: Sequelize.STRING
       },
       createdAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        type: Sequelize.DATE
       },
       updatedAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        type: Sequelize.DATE
       }
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('config_informe');
+    await queryInterface.dropTable('solicitud_documento');
   }
 };

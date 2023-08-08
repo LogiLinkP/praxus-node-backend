@@ -2,39 +2,36 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('config_practica', {
+    await queryInterface.createTable('respuesta_supervisor', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      tipo: {
-        type: Sequelize.STRING
-      },
-      modalidad: {
-        type: Sequelize.STRING
-      },
-      nombre: {
-        type: Sequelize.STRING
-      },
-      num_informes: {
+      id_pregunta_supervisor: {
         type: Sequelize.INTEGER
       },
-      cantidad_horas: {
+      id_supervisor: {
         type: Sequelize.INTEGER
+      },
+      id_practica: {
+        type: Sequelize.INTEGER
+      },
+      respuesta: {
+        type: Sequelize.STRING
       },
       createdAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        type: Sequelize.DATE
       },
       updatedAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        type: Sequelize.DATE
       }
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('config_practica');
+    await queryInterface.dropTable('respuesta_supervisor');
   }
 };

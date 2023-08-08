@@ -2,40 +2,33 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('pregunta_supervisor', {
+    await queryInterface.createTable('pregunta_informe', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      id_config_practica: {
-        allowNull: false,
+      id_config_informe: {
         type: Sequelize.INTEGER
-        /*
-        references: {
-          model: 'config_practica',
-          key: 'id'
-        }
-        */
       },
       enunciado: {
         type: Sequelize.STRING
       },
-      tipo_pregunta: {
+      tipo_respuesta: {
         type: Sequelize.STRING
       },
       createdAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        type: Sequelize.DATE
       },
       updatedAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        type: Sequelize.DATE
       }
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('pregunta_supervisor');
+    await queryInterface.dropTable('pregunta_informe');
   }
 };

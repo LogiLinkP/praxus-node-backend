@@ -10,28 +10,21 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       id_practica: {
-        allowNull: false,
         type: Sequelize.INTEGER
-        /*
-        references: {
-          model: 'practica',
-          key: 'id'
-        }
-        */
       },
-      tipo: {
-        type: Sequelize.STRING
+      id_solicitud_documento: {
+        type: Sequelize.INTEGER
       },
       key: {
         type: Sequelize.STRING
       },
       createdAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        type: Sequelize.DATE
       },
       updatedAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        allowNull: false,
+        type: Sequelize.DATE
       }
     });
   },
