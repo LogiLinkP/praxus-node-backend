@@ -21,7 +21,7 @@ routerPractica.get('', async (req: any, res: any) => {
       where: {
         id: req.query.id
       },
-      include: [estudiante, config_practica]
+      include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, config_practica, empresa, supervisor]
     });
     res.status(200).json(data);
   } catch (error) {
