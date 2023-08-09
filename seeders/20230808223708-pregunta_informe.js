@@ -6,12 +6,12 @@ module.exports = {
     await queryInterface.bulkInsert('pregunta_informe', [
       {
         id_config_informe: 1,
-        enunciado: '¿Qué tal estuvo el avance de la práctica?',
+        enunciado: '¿Resume el trabajo en tu práctica?',
         tipo_respuesta: 'abierta'
       },
       {
         id_config_informe: 2,
-        enunciado: '¿Resume el trabajo en tu práctica?',
+        enunciado: '¿Qué tal estuvo el avance de la práctica?',
         tipo_respuesta: 'abierta'
       }
     ], {});

@@ -9,7 +9,7 @@ module.exports = {
         tipo_informe: 'informe final',
       },
       {
-        id_config_practica: 1,
+        id_config_practica: 2,
         tipo_informe: 'informe avance'
       }
     ], {});

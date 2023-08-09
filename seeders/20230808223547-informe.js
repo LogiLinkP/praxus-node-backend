@@ -12,7 +12,7 @@ module.exports = {
       },
       {
         id_practica: 2,
-        id_config_informe: 1,
+        id_config_informe: 2,
         horas_trabajadas: 0,
         key : 'aca esta el informe'
       }

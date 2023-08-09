@@ -11,14 +11,6 @@ module.exports = {
       {
         id_pregunta_encuesta_final: 2,
         respuesta: 'me sirvieron harto'
-      },
-      {
-        id_pregunta_encuesta_final: 3,
-        respuesta: '3'
-      },
-      {
-        id_pregunta_encuesta_final: 4,
-        respuesta: 'no me sirvieron para nada'
       }
     ], {});
   },

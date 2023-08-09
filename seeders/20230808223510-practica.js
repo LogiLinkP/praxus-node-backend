@@ -10,14 +10,6 @@ module.exports = {
         id_config_practica: 1,
         id_supervisor: 1,
         id_empresa: 1,
-        estado: 'En curso',
-        fecha_inicio: '2023-07-11 23:59:59'
-      },
-      {
-        id_estudiante: 2,
-        id_config_practica: 2,
-        id_supervisor: 2,
-        id_empresa: 2,
         estado: 'Aprobada',
         fecha_inicio: '2023-06-11 23:59:59',
         fecha_termino: '2023-07-11 23:59:59',
@@ -29,7 +21,16 @@ module.exports = {
         key_repeticiones: 'aca estan los textos que se repiten',
         key_fragmentos: 'estos son los fragmentos que mas influyen en la consistencia'
 
+      },
+      {
+        id_estudiante: 2,
+        id_config_practica: 2,
+        id_supervisor: 2,
+        id_empresa: 2,
+        estado: 'En curso',
+        fecha_inicio: '2023-07-11 23:59:59'
       }
+      
     ], {});
 
   },
