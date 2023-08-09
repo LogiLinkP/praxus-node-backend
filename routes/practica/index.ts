@@ -1,6 +1,6 @@
 export { };
 
-const { practica, estudiante, config_practica } = require('../../models');
+const { practica, estudiante, config_practica, usuario, empresa, supervisor } = require('../../models');
 const { Router, json, urlencoded } = require('express');
 const routerPractica = new Router(); // /practica
 routerPractica.use(json());
@@ -20,7 +20,8 @@ routerPractica.get('', async (req: any, res: any) => {
     const data = await practica.findOne({
       where: {
         id: req.query.id
-      }
+      },
+      include: [estudiante, config_practica]
     });
     res.status(200).json(data);
   } catch (error) {
@@ -43,7 +44,7 @@ routerPractica.get('/todos', async (req: any, res: any) => {
 routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
   try {
     const data = await practica.findAll({
-      include: [estudiante, config_practica]
+      include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, config_practica]
     });
     res.status(200).json(data);
   } catch (error) {
@@ -181,7 +182,8 @@ routerPractica.get('/get', (req: any, res: any) => {
   practica.findOne({
     where: {
       id_estudiante: req.query.id_estudiante
-    }
+    },
+    include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, config_practica, empresa, supervisor]
   })
     .then((resultados: any) => {
       res.send(resultados);

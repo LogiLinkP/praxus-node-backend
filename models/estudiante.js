@@ -11,9 +11,13 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      //this has many practica
       this.hasMany(models.practica, {
         foreignKey: 'id'
+      });
+
+      this.belongsTo(models.usuario, {
+        foreignKey: 'id_usuario',
+        as: 'usuario' // This alias can be used when querying
       });
     }
   }
