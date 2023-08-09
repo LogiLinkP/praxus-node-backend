@@ -11,6 +11,34 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+
+      this.belongsTo(models.estudiante, {
+        foreignKey: 'id_estudiante'
+      });
+      // this belongs to supervisor, config_practica, empresa
+      this.belongsTo(models.supervisor, {
+        foreignKey: 'id_supervisor'
+      });
+      this.belongsTo(models.config_practica, {
+        foreignKey: 'id_config_practica'
+      });
+      this.belongsTo(models.empresa, {
+        foreignKey: 'id_empresa'
+      });
+
+      // this has many respuesta_supervisor, documento, documento_extra, informe
+      this.hasMany(models.respuesta_supervisor, {
+        foreignKey: 'id'
+      });
+      this.hasMany(models.documento, {
+        foreignKey: 'id'
+      });
+      this.hasMany(models.documento_extra, {
+        foreignKey: 'id'
+      });
+      this.hasMany(models.informe, {
+        foreignKey: 'id'
+      });
     }
   }
   practica.init({
@@ -31,7 +59,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'practica',
-    tableName: 'practica'
+    tableName: 'practica',
+    timestamps: false
   });
   return practica;
 };

@@ -125,7 +125,7 @@ routerPractica.delete('/eliminar', (req: any, res: any) => {
 routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
   const { id_estudiante, id_config_practica, id_supervisor, id_empresa, estado,
     fecha_inicio, fecha_termino, nota_evaluacion,
-    consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos} = req.body;
+    consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos } = req.body;
   console.log("Request de creacion de practica recibida");
   practica.create({
     id_estudiante: id_estudiante,
@@ -144,11 +144,11 @@ routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
     key_fragmentos: key_fragmentos
   })
     .then((resultados: any) => {
-      res.status(200).json({mensaje:"ok"});
+      res.status(200).json({ mensaje: "ok" });
       console.log("practica creada");
     })
     .catch((err: any) => {
-      res.status(500).json({mensaje:"error"});
+      res.status(500).json({ mensaje: "error" });
       console.log('Error al crear practica');
     })
 })
@@ -179,16 +179,16 @@ routerPractica.put('/actualizar', jsonParser, async (req: any, res: any) => {
 routerPractica.get('/get', (req: any, res: any) => {
   console.log("Obteniendo practica con id de estudiante: ", req.query.id_estudiante)
   practica.findOne({
-      where: {
-          id_estudiante: req.query.id_estudiante
-      }
+    where: {
+      id_estudiante: req.query.id_estudiante
+    }
   })
-      .then((resultados: any) => {
-          res.send(resultados);
-      })
-      .catch((err: any) => {
-          console.log('Error al obtener practica', err);
-      })
+    .then((resultados: any) => {
+      res.send(resultados);
+    })
+    .catch((err: any) => {
+      console.log('Error al obtener practica', err);
+    })
 })
 
 module.exports = routerPractica;

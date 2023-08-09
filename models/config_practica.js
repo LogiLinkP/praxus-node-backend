@@ -11,6 +11,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      // this has many practica
+      this.hasMany(models.practica, {
+        foreignKey: 'id'
+      });
     }
   }
   config_practica.init({
@@ -22,7 +26,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'config_practica',
-    tableName: 'config_practica'
+    tableName: 'config_practica',
+    timestamps: false
   });
   return config_practica;
 };
