@@ -19,7 +19,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'respuesta_encuesta_final',
-    tableName: 'respuesta_encuesta_final'
+    tableName: 'respuesta_encuesta_final',
+    timestamps: false
   });
   return respuesta_encuesta_final;
 };

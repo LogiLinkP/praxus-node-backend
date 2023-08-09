@@ -22,7 +22,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'config_practica',
-    tableName: 'config_practica'
+    tableName: 'config_practica',
+    timestamps: false
   });
   return config_practica;
 };

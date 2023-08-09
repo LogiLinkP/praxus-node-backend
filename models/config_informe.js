@@ -19,7 +19,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'config_informe',
-    tableName: 'config_informe'
+    tableName: 'config_informe',
+    timestamps: false
   });
   return config_informe;
 };
