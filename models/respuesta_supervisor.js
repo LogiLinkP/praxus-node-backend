@@ -21,7 +21,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'respuesta_supervisor',
-    tableName: 'respuesta_supervisor'
+    tableName: 'respuesta_supervisor',
+    timestamps: false
   });
   return respuesta_supervisor;
 };

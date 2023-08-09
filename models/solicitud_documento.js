@@ -21,7 +21,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'solicitud_documento',
-    tableName: 'solicitud_documento'
+    tableName: 'solicitud_documento',
+    timestamps: false
   });
   return solicitud_documento;
 };
