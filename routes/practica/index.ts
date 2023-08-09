@@ -97,7 +97,10 @@ routerPractica.put("/aprobar", async (req: any, res: any) => {
       where: {
         id_estudiante, id_config_practica
       }
-    });
+    }).then((resultados: any) => {
+      console.log(resultados);
+      res.status(200).json({ message: "Estado actualizado" });
+    })
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error interno" });
