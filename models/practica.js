@@ -28,16 +28,16 @@ module.exports = (sequelize, DataTypes) => {
 
       // this has many respuesta_supervisor, documento, documento_extra, informe
       this.hasMany(models.respuesta_supervisor, {
-        foreignKey: 'id'
+        foreignKey: 'id_practica'
       });
       this.hasMany(models.documento, {
-        foreignKey: 'id'
+        foreignKey: 'id_practica'
       });
       this.hasMany(models.documento_extra, {
-        foreignKey: 'id'
+        foreignKey: 'id_practica'
       });
       this.hasMany(models.informe, {
-        foreignKey: 'id'
+        foreignKey: 'id_practica'
       });
     }
   }

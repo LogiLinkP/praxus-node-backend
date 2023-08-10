@@ -1,6 +1,7 @@
 export { };
 
-const { practica, estudiante, config_practica, usuario, empresa, supervisor } = require('../../models');
+const { practica, estudiante, config_practica, usuario, empresa, supervisor, informe, documento, solicitud_documento,
+        documento_extra, respuesta_supervisor, pregunta_supervisor } = require('../../models');
 const { Router, json, urlencoded } = require('express');
 const routerPractica = new Router(); // /practica
 routerPractica.use(json());
@@ -10,7 +11,7 @@ var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
 
-//[GET] para obtener uno
+//[GET] para obtener una practica CON TODAS LAS TABLAS ASOCIADAS
 routerPractica.get('', async (req: any, res: any) => {
   try {
     if (!("id" in req.query)) {
@@ -21,7 +22,8 @@ routerPractica.get('', async (req: any, res: any) => {
       where: {
         id: req.query.id
       },
-      include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, config_practica, empresa, supervisor]
+      include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, config_practica, empresa, supervisor, informe, 
+                {model: documento, include: [solicitud_documento]}, documento_extra, {model:respuesta_supervisor, include: [pregunta_supervisor]}]
     });
     res.status(200).json(data);
   } catch (error) {
