@@ -48,7 +48,8 @@ routerDocumento.get('/get', (req: any, res: any) => {
     documento.findAll({
       where: {
         id_practica: req.query.id_practica
-      }
+      },
+      include: [solicitud_documento]
     })
       .then((resultados: any) => {
         res.send(resultados);
