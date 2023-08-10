@@ -118,22 +118,24 @@ routerDocumento.post('/upload', upload.single("file"), async (req: any, res: any
 });
 
 //[PUT]
-routerDocumento.put('/actualizar', jsonParser, async (req:any, res:any) => {
-    const documento = await sequelize.documento.findOne({ where: { id: req.body.id } })
-    if (documento){
-      documento.update(req.body)
-      .then((resultados:any) => {
+routerDocumento.put('/actualizar', jsonParser, async (req: any, res: any) => {
+  // buscar practica por id
+  const Documento = await documento.findOne({ where: { id: req.body.id } })
+  if (Documento) {
+    // actualizar practica
+    Documento.update(req.body)
+      .then((resultados: any) => {
         console.log(resultados);
         res.sendStatus(200);
       })
-      .catch((err:any) => {
+      .catch((err: any) => {
         res.send(500)
         console.log('Error al actualizar documento', err);
       })
-    } else {
-        console.log("No existe documento con id: ", req.query.id)
-        res.sendStatus(404)
-    }
+  } else {
+    console.log("No existe documento con id: ", req.query.id)
+    res.sendStatus(404)
+  }
 })
 
 module.exports = routerDocumento;
