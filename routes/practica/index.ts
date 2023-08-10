@@ -1,7 +1,7 @@
 export { };
 
 const { practica, estudiante, config_practica, usuario, empresa, supervisor, informe, documento, solicitud_documento,
-        documento_extra, respuesta_supervisor, pregunta_supervisor } = require('../../models');
+        documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe } = require('../../models');
 const { Router, json, urlencoded } = require('express');
 const routerPractica = new Router(); // /practica
 routerPractica.use(json());
@@ -22,7 +22,7 @@ routerPractica.get('', async (req: any, res: any) => {
       where: {
         id: req.query.id
       },
-      include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, config_practica, empresa, supervisor, informe, 
+      include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, config_practica, empresa, supervisor, {model: informe, include: [config_informe]}, 
                 {model: documento, include: [solicitud_documento]}, documento_extra, {model:respuesta_supervisor, include: [pregunta_supervisor]}]
     });
     res.status(200).json(data);
