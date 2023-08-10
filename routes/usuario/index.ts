@@ -2,10 +2,10 @@ export { };
 
 const { Router } = require('express');
 const sequelize = require('../../db');
+const { usuario, supervisor, estudiante } = require('../../models');
 const routerUsuario = new Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const validator = require('validate.js');
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
@@ -106,7 +106,7 @@ routerUsuario.post('/login',jsonParser, async (req:any, res:any) => {
     
     }
 
-    sequelize.usuario.findOne({where: {correo: email}}).then((resultados:any)=>{
+    usuario.findOne({where: {correo: email}}).then((resultados:any)=>{
       if(resultados.length===0){
         return res.status(400).send({message: 'Error en usuario y contraseña'});
       }
@@ -127,16 +127,15 @@ routerUsuario.post('/login',jsonParser, async (req:any, res:any) => {
 
 })
 
-routerUsuario('/register',jsonParser, async (req:any, res:any) =>{
-  let {email,password,cnfPwd,nombre,es_encargado,es_supervisor,es_estudiante,es_admin} = req.body;
-  const usuarioSend = {email,password,nombre};
+routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
+  let {email,password,cnfPwd,nombre,es_encargado,es_supervisor,es_estudiante,es_admin,extras} = req.body;
+  const usuarioSend = {email,password,nombre,es_encargado,es_supervisor,es_estudiante,es_admin};
   let pwdHashed = '';
-
   if(!nombre){
     return res.status(400).send({message: 'Usuario vacio'});
   }
   
-  if(!email||!validator.validate(email)){
+  if(!email){
     return res.status(400).send({message: 'Email incorrecto'});
   }
 
@@ -148,36 +147,72 @@ routerUsuario('/register',jsonParser, async (req:any, res:any) =>{
     return res.status(400).send({message: 'Contraseñas no coinciden'});
   }
 
-  sequelize.usuario.findOne({where:{correo: email}}).then((resultados:any)=>{
+  usuario.findOne({where:{correo: email}}).then((resultados:any)=>{
     if(resultados.length!=0){
       return res.status(400).send({message: 'Email ya ocupado'});
-    }
-    bcrypt.hash(password,8).then((hash:any)=>{
-      usuarioSend.password = hash;
-      pwdHashed = hash;
-    }).then(()=>{
-      sequelize.usuario.create({
-        correo: email,
-        password: pwdHashed,
-        nombre: nombre,
-        es_encargado: es_encargado,
-        es_supervisor: es_supervisor,
-        es_estudiante: es_estudiante,
-        es_admin: es_admin
+    }else{
+      bcrypt.hash(password,8).then((hash:any)=>{
+        usuarioSend.password = hash;
+        pwdHashed = hash;
       }).then(()=>{
-        sequelize.usuario.findOne({where:{correo: email}}).then(()=>{
-          return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+        usuario.create({
+          correo: email,
+          password: pwdHashed,
+          nombre: nombre,
+          es_encargado: es_encargado,
+          es_supervisor: es_supervisor,
+          es_estudiante: es_estudiante,
+          es_admin: es_admin
+        }).then(()=>{
+          usuario.findOne({where:{correo: email}}).then(()=>{
+            if(es_encargado){
+              return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+            }
+            if(es_supervisor){
+              supervisor.create({
+                nombre: nombre,
+                correo: email,
+                carnet_rostro: null,
+                es_correo_institucional: null
+              }).then(()=>{
+                return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+              }).catch((err:any)=>{
+                if(err){
+                  return res.status(400).send({message: err});
+                }
+              })
+            }
+            if(es_estudiante){
+              estudiante.create({
+                nombre_id_org: null,
+                id_org: null,
+                rut: null
+              }).then(()=>{
+                return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+              }).catch((err:any)=>{
+                if(err){
+                  return res.status(400).send({message: err});
+                }
+              })
+            } 
+            if(es_admin){
+              return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+            }
+            else{
+              return res.status(400).send({message: 'Usuario no identificado'});
+            }
+          }).catch((err:any)=>{
+            if(err){
+              return res.status(400).send({message: err});
+            }
+          })
         }).catch((err:any)=>{
           if(err){
             return res.status(400).send({message: err});
           }
         })
-      }).catch((err:any)=>{
-        if(err){
-          return res.status(400).send({message: err});
-        }
       })
-    })
+    }
   }).catch((err:any)=>{
     if(err){
       return res.status(400).send({message: err});
@@ -185,7 +220,7 @@ routerUsuario('/register',jsonParser, async (req:any, res:any) =>{
   })
 })
 
-routerUsuario('/logout',jsonParser,(req:any,res:any)=>{
+routerUsuario.post('/logout',jsonParser,(req:any,res:any)=>{
   res.clearCookie("jwt");
   res.redirect("/");
 })
