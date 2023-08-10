@@ -185,4 +185,9 @@ routerUsuario('/register',jsonParser, async (req:any, res:any) =>{
   })
 })
 
+routerUsuario('/logout',jsonParser,(req:any,res:any)=>{
+  res.clearCookie("jwt");
+  res.redirect("/");
+})
+
 module.exports = routerUsuario;
