@@ -146,7 +146,7 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
   if(!cnfPwd||password!=cnfPwd){
     return res.status(400).send({message: 'Contraseñas no coinciden'});
   }
-
+  console.log(email);
   usuario.findOne({where:{correo: email}}).then((resultados:any)=>{
     if(resultados.length!=0){
       return res.status(400).send({message: 'Email ya ocupado'});
@@ -178,7 +178,7 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
                 return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
               }).catch((err:any)=>{
                 if(err){
-                  return res.status(400).send({message: err});
+                  return res.status(400).send({message: 'Error al crear super'});
                 }
               })
             }
@@ -191,7 +191,7 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
                 return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
               }).catch((err:any)=>{
                 if(err){
-                  return res.status(400).send({message: err});
+                  return res.status(400).send({message: 'Error al crear est'});
                 }
               })
             } 
@@ -203,19 +203,19 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
             }
           }).catch((err:any)=>{
             if(err){
-              return res.status(400).send({message: err});
+              return res.status(400).send({message: 'Error al encontrar email1'});
             }
           })
         }).catch((err:any)=>{
           if(err){
-            return res.status(400).send({message: err});
+            return res.status(400).send({message: 'Error al crear usuario'});
           }
         })
       })
     }
   }).catch((err:any)=>{
     if(err){
-      return res.status(400).send({message: err});
+      return res.status(400).send({message: 'Error al encontrar email2'});
     }
   })
 })
