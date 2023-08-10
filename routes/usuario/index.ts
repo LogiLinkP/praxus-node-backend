@@ -3,7 +3,9 @@ export { };
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerUsuario = new Router();
-
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const validator = require('validate.js');
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
@@ -94,6 +96,93 @@ routerUsuario.put('/actualizar', jsonParser, async (req:any, res:any) => {
       console.log("No existe usuario con id: ", req.query.id)
       res.sendStatus(404)
   }
+})
+
+routerUsuario.post('/login',jsonParser, async (req:any, res:any) => {
+  const {email,password}=req.body
+    
+    if(req.body.email.trim()===''||req.body.password.trim()===''){
+        return res.status(400).send({msg:"email or password must not be empty"})
+    
+    }
+
+    sequelize.usuario.findOne({where: {correo: email}}).then((resultados:any)=>{
+      if(resultados.length===0){
+        return res.status(400).send({message: 'Error en usuario y contraseña'});
+      }
+      bcrypt.compare(password,resultados[0].password).then((checkout:any)=>{
+        if(checkout===false){
+          return res.status(400).send({message: 'Error en usuario y contraseña'});
+        }
+        const token = jwt.sign({id:resultados[0].id.toString()},process.env.SECRET_KEY,{expiresIn:'1h'})
+        return res.status(200).send({message: 'Incio de sesion correcto', userdata: resultados[0],token});
+      })
+    }).catch((err:any)=>{
+      if(err){
+        return res.status(400).send({
+            msg:err
+        })
+      }
+    })
+
+})
+
+routerUsuario('/register',jsonParser, async (req:any, res:any) =>{
+  let {email,password,cnfPwd,nombre,es_encargado,es_supervisor,es_estudiante,es_admin} = req.body;
+  const usuarioSend = {email,password,nombre};
+  let pwdHashed = '';
+
+  if(!nombre){
+    return res.status(400).send({message: 'Usuario vacio'});
+  }
+  
+  if(!email||!validator.validate(email)){
+    return res.status(400).send({message: 'Email incorrecto'});
+  }
+
+  if(!password||password.length < 6){
+    return res.status(400).send({message: 'Contraseña pequeña'});
+  }
+
+  if(!cnfPwd||password!=cnfPwd){
+    return res.status(400).send({message: 'Contraseñas no coinciden'});
+  }
+
+  sequelize.usuario.findOne({where:{correo: email}}).then((resultados:any)=>{
+    if(resultados.length!=0){
+      return res.status(400).send({message: 'Email ya ocupado'});
+    }
+    bcrypt.hash(password,8).then((hash:any)=>{
+      usuarioSend.password = hash;
+      pwdHashed = hash;
+    }).then(()=>{
+      sequelize.usuario.create({
+        correo: email,
+        password: pwdHashed,
+        nombre: nombre,
+        es_encargado: es_encargado,
+        es_supervisor: es_supervisor,
+        es_estudiante: es_estudiante,
+        es_admin: es_admin
+      }).then(()=>{
+        sequelize.usuario.findOne({where:{correo: email}}).then(()=>{
+          return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+        }).catch((err:any)=>{
+          if(err){
+            return res.status(400).send({message: err});
+          }
+        })
+      }).catch((err:any)=>{
+        if(err){
+          return res.status(400).send({message: err});
+        }
+      })
+    })
+  }).catch((err:any)=>{
+    if(err){
+      return res.status(400).send({message: err});
+    }
+  })
 })
 
 module.exports = routerUsuario;
