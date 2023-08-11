@@ -25,6 +25,9 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.empresa, {
         foreignKey: 'id_empresa'
       });
+      this.belongsTo(models.encargado, {
+        foreignKey: 'id_encargado'
+      });
 
       // this has many respuesta_supervisor, documento, documento_extra, informe
       this.hasMany(models.respuesta_supervisor, {
@@ -46,6 +49,7 @@ module.exports = (sequelize, DataTypes) => {
     id_config_practica: DataTypes.INTEGER,
     id_supervisor: DataTypes.INTEGER,
     id_empresa: DataTypes.INTEGER,
+    id_encargado: DataTypes.INTEGER,
     estado: DataTypes.STRING,
     fecha_inicio: DataTypes.DATE,
     fecha_termino: DataTypes.DATE,

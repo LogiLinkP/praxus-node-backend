@@ -80,12 +80,13 @@ routerDocumento.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] Crear un documento con los datos recibidos
 routerDocumento.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_practica, id_solicitud_documento, key} = req.body;
+  const {id_practica, id_solicitud_documento, key, fecha_subida} = req.body;
   console.log("Request de creacion de documento recibida");
   documento.create({
       id_practica: id_practica,
         id_solicitud_documento: id_solicitud_documento,
-        key: key
+        key: key,
+        fecha_subida: fecha_subida
   })
   .then((resultados:any) => {
       res.send("documento creado");
