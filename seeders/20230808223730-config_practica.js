@@ -16,7 +16,7 @@ module.exports = {
         modalidad: 'meses',
         cantidad_tiempo: 2,
         frecuencia_informes: 'semanal',
-        informe_final: true,
+        informe_final: false,
       }
     ], {});
   },

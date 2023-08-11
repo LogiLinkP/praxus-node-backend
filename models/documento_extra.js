@@ -18,7 +18,9 @@ module.exports = (sequelize, DataTypes) => {
     nombre_solicitud: DataTypes.STRING,
     descripcion: DataTypes.STRING,
     tipo_archivo: DataTypes.STRING,
-    key: DataTypes.STRING
+    key: DataTypes.STRING,
+    fecha_solicitud: DataTypes.DATE,
+    fecha_subida: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'documento_extra',

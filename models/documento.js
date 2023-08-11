@@ -16,7 +16,8 @@ module.exports = (sequelize, DataTypes) => {
   documento.init({
     id_practica: DataTypes.INTEGER,
     id_solicitud_documento: DataTypes.INTEGER,
-    key: DataTypes.STRING
+    key: DataTypes.STRING,
+    fecha_subida: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'documento',

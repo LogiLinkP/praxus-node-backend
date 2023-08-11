@@ -20,7 +20,8 @@ module.exports = (sequelize, DataTypes) => {
     es_encargado: DataTypes.BOOLEAN,
     es_supervisor: DataTypes.BOOLEAN,
     es_estudiante: DataTypes.BOOLEAN,
-    es_admin: DataTypes.BOOLEAN
+    es_admin: DataTypes.BOOLEAN,
+    config: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'usuario',
