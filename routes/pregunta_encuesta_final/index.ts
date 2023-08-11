@@ -1,5 +1,6 @@
 export { };
 
+const { pregunta_encuesta_final } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerPregEncuesta = new Router();
@@ -10,7 +11,7 @@ const jsonParser = bodyParser.json();
 //[GET] mostrar todas las preguntas de practica
 routerPregEncuesta.get('/todos', (req:any, res:any) => {
     console.log("Obteniendo todas las preguntas de practica")
-    sequelize.pregunta_encuesta_final.findAll().then((resultados:any) => {
+    pregunta_encuesta_final.findAll().then((resultados:any) => {
       res.send(resultados)
     })
     .catch((err:any) => {
@@ -22,7 +23,7 @@ routerPregEncuesta.get('/todos', (req:any, res:any) => {
 //[GET] para obtener una pregunta de practica con su ID
 routerPregEncuesta.get('', (req: any, res: any) => {
     console.log("Obteniendo preguntas de practica de id: ", req.query.id)
-    sequelize.pregunta_encuesta_final.findOne({
+    pregunta_encuesta_final.findOne({
         where: {
             id: req.query.id
         }
@@ -37,10 +38,11 @@ routerPregEncuesta.get('', (req: any, res: any) => {
 
 //[POST] Crear preguntas de practica con los datos recibidos
 routerPregEncuesta.post('/crear', jsonParser, (req: any, res: any) => {
-    const {enunciado, tipo_respuesta} = req.body;
+    const {id_config_practica,enunciado, tipo_respuesta} = req.body;
     console.log("Request de creacion de preguntas de practica recibida");
     // hacer post a python backend
-    sequelize.pregunta_encuesta_final.create({
+    pregunta_encuesta_final.create({
+        id_config_practica: id_config_practica,
         enunciado: enunciado,
         tipo_respuesta: tipo_respuesta
     })
@@ -56,7 +58,7 @@ routerPregEncuesta.post('/crear', jsonParser, (req: any, res: any) => {
 //[DELETE] Eliminar preguntas de practica con su ID
 routerPregEncuesta.delete('/eliminar', (req:any, res:any) => {
     console.log("Eliminando preguntas de practica con id: ", req.query.id)
-    sequelize.pregunta_encuesta_final.destroy({
+    pregunta_encuesta_final.destroy({
       where: {
         id: req.query.id
       }
