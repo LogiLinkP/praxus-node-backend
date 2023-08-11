@@ -147,6 +147,73 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
     return res.status(400).send({message: 'Contraseñas no coinciden'});
   }
   console.log(email);
+  // Verifico si correo ya se ocu
+  const data = await usuario.findOne({where:{correo: email}})
+  //console.log(data);
+  if(data!=null){
+    return res.status(400).send({message: 'Email ya ocupado'});
+  }
+  else{
+    console.log("1")
+    bcrypt.hash(password,8).then((hash:any)=>{
+      usuarioSend.password = hash;
+      pwdHashed = hash;
+    }).then(()=>{
+      console.log("2")
+      usuario.create({
+        correo: email,
+        password: pwdHashed,
+        nombre: nombre,
+        es_encargado: es_encargado,
+        es_supervisor: es_supervisor,
+        es_estudiante: es_estudiante,
+        es_admin: es_admin
+      }).then(()=>{
+        console.log("3")
+        usuario.findOne({where:{correo: email}}).then(()=>{
+          if(es_encargado){
+            return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+          }
+          if(es_supervisor){
+            supervisor.create({
+              nombre: nombre,
+              correo: email,
+              carnet_rostro: null,
+              es_correo_institucional: null
+            }).then(()=>{
+              return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+            }).catch((err:any)=>{
+              if(err){
+                return res.status(400).send({message: 'Error al crear super'});
+              }
+            })
+          }
+          if(es_estudiante){
+            estudiante.create({
+              nombre_id_org: null,
+              id_org: null,
+              rut: null
+            }).then(()=>{
+              return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+            }).catch((err:any)=>{
+              if(err){
+                return res.status(400).send({message: 'Error al crear est'});
+              }
+            })
+          } 
+        }).catch((err:any)=>{
+          if(err){
+            return res.status(400).send({message: 'Error al encontrar email1'});
+          }
+        })
+      }).catch((err:any)=>{
+        if(err){
+          return res.status(400).send({message: 'Error al crear usuario'});
+        }
+      })
+    })
+  }
+  /*
   usuario.findOne({where:{correo: email}}).then((resultados:any)=>{
     if(resultados.length!=0){
       return res.status(400).send({message: 'Email ya ocupado'});
@@ -217,7 +284,7 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
     if(err){
       return res.status(400).send({message: 'Error al encontrar email2'});
     }
-  })
+  })*/
 })
 
 routerUsuario.post('/logout',jsonParser,(req:any,res:any)=>{
