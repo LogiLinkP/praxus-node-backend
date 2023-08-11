@@ -1,5 +1,6 @@
 export { };
 
+const { config_informe } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerConfigInforme = new Router();
@@ -9,56 +10,58 @@ const jsonParser = bodyParser.json();
 
 
 //[GET] para obtener uno
-routerConfigInforme.get('', (req: any, res: any) => {
-    console.log("Obteniendo config_informe con id: ", req.query.id)
-    sequelize.config_informe.findOne({
-        where: {
-            id: req.query.id
-        }
-    })
-    .then((resultados: any) => {
-        res.send(resultados);
-    })
-    .catch((err: any) => {
-        console.log('Error al obtener config_informe', err);
-    })
-})
+routerConfigInforme.get('', async (req: any, res: any) => {
+  try {
+    if (!("id" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar id" });
+      return;
+    }
+    const data = await config_informe.findOne({
+      where: {
+        id: req.query.id
+      }
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
 
 //[GET] mostrar todos
-routerConfigInforme.get('/todos', (req:any, res:any) => {
-    console.log("Obteniendo todos las config_informe")
-    sequelize.config_informe.findAll().then((resultados:any) => {
-      res.send(resultados)
-    })
-    .catch((err:any) => {
-      console.log('Error al mostrar config_informe', err);
-      res.send('Error al mostrar config_informe', err)
-    })
-})
+routerConfigInforme.get('/todos', async (req: any, res: any) => {
+  try {
+    const data = await config_informe.findAll();
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
 
 //[DELETE] Eliminar
-routerConfigInforme.delete('/eliminar', (req:any, res:any) => {
+routerConfigInforme.delete('/eliminar', (req: any, res: any) => {
   console.log("Eliminando config_informe con id: ", req.query.id)
-  sequelize.config_informe.destroy({
+  config_informe.destroy({
     where: {
       id: req.query.id
     }
   })
-  .then((resultados:any) => {
-    console.log(resultados);
-    res.sendStatus(200);
-  })
-  .catch((err:any) => {
-    res.send(500)
-    console.log('Error al eliminar de config_informe', err);
-  })
+    .then((resultados: any) => {
+      console.log(resultados);
+      res.sendStatus(200);
+    })
+    .catch((err: any) => {
+      res.send(500)
+      console.log('Error al eliminar config_practica', err);
+    })
 })
 
 //[POST] Crear uno
 routerConfigInforme.post('/crear', jsonParser, (req: any, res: any) => {
   const {id_config_practica, tipo_informe} = req.body;
   console.log("Request de config_informe");
-  sequelize.config_informe.create({
+  config_informe.create({
     id_config_practica: id_config_practica,
     tipo_informe: tipo_informe,
   })
@@ -73,22 +76,25 @@ routerConfigInforme.post('/crear', jsonParser, (req: any, res: any) => {
 
 
 //[PUT]
-routerConfigInforme.put('/actualizar', jsonParser, async (req:any, res:any) => {
-    const config_informe = await sequelize.config_informe.findOne({ where: { id: req.body.id } })
-    if (config_informe){
-      config_informe.update(req.body)
-      .then((resultados:any) => {
+routerConfigInforme.put('/actualizar', jsonParser, async (req: any, res: any) => {
+  // buscar practica por id
+  const Config_informe = await config_informe.findOne({ where: { id: req.body.id } })
+  if (Config_informe) {
+    // actualizar practica
+    Config_informe.update(req.body)
+      .then((resultados: any) => {
         console.log(resultados);
         res.sendStatus(200);
       })
-      .catch((err:any) => {
+      .catch((err: any) => {
         res.send(500)
         console.log('Error al actualizar config_informe', err);
       })
-    } else {
-        console.log("No existe config_informe con id: ", req.query.id)
-        res.sendStatus(404)
-    }
+  } else {
+    console.log("No existe config_informe con id: ", req.query.id)
+    res.sendStatus(404)
+  }
 })
+
 
 module.exports = routerConfigInforme;
