@@ -1,5 +1,6 @@
 export { };
 
+const { informe } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerInforme = new Router();
@@ -11,7 +12,7 @@ const jsonParser = bodyParser.json();
 //[GET] para obtener uno
 routerInforme.get('', (req: any, res: any) => {
     console.log("Obteniendo informe con id: ", req.query.id)
-    sequelize.informe.findOne({
+    informe.findOne({
         where: {
             id: req.query.id
         }
@@ -27,7 +28,7 @@ routerInforme.get('', (req: any, res: any) => {
 //[GET] mostrar todos
 routerInforme.get('/todos', (req:any, res:any) => {
     console.log("Obteniendo todos los informe")
-    sequelize.informe.findAll().then((resultados:any) => {
+    informe.findAll().then((resultados:any) => {
       res.send(resultados)
     })
     .catch((err:any) => {
@@ -39,7 +40,7 @@ routerInforme.get('/todos', (req:any, res:any) => {
 //[DELETE] Eliminar
 routerInforme.delete('/eliminar', (req:any, res:any) => {
   console.log("Eliminando informe con id: ", req.query.id)
-  sequelize.informe.destroy({
+  informe.destroy({
     where: {
       id: req.query.id
     }
@@ -58,7 +59,7 @@ routerInforme.delete('/eliminar', (req:any, res:any) => {
 routerInforme.post('/crear', jsonParser, (req: any, res: any) => {
   const {id_practica, id_config_informe, horas_trabajadas, key} = req.body;
   console.log("Request de creacion de informe");
-  sequelize.informe.create({
+  informe.create({
     id_practica: id_practica,
     id_config_informe: id_config_informe,
     horas_trabajadas: horas_trabajadas,
@@ -77,9 +78,9 @@ routerInforme.post('/crear', jsonParser, (req: any, res: any) => {
 
 //[PUT]
 routerInforme.put('/actualizar', jsonParser, async (req:any, res:any) => {
-    const informe = await sequelize.informe.findOne({ where: { id: req.body.id } })
-    if (informe){
-      informe.update(req.body)
+    const Informe = await informe.findOne({ where: { id: req.body.id } })
+    if (Informe){
+      Informe.update(req.body)
       .then((resultados:any) => {
         console.log(resultados);
         res.sendStatus(200);
@@ -97,7 +98,7 @@ routerInforme.put('/actualizar', jsonParser, async (req:any, res:any) => {
 //[GET] mostrar todos los informes asociados a un id_practica
 routerInforme.get('/todos_practica', (req:any, res:any) => {
   console.log("Obteniendo todos los informes")
-  sequelize.informe.findAll({
+  informe.findAll({
       where: {
         id_practica: req.query.id_practica
       }

@@ -1,5 +1,6 @@
 export { };
 
+const { respuesta_encuesta_final } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerRespuestaPreguntaFinal = new Router();
@@ -11,7 +12,7 @@ const jsonParser = bodyParser.json();
 //[GET] para obtener un respuesta_encuesta_final con su ID
 routerRespuestaPreguntaFinal.get('', (req: any, res: any) => {
     console.log("Obteniendo respuesta_encuesta_final de id: ", req.query.id)
-    sequelize.respuesta_encuesta_final.findOne({
+    respuesta_encuesta_final.findOne({
         where: {
             id: req.query.id
         }
@@ -27,7 +28,7 @@ routerRespuestaPreguntaFinal.get('', (req: any, res: any) => {
 //[GET] mostrar todos los respuesta_encuesta_finals
 routerRespuestaPreguntaFinal.get('/todos', (req:any, res:any) => {
     console.log("Obteniendo todos los respuesta_encuesta_finals")
-    sequelize.respuesta_encuesta_final.findAll().then((resultados:any) => {
+    respuesta_encuesta_final.findAll().then((resultados:any) => {
       res.send(resultados)
     })
     .catch((err:any) => {
@@ -39,7 +40,7 @@ routerRespuestaPreguntaFinal.get('/todos', (req:any, res:any) => {
 //[DELETE] Eliminar respuesta_encuesta_final con su ID
 routerRespuestaPreguntaFinal.delete('/eliminar', (req:any, res:any) => {
     console.log("Eliminando respuesta_encuesta_final con id: ", req.query.id)
-    sequelize.respuesta_encuesta_final.destroy({
+    respuesta_encuesta_final.destroy({
         where: {
           id: req.query.id
         }
@@ -58,7 +59,7 @@ routerRespuestaPreguntaFinal.delete('/eliminar', (req:any, res:any) => {
 routerRespuestaPreguntaFinal.post('/crear', jsonParser, (req: any, res: any) => {
   const {id_pregunta_encuesta_final, respuesta} = req.body;
   console.log("Request de creacion de respuesta_encuesta_final recibida");
-  sequelize.respuesta_encuesta_final.create({
+  respuesta_encuesta_final.create({
       id_pregunta_encuesta_final: id_pregunta_encuesta_final,
       respuesta: respuesta
   })
@@ -72,9 +73,9 @@ routerRespuestaPreguntaFinal.post('/crear', jsonParser, (req: any, res: any) => 
 
 //[PUT]
 routerRespuestaPreguntaFinal.put('/actualizar', jsonParser, async (req:any, res:any) => {
-    const respuesta_encuesta_final = await sequelize.respuesta_encuesta_final.findOne({ where: { id: req.body.id } })
-    if (respuesta_encuesta_final){
-      respuesta_encuesta_final.update(req.body)
+    const Respuesta_encuesta_final = await respuesta_encuesta_final.findOne({ where: { id: req.body.id } })
+    if (Respuesta_encuesta_final){
+      Respuesta_encuesta_final.update(req.body)
       .then((resultados:any) => {
         console.log(resultados);
         res.sendStatus(200);

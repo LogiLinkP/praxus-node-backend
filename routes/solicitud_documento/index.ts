@@ -1,6 +1,6 @@
 export { };
 
-const { solicitud_documento} = require("../../models");
+const { solicitud_documento } = require("../../models");
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerSolicitudDocumento = new Router();
@@ -78,7 +78,7 @@ routerSolicitudDocumento.post('/crear', jsonParser, (req: any, res: any) => {
 
 //[PUT]
 routerSolicitudDocumento.put('/actualizar', jsonParser, async (req:any, res:any) => {
-    const Solicitud_documento = await sequelize.solicitud_documento.findOne({ where: { id: req.body.id } })
+    const Solicitud_documento = await solicitud_documento.findOne({ where: { id: req.body.id } })
     if (Solicitud_documento){
       Solicitud_documento.update(req.body)
       .then((resultados:any) => {
