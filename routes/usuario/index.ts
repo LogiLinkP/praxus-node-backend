@@ -10,16 +10,15 @@ var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
 //[GET] mostrar todos los usuarios
-routerUsuario.get('/todos', (req:any, res:any) => {
-    console.log("Obteniendo todos los usuarios")
-    sequelize.usuario.findAll().then((resultados:any) => {
-      res.send(resultados)
-    })
-    .catch((err:any) => {
-      console.log('Error al mostrar usuarios', err);
-      res.send('Error al mostrar usuarios', err);
-    })
-})
+routerUsuario.get('/todos', async (req: any, res: any) => {
+  try {
+    const data = await usuario.findAll();
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
 
 //[GET] para obtener un usuario con su ID
 routerUsuario.get('', (req: any, res: any) => {
@@ -147,7 +146,70 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
     return res.status(400).send({message: 'Contraseñas no coinciden'});
   }
   console.log(email);
-  usuario.findOne({where:{correo: email}}).then((resultados:any)=>{
+  const data = await usuario.findOne({where:{correo: email}})
+  console.log(data);
+  if(data!=null){
+    return res.status(400).send({message: 'Email ya ocupado'});
+  }
+  else{
+    bcrypt.hash(password,8).then((hash:any)=>{
+      usuarioSend.password = hash;
+      pwdHashed = hash;
+    }).then(()=>{
+      usuario.create({
+        correo: email,
+        password: pwdHashed,
+        nombre: nombre,
+        es_encargado: es_encargado,
+        es_supervisor: es_supervisor,
+        es_estudiante: es_estudiante,
+        es_admin: es_admin
+      }).then(()=>{
+        usuario.findOne({where:{correo: email}}).then(()=>{
+          if(es_encargado){
+            return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+          }
+          if(es_supervisor){
+            supervisor.create({
+              nombre: nombre,
+              correo: email,
+              carnet_rostro: null,
+              es_correo_institucional: null
+            }).then(()=>{
+              return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+            }).catch((err:any)=>{
+              if(err){
+                return res.status(400).send({message: 'Error al crear super'});
+              }
+            })
+          }
+          if(es_estudiante){
+            estudiante.create({
+              nombre_id_org: null,
+              id_org: null,
+              rut: null
+            }).then(()=>{
+              return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+            }).catch((err:any)=>{
+              if(err){
+                return res.status(400).send({message: 'Error al crear est'});
+              }
+            })
+          } 
+        }).catch((err:any)=>{
+          if(err){
+            return res.status(400).send({message: 'Error al encontrar email1'});
+          }
+        })
+      }).catch((err:any)=>{
+        if(err){
+          return res.status(400).send({message: 'Error al crear usuario'});
+        }
+      })
+    })
+  }
+})
+  /*const data = await usuario.findOne({where:{correo: email}}).then((resultados:any)=>{
     if(resultados.length!=0){
       return res.status(400).send({message: 'Email ya ocupado'});
     }else{
@@ -218,7 +280,7 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
       return res.status(400).send({message: 'Error al encontrar email2'});
     }
   })
-})
+})*/
 
 routerUsuario.post('/logout',jsonParser,(req:any,res:any)=>{
   res.clearCookie("jwt");
