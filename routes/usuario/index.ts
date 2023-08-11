@@ -167,7 +167,8 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
         es_encargado: es_encargado,
         es_supervisor: es_supervisor,
         es_estudiante: es_estudiante,
-        es_admin: es_admin
+        es_admin: es_admin,
+        config: null
       }).then(()=>{
         console.log("3")
         usuario.findOne({where:{correo: email}}).then(()=>{
