@@ -10,16 +10,15 @@ var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
 //[GET] mostrar todos los usuarios
-routerUsuario.get('/todos', (req:any, res:any) => {
-    console.log("Obteniendo todos los usuarios")
-    sequelize.usuario.findAll().then((resultados:any) => {
-      res.send(resultados)
-    })
-    .catch((err:any) => {
-      console.log('Error al mostrar usuarios', err);
-      res.send('Error al mostrar usuarios', err);
-    })
-})
+routerUsuario.get('/todos', async (req: any, res: any) => {
+  try {
+    const data = await usuario.findAll();
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
 
 //[GET] para obtener un usuario con su ID
 routerUsuario.get('', (req: any, res: any) => {
