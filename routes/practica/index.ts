@@ -129,7 +129,7 @@ routerPractica.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] Crear uno
 routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
-  const { id_estudiante, id_config_practica, id_supervisor, id_empresa, estado,
+  const { id_estudiante, id_config_practica, id_supervisor, id_empresa, id_encargado, estado,
     fecha_inicio, fecha_termino, nota_evaluacion,
     consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos } = req.body;
   console.log("Request de creacion de practica recibida");
@@ -138,6 +138,7 @@ routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
     id_config_practica: id_config_practica,
     id_supervisor: id_supervisor,
     id_empresa: id_empresa,
+    id_encargado: id_encargado,
     estado: estado,
     fecha_inicio: fecha_inicio,
     fecha_termino: fecha_termino,

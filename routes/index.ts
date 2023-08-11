@@ -21,5 +21,9 @@ router.use('/similitud', require('./similitud'));
 router.use('/solicitud_documento', require('./solicitud_documento'));
 router.use('/supervisor', require('./supervisor'));
 router.use('/usuario', require('./usuario'));
+router.use('/notificacion', require('./notificacion'));
+router.use('/chat', require('./chat'));
+router.use('/mensaje', require('./mensaje'));
+router.use('/encargado', require('./encargado'));
 
 module.exports = router;

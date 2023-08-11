@@ -75,14 +75,16 @@ routerDocumentoExtra.delete('/eliminar', (req: any, res: any) => {
   
 //[POST] Crear un documento_extra con los datos recibidos
 routerDocumentoExtra.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_practica, nombre_solicitud, descripcion, tipo_archivo, key} = req.body;
+  const {id_practica, nombre_solicitud, descripcion, tipo_archivo, key, fecha_subida, fecha_solicitud} = req.body;
   console.log("Request de creacion de documento_extra recibida");
   documento_extra.create({
       id_practica: id_practica,
       nombre_solicitud: nombre_solicitud,
       descripcion: descripcion,
       tipo_archivo: tipo_archivo,
-      key: key
+      key: key,
+      fecha_subida: fecha_subida,
+      fecha_solicitud: fecha_solicitud
 
   })
   .then((resultados:any) => {
