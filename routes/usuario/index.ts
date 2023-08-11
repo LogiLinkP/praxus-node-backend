@@ -8,6 +8,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
+require('dotenv').config();
 
 //[GET] mostrar todos los usuarios
 routerUsuario.get('/todos', async (req: any, res: any) => {
@@ -100,30 +101,35 @@ routerUsuario.put('/actualizar', jsonParser, async (req:any, res:any) => {
 
 routerUsuario.post('/login',jsonParser, async (req:any, res:any) => {
   const {email,password}=req.body
+  if(req.body.email.trim()===''||req.body.password.trim()===''){
+      return res.status(400).send({msg:"email or password must not be empty"})
     
-    if(req.body.email.trim()===''||req.body.password.trim()===''){
-        return res.status(400).send({msg:"email or password must not be empty"})
-    
+  }
+  usuario.findOne({where: {correo: email}}).then((resultados:any)=>{
+    if(resultados.length===0){
+      return res.status(400).send({message: 'Error en usuario y contraseña'});
     }
-
-    usuario.findOne({where: {correo: email}}).then((resultados:any)=>{
-      if(resultados.length===0){
+    bcrypt.compare(password,resultados.dataValues.password).then((checkout:any)=>{
+      if(checkout===false){
         return res.status(400).send({message: 'Error en usuario y contraseña'});
       }
-      bcrypt.compare(password,resultados[0].password).then((checkout:any)=>{
-        if(checkout===false){
-          return res.status(400).send({message: 'Error en usuario y contraseña'});
-        }
-        const token = jwt.sign({id:resultados[0].id.toString()},process.env.SECRET_KEY,{expiresIn:'1h'})
-        return res.status(200).send({message: 'Incio de sesion correcto', userdata: resultados[0],token});
-      })
+      const token = jwt.sign({id:resultados.dataValues.id.toString()},process.env.SECRET_KEY,{expiresIn:'1h'})
+      return res.status(200).send({message: 'Incio de sesion correcto', userdata: resultados.dataValues,token});
     }).catch((err:any)=>{
       if(err){
+        console.log(err)
         return res.status(400).send({
-            msg:err
+          msg:"Password no coinciden"
         })
       }
     })
+  }).catch((err:any)=>{
+    if(err){
+      return res.status(400).send({
+          msg:"Usuario no encontrado"
+      })
+    }
+  })
 
 })
 
@@ -149,17 +155,14 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
   console.log(email);
   // Verifico si correo ya se ocu
   const data = await usuario.findOne({where:{correo: email}})
-  //console.log(data);
   if(data!=null){
     return res.status(400).send({message: 'Email ya ocupado'});
   }
   else{
-    console.log("1")
     bcrypt.hash(password,8).then((hash:any)=>{
       usuarioSend.password = hash;
       pwdHashed = hash;
     }).then(()=>{
-      console.log("2")
       usuario.create({
         correo: email,
         password: pwdHashed,
@@ -170,7 +173,6 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
         es_admin: es_admin,
         config: null
       }).then(()=>{
-        console.log("3")
         usuario.findOne({where:{correo: email}}).then(()=>{
           if(es_encargado){
             return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
@@ -204,7 +206,7 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
           } 
         }).catch((err:any)=>{
           if(err){
-            return res.status(400).send({message: 'Error al encontrar email1'});
+            return res.status(400).send({message: 'Error al encontrar email'});
           }
         })
       }).catch((err:any)=>{
