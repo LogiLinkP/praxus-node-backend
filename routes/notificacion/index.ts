@@ -9,16 +9,13 @@ var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
 
-//[GET] para obtener uno
-routerNotificacion.get('', async (req: any, res: any) => {
+
+//[GET] MODIFICAR mostrar todos por id_usuario
+routerNotificacion.get('/todos', async (req: any, res: any) => {
   try {
-    if (!("id" in req.query)) {
-      res.status(406).json({ message: "Se requiere ingresar id" });
-      return;
-    }
-    const data = await notificacion.findOne({
+    const data = await notificacion.findAll({
       where: {
-        id: req.query.id
+        id_usuario: req.query.id_usuario
       }
     });
     res.status(200).json(data);
@@ -28,23 +25,13 @@ routerNotificacion.get('', async (req: any, res: any) => {
   }
 });
 
-//[GET] mostrar todos
-routerNotificacion.get('/todos', async (req: any, res: any) => {
-  try {
-    const data = await notificacion.findAll();
-    res.status(200).json(data);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Error interno" });
-  }
-});
 
-//[DELETE] Eliminar
+//[DELETE] Eliminar todos por id_usuario
 routerNotificacion.delete('/eliminar', (req: any, res: any) => {
-  console.log("Eliminando notificacion con id: ", req.query.id)
+  console.log("Eliminando notificacion con id_usuario: ", req.query.id)
   notificacion.destroy({
     where: {
-      id: req.query.id
+      id_usuario: req.query.id_usuario
     }
   })
     .then((resultados: any) => {
@@ -56,14 +43,15 @@ routerNotificacion.delete('/eliminar', (req: any, res: any) => {
       console.log('Error al eliminar notificacion', err);
     })
 })
-//[POST] Crear uno
+
+//[POST] 
 routerNotificacion.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_usuario,texto,fecha} = req.body;
+  const {id_usuario, mensaje} = req.body;
   console.log("Request de notificacion");
   notificacion.create({
     id_usuario: id_usuario,
-    texto: texto,
-    fecha: fecha
+    texto: mensaje.texto,
+    fecha: mensaje.fecha
   })
   .then((resultados:any) => {
       console.log(resultados);

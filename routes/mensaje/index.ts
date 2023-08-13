@@ -1,6 +1,6 @@
 export { };
 
-const { mensaje } = require('../../models');
+const { mensaje,chat } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerMensaje = new Router();
@@ -56,22 +56,44 @@ routerMensaje.delete('/eliminar', (req: any, res: any) => {
       console.log('Error al eliminar mensaje', err);
     })
 })
-//[POST] Crear uno
+
+
+//[POST] Crear uno usando el id de estudiante y encargado (que se usan para buscar el chat)
 routerMensaje.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_chat,emisor,texto,fecha} = req.body;
-  console.log("Request de mensaje");
- mensaje.create({
-    id_chat: id_chat,
-    emisor: emisor,
-    texto: texto,
-    fecha: fecha
+  const {id_estudiante,id_encargado} = req.body;
+  const msj = req.body.mensaje;
+  const {emisor,texto,fecha} = msj;
+  console.log("Datos obtenidos para crear mensaje: ", id_estudiante,id_encargado,emisor,texto,fecha);
+  chat.findOne({ //Buscar chat con id_estudiante e id_encargado
+    where: {
+      id_estudiante: id_estudiante,
+      id_encargado: id_encargado
+    }
   })
   .then((resultados:any) => {
-      console.log(resultados);
-      res.send( "mensaje creado");
+    console.log(resultados);
+    if(resultados){
+      mensaje.create({
+          id_chat: resultados.id,
+          emisor: emisor,
+          texto: texto,
+          fecha: fecha
+        })
+        .then((resultados:any) => {
+            console.log(resultados);
+            res.send( "mensaje creado");
+        })
+        .catch((err:any) => {
+            console.log('Error al crear mensaje',err);
+            res.send("Error al crear mensaje")
+        })
+    }else{
+      res.send("No existe chat con esos id")
+    }   
   })
   .catch((err:any) => {
-      console.log('Error al crear mensaje',err);
+      console.log('Error al obtener chat entre estudiante y encargado',err);
+      res.send("Error al obtener chat entre estudiante y encargado")
   })
 })
 
