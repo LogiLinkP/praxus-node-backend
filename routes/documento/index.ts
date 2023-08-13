@@ -69,10 +69,9 @@ routerDocumento.get('/download', async (req: any, res: any) => {
       const data = await documento.findOne({
         where: {
           id: req.query.id
-        },
-        include: [solicitud_documento]
+        }
       });
-      res.download(`./tmp/${data.key}`);
+      return res.download(`./tmp/${data.key}`);
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: "Error interno" });

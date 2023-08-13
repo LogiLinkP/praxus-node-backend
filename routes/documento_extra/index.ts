@@ -55,6 +55,25 @@ routerDocumentoExtra.get('/get', (req: any, res: any) => {
       })
   })
 
+//[GET] para descargar un documento extra con su ID
+routerDocumentoExtra.get('/download', async (req: any, res: any) => {
+  try {
+    if (!("id" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar id" });
+      return;
+    }
+    const data = await documento_extra.findOne({
+      where: {
+        id: req.query.id
+      }
+    });
+    return res.download(`./tmp/${data.key}`);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
 //[DELETE] Eliminar documento_extra con su ID
 routerDocumentoExtra.delete('/eliminar', (req: any, res: any) => {
     console.log("Eliminando documento_extra con id: ", req.query.id)
