@@ -13,8 +13,8 @@ module.exports = {
       },
       {
         id_chat: 1,
-        emisor: 'alumno',
-        texto: 'Hola, soy el alumno',
+        emisor: 'estudiante',
+        texto: 'Hola, soy el estudiante',
         fecha: '2021-08-12 16:09:48'
       }
 
