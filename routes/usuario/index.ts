@@ -136,17 +136,6 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
   let {email,password,cnfPwd,nombre,es_encargado,es_supervisor,es_estudiante,es_admin,extras} = req.body;
   const usuarioSend = {email,password,nombre,es_encargado,es_supervisor,es_estudiante,es_admin};
   let pwdHashed = '';
-  if(!nombre){
-    return res.status(400).send({message: 'Usuario vacio'});
-  }
-  
-  if(!email){
-    return res.status(400).send({message: 'Email incorrecto'});
-  }
-
-  if(!password||password.length < 6){
-    return res.status(400).send({message: 'Contraseña pequeña'});
-  }
 
   if(!cnfPwd||password!=cnfPwd){
     return res.status(400).send({message: 'Contraseñas no coinciden'});
