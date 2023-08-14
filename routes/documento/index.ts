@@ -11,7 +11,7 @@ var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
 
-//[GET] para obtener un documento con su ID
+//[GET] para obtener datos de un documento con su ID
 routerDocumento.get('', async (req: any, res: any) => {
     try {
       if (!("id" in req.query)) {
@@ -42,7 +42,7 @@ routerDocumento.get('/todos', async (req: any, res: any) => {
     }
   });
 
-//[GET] para obtener todos los documentos de acuerdo al id de la practica
+//[GET] para obtener todos datos de los documentos de acuerdo al id de la practica
 routerDocumento.get('/get', (req: any, res: any) => {
     console.log("Obteniendo documentos con id de practica: ", req.query.id_practica)
     documento.findAll({
@@ -58,6 +58,25 @@ routerDocumento.get('/get', (req: any, res: any) => {
         console.log('Error al obtener documentos', err);
       })
   })
+
+//[GET] para descargar un documento con su ID
+routerDocumento.get('/download', async (req: any, res: any) => {
+    try {
+      if (!("id" in req.query)) {
+        res.status(406).json({ message: "Se requiere ingresar id" });
+        return;
+      }
+      const data = await documento.findOne({
+        where: {
+          id: req.query.id
+        }
+      });
+      return res.download(`./tmp/${data.key}`);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Error interno" });
+    }
+  });
 
 //[DELETE] Eliminar documento con su ID
 routerDocumento.delete('/eliminar', (req: any, res: any) => {
