@@ -28,6 +28,30 @@ routerChat.get('', async (req: any, res: any) => {
   }
 });
 
+//[GET] para obtener uno con BODY id_estudiante y id_encargado
+
+routerChat.get('/get', jsonParser, async (req: any, res: any) => {
+  try {
+    //parse body of the request with json parser
+    const { id_estudiante, id_encargado } = req.body;
+    console.log("datos de request:", id_estudiante, id_encargado);
+    if ((id_estudiante==null) || (id_encargado==null)) {
+      res.status(406).json({ message: "Se requiere ingresar id de estudiante y de encargado" });    
+      return;
+    }
+    const data = await chat.findOne({
+      where: {
+        id_estudiante: id_estudiante,
+        id_encargado: id_encargado
+      }
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
 //[GET] mostrar todos
 routerChat.get('/todos', async (req: any, res: any) => {
   try {
@@ -56,6 +80,7 @@ routerChat.delete('/eliminar', (req: any, res: any) => {
       console.log('Error al eliminar chat', err);
     })
 })
+
 //[POST] Crear uno
 routerChat.post('/crear', jsonParser, (req: any, res: any) => {
   const {id_estudiante,id_encargado} = req.body;
