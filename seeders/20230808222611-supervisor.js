@@ -6,13 +6,13 @@ module.exports = {
     
     await queryInterface.bulkInsert('supervisor', [
       {
-        nombre: 'supervisor buena onda',
+        nombre: 'supervisor1',
         correo: 'correo_supervisor1@gmail.com',
         carnet_rostro: false,
         es_correo_institucional: false
       },
       {
-        nombre: 'supervisor mala onda',
+        nombre: 'supervisor2',
         correo: 'correo_supervisor2@gmail.com',
         carnet_rostro: false,
         es_correo_institucional: false
