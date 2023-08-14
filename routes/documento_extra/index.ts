@@ -26,6 +26,21 @@ routerDocumentoExtra.get('', async (req: any, res: any) => {
     console.log(error);
     res.status(500).json({ message: "Error interno" });
   }
+  try {
+    if (!("id" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar id" });
+      return;
+    }
+    const data = await documento_extra.findOne({
+      where: {
+        id: req.query.id
+      }
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
 });
 
 //[GET] mostrar todos los documentos_extra
@@ -91,6 +106,7 @@ routerDocumentoExtra.delete('/eliminar', (req: any, res: any) => {
       console.log('Error al eliminar documento_extra', err);
     })
 })
+
 
 //[POST] Crear un documento_extra con los datos recibidos
 routerDocumentoExtra.post('/crear', jsonParser, (req: any, res: any) => {
