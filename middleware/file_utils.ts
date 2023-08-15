@@ -12,7 +12,6 @@ const storage = multer.diskStorage({
         cb(null, path);
     },
     filename: (req: Request, file: any, cb: CallableFunction) => {
-        console.log(file.originalname);
         cb(null, `${Date.now()}-${file.originalname}`);
     },
 });
@@ -32,9 +31,6 @@ export async function checkFileType(filePath: string, type: string[]): Promise<b
     // obtiene la extensión teniendo en cuenta que el nombre del archivo puede no tener puntos o partir con puntos
     let file_ext = _filename.slice((_filename.lastIndexOf(".") - 1 >>> 0) + 2)
     let _types = type.map((t: string) => t.toLowerCase());
-    console.log(file_ext)
-    console.log(_types)
-    console.log(_types.includes(file_ext));
     if (!_types.includes(file_ext)) return false;
 
     let buffer = fs.readFileSync(filePath);
