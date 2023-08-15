@@ -30,19 +30,17 @@ routerChat.get('', async (req: any, res: any) => {
 
 //[GET] para obtener uno con BODY id_estudiante y id_encargado
 
-routerChat.get('/get', jsonParser, async (req: any, res: any) => {
+routerChat.get('/get', async (req: any, res: any) => {
   try {
-    //parse body of the request with json parser
-    const { id_estudiante, id_encargado } = req.body;
-    console.log("datos de request:", id_estudiante, id_encargado);
-    if ((id_estudiante==null) || (id_encargado==null)) {
+    console.log("datos de request:", req.query.id_estudiante, req.query.id_encargado);
+    if ((req.query.id_estudiante==null) || (req.query.id_encargado==null)) {
       res.status(406).json({ message: "Se requiere ingresar id de estudiante y de encargado" });    
       return;
     }
     const data = await chat.findOne({
       where: {
-        id_estudiante: id_estudiante,
-        id_encargado: id_encargado
+        id_estudiante: req.query.id_estudiante,
+        id_encargado: req.query.id_encargado
       }
     });
     res.status(200).json(data);

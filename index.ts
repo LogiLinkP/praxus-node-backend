@@ -25,6 +25,7 @@ const options = {
     origin: 'http://localhost:4200',
   },
 };
+
 const server = require('http').Server(app);
 const io = require('socket.io')(server, options);
 
