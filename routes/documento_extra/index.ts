@@ -7,6 +7,7 @@ const routerDocumentoExtra = new Router(); // /documento_extra
 
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
+const { uploadFile, deleteFile, checkFileType } = require("../../middleware/file_utils");
 
 
 //[GET] para obtener un documento_extra con su ID
@@ -110,48 +111,61 @@ routerDocumentoExtra.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] Crear un documento_extra con los datos recibidos
 routerDocumentoExtra.post('/crear', jsonParser, (req: any, res: any) => {
-  const { id_practica, nombre_solicitud, descripcion, tipo_archivo , fecha_subida, fecha_solicitud} = req.body;
-  let validacion = [id_practica, nombre_solicitud, descripcion, tipo_archivo].every(Boolean);
+  const { id_practica, nombre_solicitud, descripcion, tipo_archivo, fecha_subida, fecha_solicitud } = req.body;
+  let validacion = [id_practica, nombre_solicitud, tipo_archivo].every(Boolean);
   if (!validacion) {
     return res.status(400).send({
       message: 'Faltan campos obligatorios'
     });
   }
   documento_extra.create({
-      id_practica: id_practica,
-      nombre_solicitud: nombre_solicitud,
-      descripcion: descripcion,
-      tipo_archivo: tipo_archivo,
-      key: null,
-      fecha_subida: fecha_subida,
-      fecha_solicitud: fecha_solicitud
+    id_practica: id_practica,
+    nombre_solicitud: nombre_solicitud,
+    descripcion: descripcion || null,
+    tipo_archivo: tipo_archivo,
+    key: null,
+    fecha_subida: fecha_subida,
+    fecha_solicitud: fecha_solicitud
   })
-  .then((resultados:any) => {
+    .then((resultados: any) => {
       res.send("documento_extra creado");
-  })
-  .catch((err:any) => {
-      console.log('Error al crear documento_extra',err);
-  })
+    })
+    .catch((err: any) => {
+      console.log('Error al crear documento_extra', err);
+    })
 })
 
 //[PUT] Agrega la key de un documento ya subido a la solicitud
-routerDocumentoExtra.put('/agregar_documento', jsonParser, async (req: any, res: any) => {
+routerDocumentoExtra.put('/agregar_documento', uploadFile.single("file"), async (req: any, res: any) => {
   try {
-    const id = req.body.id;
-    const key = req.body.key;
-    if (!id) {
-      console.log("No se ingreso id de documento_extra")
+    const id_documento_extra = req.body.id_documento_extra;
+    if (!id_documento_extra) {
+      console.log("No se ingreso id de documento_extra");
+      deleteFile(req.file.path);
       return res.sendStatus(400);
     }
+    console.log(1)
+    const key = req.file.filename;
     if (!key) {
-      console.log("No se ingreso key de documento_extra")
+      console.log("No se ingreso key de documento_extra");
+      deleteFile(req.file.path);
       return res.sendStatus(400);
     }
-    const DocumentoExtra = await documento_extra.findOne({ where: { id } })
+    console.log(2)
+    const DocumentoExtra = await documento_extra.findOne({ where: { id: id_documento_extra } });
     if (!DocumentoExtra) {
-      console.log("No existe documento_extra con id: ", req.body.id)
+      console.log("No existe documento_extra con id: ", id_documento_extra);
+      deleteFile(req.file.path);
       return res.sendStatus(404)
     }
+    console.log(3)
+    let filetypes = DocumentoExtra.tipo_archivo.split(",");
+    if (!(await checkFileType(req.file.path, filetypes))) {
+      console.log("El archivo no tiene el formato correcto");
+      deleteFile(req.file.path);
+      return res.sendStatus(415);
+    }
+    console.log(4)
     DocumentoExtra.update({ key })
     return res.sendStatus(200);
   } catch (error) {
