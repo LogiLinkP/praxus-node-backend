@@ -1,13 +1,13 @@
 export { };
 
 const { Router } = require('express');
-const sequelize = require('../../db');
 const { usuario, supervisor, estudiante } = require('../../models');
 const routerUsuario = new Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
+require('dotenv').config();
 
 //[GET] mostrar todos los usuarios
 routerUsuario.get('/todos', async (req: any, res: any) => {
@@ -23,7 +23,7 @@ routerUsuario.get('/todos', async (req: any, res: any) => {
 //[GET] para obtener un usuario con su ID
 routerUsuario.get('', (req: any, res: any) => {
     console.log("Obteniendo usuario de id: ", req.query.id)
-    sequelize.usuario.findOne({
+    usuario.findOne({
         where: {
             id: req.query.id
         }
@@ -41,7 +41,7 @@ routerUsuario.post('/crear', jsonParser, (req: any, res: any) => {
     const {correo, password, nombre, es_encargado, es_supervisor, es_estudiante, es_admin, config} = req.body;
     console.log("Request de creacion de usuario recibida");
     // hacer post a python backend
-    sequelize.usuario.create({
+    usuario.create({
         correo: correo,
         password: password,
         nombre: nombre,
@@ -64,7 +64,7 @@ routerUsuario.post('/crear', jsonParser, (req: any, res: any) => {
 //[DELETE] Eliminar usuario con su ID
 routerUsuario.delete('/eliminar', (req:any, res:any) => {
     console.log("Eliminando usuario con id: ", req.query.id)
-    sequelize.usuario.destroy({
+    usuario.destroy({
       where: {
         id: req.query.id
       }
@@ -81,9 +81,9 @@ routerUsuario.delete('/eliminar', (req:any, res:any) => {
 
 //[PUT]
 routerUsuario.put('/actualizar', jsonParser, async (req:any, res:any) => {
-  const usuario = await sequelize.usuario.findOne({ where: { id: req.body.id } })
-  if (usuario){
-    usuario.update(req.body)
+  const Usuario = await usuario.findOne({ where: { id: req.body.id } })
+  if (Usuario){
+    Usuario.update(req.body)
     .then((resultados:any) => {
       console.log(resultados);
       res.sendStatus(200);
@@ -131,17 +131,6 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
   }
   const usuarioSend = {email,password,nombre,es_encargado,es_supervisor,es_estudiante,es_admin};
   let pwdHashed = '';
-  if(!nombre){
-    return res.status(400).send({message: 'Usuario vacio'});
-  }
-  
-  if(!email){
-    return res.status(400).send({message: 'Email incorrecto'});
-  }
-
-  if(!password||password.length < 6){
-    return res.status(400).send({message: 'Contraseña pequeña'});
-  }
 
   if(!cnfPwd||password!=cnfPwd){
     return res.status(400).send({message: 'Contraseñas no coinciden'});
@@ -149,7 +138,6 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
   console.log(email);
   // Verifico si correo ya se ocu
   const data = await usuario.findOne({where:{correo: email}})
-  //console.log(data);
   if(data!=null){
     return res.status(400).send({message: 'Email ya ocupado'});
   }
