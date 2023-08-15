@@ -1,5 +1,6 @@
 export { };
 
+const { pregunta_informe } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerPreguntaInforme = new Router();
@@ -11,7 +12,7 @@ const jsonParser = bodyParser.json();
 //[GET] para obtener un pregunta_informe con su ID
 routerPreguntaInforme.get('', (req: any, res: any) => {
     console.log("Obteniendo pregunta_informe de id: ", req.query.id)
-    sequelize.pregunta_informe.findOne({
+    pregunta_informe.findOne({
         where: {
             id: req.query.id
         }
@@ -27,7 +28,7 @@ routerPreguntaInforme.get('', (req: any, res: any) => {
 //[GET] mostrar todos los pregunta_informe
 routerPreguntaInforme.get('/todos', (req:any, res:any) => {
     console.log("Obteniendo todas las pregunta_informe")
-    sequelize.pregunta_informe.findAll().then((resultados:any) => {
+    pregunta_informe.findAll().then((resultados:any) => {
       res.send(resultados)
     })
     .catch((err:any) => {
@@ -39,7 +40,7 @@ routerPreguntaInforme.get('/todos', (req:any, res:any) => {
 //[DELETE] Eliminar pregunta_informe con su ID
 routerPreguntaInforme.delete('/eliminar', (req:any, res:any) => {
     console.log("Eliminando pregunta_informe con id: ", req.query.id)
-    sequelize.pregunta_informe.destroy({
+    pregunta_informe.destroy({
         where: {
           id: req.query.id
         }
@@ -58,7 +59,7 @@ routerPreguntaInforme.delete('/eliminar', (req:any, res:any) => {
 routerPreguntaInforme.post('/crear', jsonParser, (req: any, res: any) => {
   const {id_config_informe, enunciado, tipo_respuesta} = req.body;
   console.log("Request de creacion de pregunta_informe recibida");
-  sequelize.pregunta_informe.create({
+  pregunta_informe.create({
       id_config_informe: id_config_informe,
       enunciado: enunciado,
       tipo_respuesta: tipo_respuesta
@@ -73,8 +74,8 @@ routerPreguntaInforme.post('/crear', jsonParser, (req: any, res: any) => {
 
 //[PUT]
 routerPreguntaInforme.put('/actualizar', jsonParser, async (req:any, res:any) => {
-    const pregunta_informe = await sequelize.pregunta_informe.findOne({ where: { id: req.body.id } })
-    if (pregunta_informe){
+    const Pregunta_informe = await pregunta_informe.findOne({ where: { id: req.body.id } })
+    if (Pregunta_informe){
       pregunta_informe.update(req.body)
       .then((resultados:any) => {
         console.log(resultados);

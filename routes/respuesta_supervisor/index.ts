@@ -1,71 +1,74 @@
 export { };
 
+const { respuesta_supervisor } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
-const routerRespuestaSupervisor = new Router();
+const routerRespuesta_supervisor = new Router();
 
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
 
 //[GET] para obtener uno
-routerRespuestaSupervisor.get('', (req: any, res: any) => {
-    console.log("Obteniendo respuesta_supervisor con id: ", req.query.id)
-    sequelize.respuesta_supervisor.findOne({
-        where: {
-            id: req.query.id
-        }
-    })
-    .then((resultados: any) => {
-        res.send(resultados);
-    })
-    .catch((err: any) => {
-        console.log('Error al obtener respuesta_supervisor', err);
-    })
-})
+routerRespuesta_supervisor.get('', async (req: any, res: any) => {
+  try {
+    if (!("id" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar id" });
+      return;
+    }
+    const data = await respuesta_supervisor.findOne({
+      where: {
+        id: req.query.id
+      }
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
 
 //[GET] mostrar todos
-routerRespuestaSupervisor.get('/todos', (req:any, res:any) => {
-    console.log("Obteniendo todas las respuesta_supervisor")
-    sequelize.respuesta_supervisor.findAll().then((resultados:any) => {
-      res.send(resultados)
-    })
-    .catch((err:any) => {
-      console.log('Error al mostrar respuesta_supervisor', err);
-      res.send('Error al mostrar respuesta_supervisor', err)
-    })
-})
+routerRespuesta_supervisor.get('/todos', async (req: any, res: any) => {
+  try {
+    const data = await respuesta_supervisor.findAll();
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
 
 //[DELETE] Eliminar
-routerRespuestaSupervisor.delete('/eliminar', (req:any, res:any) => {
-  console.log("Eliminar respuesta_supervisor con id: ", req.query.id)
-  sequelize.respuesta_supervisor.destroy({
+routerRespuesta_supervisor.delete('/eliminar', (req: any, res: any) => {
+  console.log("Eliminando respuesta_supervisor con id: ", req.query.id)
+ respuesta_supervisor.destroy({
     where: {
       id: req.query.id
     }
   })
-  .then((resultados:any) => {
-    console.log(resultados);
-    res.sendStatus(200);
-  })
-  .catch((err:any) => {
-    res.send(500)
-    console.log('Error al eliminar respuesta_supervisor', err);
-  })
+    .then((resultados: any) => {
+      console.log(resultados);
+      res.sendStatus(200);
+    })
+    .catch((err: any) => {
+      res.send(500)
+      console.log('Error al eliminar respuesta_supervisor', err);
+    })
 })
-
 //[POST] Crear uno
-routerRespuestaSupervisor.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_supervisor, id_practica, respuesta} = req.body;
-  console.log("Request de creacion de respuesta_supervisor");
-  sequelize.respuesta_supervisor.create({
+routerRespuesta_supervisor.post('/crear', jsonParser, (req: any, res: any) => {
+  const {id_pregunta_supervisor,id_supervisor,id_practica,respuesta} = req.body;
+  console.log("Request de respuesta_supervisor");
+ respuesta_supervisor.create({
+    id_pregunta_supervisor: id_pregunta_supervisor,
     id_supervisor: id_supervisor,
     id_practica: id_practica,
     respuesta: respuesta
   })
   .then((resultados:any) => {
       console.log(resultados);
-      res.send("respuesta_supervisor creado");
+      res.send(  "respuesta_supervisor creado");
   })
   .catch((err:any) => {
       console.log('Error al crear respuesta_supervisor',err);
@@ -74,22 +77,24 @@ routerRespuestaSupervisor.post('/crear', jsonParser, (req: any, res: any) => {
 
 
 //[PUT]
-routerRespuestaSupervisor.put('/actualizar', jsonParser, async (req:any, res:any) => {
-    const respuesta_supervisor = await sequelize.respuesta_supervisor.findOne({ where: { id: req.body.id } })
-    if (respuesta_supervisor) {
-      respuesta_supervisor.update(req.body)
-      .then((resultados:any) => {
+routerRespuesta_supervisor.put('/actualizar', jsonParser, async (req: any, res: any) => {
+  // buscar practica por id
+  const Respuesta_supervisor = await respuesta_supervisor.findOne({ where: { id: req.body.id } })
+  if (Respuesta_supervisor) {
+    // actualizar practica
+    Respuesta_supervisor.update(req.body)
+      .then((resultados: any) => {
         console.log(resultados);
         res.sendStatus(200);
       })
-      .catch((err:any) => {
+      .catch((err: any) => {
         res.send(500)
-        console.log('Error al actulizar respuesta_supervisor', err);
+        console.log('Error al actualizar respuesta_supervisor', err);
       })
-    } else {
-        console.log("No existe respuesta_supervisor con id: ", req.query.id)
-        res.sendStatus(404)
-    }
+  } else {
+    console.log("No existe respuesta_supervisor con id: ", req.query.id)
+    res.sendStatus(404)
+  }
 })
 
-module.exports = routerRespuestaSupervisor;
+module.exports = routerRespuesta_supervisor;
