@@ -144,28 +144,24 @@ routerDocumentoExtra.put('/agregar_documento', uploadFile.single("file"), async 
       deleteFile(req.file.path);
       return res.sendStatus(400);
     }
-    console.log(1)
     const key = req.file.filename;
     if (!key) {
       console.log("No se ingreso key de documento_extra");
       deleteFile(req.file.path);
       return res.sendStatus(400);
     }
-    console.log(2)
     const DocumentoExtra = await documento_extra.findOne({ where: { id: id_documento_extra } });
     if (!DocumentoExtra) {
       console.log("No existe documento_extra con id: ", id_documento_extra);
       deleteFile(req.file.path);
       return res.sendStatus(404)
     }
-    console.log(3)
     let filetypes = DocumentoExtra.tipo_archivo.split(",");
     if (!(await checkFileType(req.file.path, filetypes))) {
       console.log("El archivo no tiene el formato correcto");
       deleteFile(req.file.path);
       return res.sendStatus(415);
     }
-    console.log(4)
     DocumentoExtra.update({ key })
     return res.sendStatus(200);
   } catch (error) {
