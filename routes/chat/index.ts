@@ -1,6 +1,6 @@
 export { };
 
-const { chat } = require('../../models');
+const { chat, mensaje } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerChat = new Router();
@@ -41,7 +41,11 @@ routerChat.get('/get', async (req: any, res: any) => {
       where: {
         id_estudiante: req.query.id_estudiante,
         id_encargado: req.query.id_encargado
-      }
+      },
+      include: [{
+        model: mensaje,
+        as: 'mensajes'
+      }]
     });
     res.status(200).json(data);
   } catch (error) {

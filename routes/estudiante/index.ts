@@ -1,6 +1,6 @@
 export { };
 
-const { estudiante } = require('../../models');
+const { estudiante, usuario } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerEstudiante = new Router();
@@ -27,6 +27,29 @@ routerEstudiante.get('', async (req: any, res: any) => {
       res.status(500).json({ message: "Error interno" });
     }
   });
+
+//[GET] para obtener un estudiante con su ID de usuario
+routerEstudiante.get('/usuario', async (req: any, res: any) => {
+  try {
+    if (!("id_usuario" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar id_usuario" });
+      return;
+    }
+    const data = await estudiante.findOne({
+      where: {
+        id_usuario: req.query.id_usuario
+      },
+      include: [{
+        model: usuario,
+        as: 'usuario'
+      }]
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
 
 //[GET] mostrar todos los estudiantes
 routerEstudiante.get('/todos', async (req: any, res: any) => {

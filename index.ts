@@ -39,7 +39,8 @@ io.on('connection', function (socket: any) {
   socket.join(nameRoom)
 
   socket.on('evento', (res:any) => {
-    // Emite el mensaje a todos lo miembros de las sala menos a la persona que envia el mensaje   
+    // Emite el mensaje a todos lo miembros de las sala menos a la persona que envia el mensaje 
+    console.log("Evento recibido", res)  
     socket.to(nameRoom).emit('evento', res);
   })
 

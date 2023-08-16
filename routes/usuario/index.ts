@@ -100,40 +100,35 @@ routerUsuario.put('/actualizar', jsonParser, async (req:any, res:any) => {
 
 routerUsuario.post('/login',jsonParser, async (req:any, res:any) => {
   const {email,password}=req.body
-  if(req.body.email.trim()===''||req.body.password.trim()===''){
-      return res.status(400).send({msg:"email or password must not be empty"})
+
+  console.log(typeof password)
     
+  if(req.body.email.trim()===''||req.body.password.trim()===''){
+      return res.status(400).send({message:"Email o password vacios"})
+  
   }
-  usuario.findOne({where: {correo: email}}).then((resultados:any)=>{
-    if(resultados.length===0){
-      return res.status(400).send({message: 'Error en usuario y contraseña'});
-    }
-    bcrypt.compare(password,resultados.dataValues.password).then((checkout:any)=>{
-      if(checkout===false){
-        return res.status(400).send({message: 'Error en usuario y contraseña'});
-      }
-      const token = jwt.sign({id:resultados.dataValues.id.toString()},process.env.SECRET_KEY,{expiresIn:'1h'})
-      return res.status(200).send({message: 'Incio de sesion correcto', userdata: resultados.dataValues,token});
-    }).catch((err:any)=>{
-      if(err){
-        console.log(err)
-        return res.status(400).send({
-          msg:"Password no coinciden"
-        })
-      }
-    })
-  }).catch((err:any)=>{
-    if(err){
-      return res.status(400).send({
-          msg:"Usuario no encontrado"
-      })
-    }
-  })
+  console.log(1)
+  const resultados = await usuario.findOne({where: {correo: email}})
+  if(resultados.length===0){
+    return res.status(400).send({message: 'Error en usuario y contraseña'});
+  }
+  console.log(2)
+  let checkout = await bcrypt.compare(password,resultados.password)
+  if(checkout===false){
+    return res.status(400).send({message: 'Error en usuario y contraseña'});
+  }
+  console.log(3)
+  const token = jwt.sign({id:resultados.id.toString()},process.env.SECRET_KEY,{expiresIn:'1h'})
+  return res.status(200).send({message: 'Incio de sesion correcto', userdata: resultados,token});
 
 })
 
 routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
   let {email,password,cnfPwd,nombre,es_encargado,es_supervisor,es_estudiante,es_admin,extras} = req.body;
+  let RUT:any ;
+  if(es_estudiante){
+    RUT = extras.RUT;
+  }
   const usuarioSend = {email,password,nombre,es_encargado,es_supervisor,es_estudiante,es_admin};
   let pwdHashed = '';
 
@@ -147,11 +142,12 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
     return res.status(400).send({message: 'Email ya ocupado'});
   }
   else{
-    bcrypt.hash(password,8).then((hash:any)=>{
-      usuarioSend.password = hash;
-      pwdHashed = hash;
-    }).then(()=>{
-      usuario.create({
+    console.log("1")
+    let hash = await bcrypt.hash(password,8)
+    usuarioSend.password = hash;
+    pwdHashed = hash;
+    try{
+      let _usuario = await usuario.create({
         correo: email,
         password: pwdHashed,
         nombre: nombre,
@@ -160,50 +156,46 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
         es_estudiante: es_estudiante,
         es_admin: es_admin,
         config: null
-      }).then(()=>{
-        usuario.findOne({where:{correo: email}}).then(()=>{
-          if(es_encargado){
-            return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
-          }
-          if(es_supervisor){
-            supervisor.create({
-              nombre: nombre,
-              correo: email,
-              carnet_rostro: null,
-              es_correo_institucional: null
-            }).then(()=>{
-              return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
-            }).catch((err:any)=>{
-              if(err){
-                return res.status(400).send({message: 'Error al crear super'});
-              }
-            })
-          }
-          if(es_estudiante){
-            estudiante.create({
-              nombre_id_org: null,
-              id_org: null,
-              rut: null
-            }).then(()=>{
-              return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
-            }).catch((err:any)=>{
-              if(err){
-                return res.status(400).send({message: 'Error al crear est'});
-              }
-            })
-          } 
-        }).catch((err:any)=>{
-          if(err){
-            return res.status(400).send({message: 'Error al encontrar email'});
-          }
-        })
-      }).catch((err:any)=>{
-        if(err){
-          return res.status(400).send({message: 'Error al crear usuario'});
-        }
       })
-    })
-  }
+
+      console.log(_usuario)
+      if(_usuario.es_encargado){
+        return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+      }
+      console.log(1)
+      if(_usuario.es_supervisor){
+        try{
+          supervisor.create({
+            nombre: nombre,
+            correo: email,
+            carnet_rostro: null,
+            es_correo_institucional: null
+          })
+          return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+        }
+        catch(err){
+          return res.status(400).send({message: 'Error al crear super'});
+        }
+      }
+      if(_usuario.es_estudiante){
+        try{
+          estudiante.create({
+            id_usuario: _usuario.id,
+            nombre_id_org: null,
+            id_org: null,
+            rut: RUT
+          })
+          return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+        }
+        catch(err){
+          return res.status(400).send({message: 'Error al crear est'});
+        }
+      }
+    
+    }
+    catch(err){
+      return res.status(400).send({message: 'Error al crear usuario'});
+    }}
 })
 
 routerUsuario.post('/logout',jsonParser,(req:any,res:any)=>{

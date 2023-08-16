@@ -71,7 +71,6 @@ routerMensaje.post('/crear', jsonParser, (req: any, res: any) => {
     }
   })
   .then((resultados:any) => {
-    console.log(resultados);
     if(resultados){
       mensaje.create({
           id_chat: resultados.id,
@@ -80,7 +79,6 @@ routerMensaje.post('/crear', jsonParser, (req: any, res: any) => {
           fecha: fecha
         })
         .then((resultados:any) => {
-            console.log(resultados);
             res.send( "mensaje creado");
         })
         .catch((err:any) => {
