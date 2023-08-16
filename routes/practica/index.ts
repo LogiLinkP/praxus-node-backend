@@ -39,8 +39,10 @@ routerPractica.get('/get_asEstudiante', (req: any, res: any) => {
     where: {
       id_estudiante: req.query.id_estudiante
     },
-    include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, config_practica, empresa, supervisor, {model: informe, include: [config_informe]}, 
-              {model: documento, include: [solicitud_documento]}, documento_extra, {model:respuesta_supervisor, include: [pregunta_supervisor]}, encargado]
+    include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, {model: config_practica, 
+              include: [{model: solicitud_documento, include:[documento]}]}, empresa, 
+              supervisor, {model: informe, include: [config_informe]}, {model: documento, include: [solicitud_documento]}, 
+              documento_extra, {model:respuesta_supervisor, include: [pregunta_supervisor]}, encargado]
   })
     .then((resultados: any) => {
       res.send(resultados);
