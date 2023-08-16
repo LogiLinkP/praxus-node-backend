@@ -32,6 +32,23 @@ routerPractica.get('', async (req: any, res: any) => {
   }
 });
 
+//[GET] para obtener todas las practicas con el id de un estudiante
+routerPractica.get('/get', (req: any, res: any) => {
+  console.log("Obteniendo practica con id de estudiante: ", req.query.id_estudiante)
+  practica.findAll({
+    where: {
+      id_estudiante: req.query.id_estudiante
+    },
+    include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, config_practica, empresa, supervisor]
+  })
+    .then((resultados: any) => {
+      res.send(resultados);
+    })
+    .catch((err: any) => {
+      console.log('Error al obtener practica', err);
+    })
+})
+
 //[GET] mostrar todos
 routerPractica.get('/todos', async (req: any, res: any) => {
   try {
@@ -182,21 +199,6 @@ routerPractica.put('/actualizar', jsonParser, async (req: any, res: any) => {
   }
 })
 
-//[GET] para obtener una practica de acuerdo al id del estudiante (por ahora se asume que tiene una práctica)
-routerPractica.get('/get', (req: any, res: any) => {
-  console.log("Obteniendo practica con id de estudiante: ", req.query.id_estudiante)
-  practica.findOne({
-    where: {
-      id_estudiante: req.query.id_estudiante
-    },
-    include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, config_practica, empresa, supervisor]
-  })
-    .then((resultados: any) => {
-      res.send(resultados);
-    })
-    .catch((err: any) => {
-      console.log('Error al obtener practica', err);
-    })
-})
+
 
 module.exports = routerPractica;
