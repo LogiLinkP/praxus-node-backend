@@ -40,8 +40,7 @@ routerEstudiante.get('/usuario', async (req: any, res: any) => {
         id_usuario: req.query.id_usuario
       },
       include: [{
-        model: usuario,
-        as: 'usuario'
+        model: usuario
       }]
     });
     res.status(200).json(data);
