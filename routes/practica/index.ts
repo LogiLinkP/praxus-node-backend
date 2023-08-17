@@ -1,7 +1,7 @@
 export { };
 
 const { practica, estudiante, config_practica, usuario, empresa, supervisor, informe, documento, solicitud_documento,
-        documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe } = require('../../models');
+        documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe, encargado } = require('../../models');
 const { Router, json, urlencoded } = require('express');
 const routerPractica = new Router(); // /practica
 routerPractica.use(json());
@@ -33,13 +33,34 @@ routerPractica.get('', async (req: any, res: any) => {
 });
 
 //[GET] para obtener todas las practicas con el id de un estudiante
-routerPractica.get('/get', (req: any, res: any) => {
+routerPractica.get('/get_asEstudiante', (req: any, res: any) => {
   console.log("Obteniendo practica con id de estudiante: ", req.query.id_estudiante)
   practica.findAll({
     where: {
       id_estudiante: req.query.id_estudiante
     },
-    include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, config_practica, empresa, supervisor]
+    include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, {model: config_practica, 
+              include: [{model: solicitud_documento, include:[documento]}, config_informe]}, empresa, 
+              supervisor, {model: informe, include: [config_informe]}, {model: documento, include: [solicitud_documento]}, 
+              documento_extra, {model:respuesta_supervisor, include: [pregunta_supervisor]}, encargado]
+  })
+    .then((resultados: any) => {
+      res.send(resultados);
+    })
+    .catch((err: any) => {
+      console.log('Error al obtener practica', err);
+    })
+})
+
+//[GET] para obtener todas las practicas con el id de un encargado
+routerPractica.get('/get_asEncargado', (req: any, res: any) => {
+  console.log("Obteniendo practica con id de estudiante: ", req.query.id_encargado)
+  practica.findAll({
+    where: {
+      id_estudiante: req.query.id_encargado
+    },
+    include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, config_practica, empresa, supervisor, {model: informe, include: [config_informe]}, 
+              {model: documento, include: [solicitud_documento]}, documento_extra, {model:respuesta_supervisor, include: [pregunta_supervisor]}, encargado]
   })
     .then((resultados: any) => {
       res.send(resultados);

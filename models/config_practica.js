@@ -13,7 +13,15 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       // this has many practica
       this.hasMany(models.practica, {
-        foreignKey: 'id'
+        foreignKey: 'id_config_practica'
+      });
+
+      this.hasMany(models.solicitud_documento, {
+        foreignKey: 'id_config_practica'
+      });
+
+      this.hasMany(models.config_informe, {
+        foreignKey: 'id_config_practica'
       });
     }
   }
