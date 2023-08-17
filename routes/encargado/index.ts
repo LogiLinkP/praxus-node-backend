@@ -1,6 +1,6 @@
 export { };
 
-const { encargado } = require('../../models');
+const { encargado, usuario } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerEncargado = new Router();
@@ -28,6 +28,28 @@ routerEncargado.get('', async (req: any, res: any) => {
   }
 });
 
+
+//[GET] para obtener un encargado con su ID de usuario
+routerEncargado.get('/usuario', async (req: any, res: any) => {
+  try {
+    if (!("id_usuario" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar id_usuario" });
+      return;
+    }
+    const data = await encargado.findOne({
+      where: {
+        id_usuario: req.query.id_usuario
+      },
+      include: [{
+        model: usuario
+      }]
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
 //[GET] mostrar todos
 routerEncargado.get('/todos', async (req: any, res: any) => {
   try {

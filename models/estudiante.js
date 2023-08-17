@@ -12,12 +12,10 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.hasMany(models.practica, {
-        foreignKey: 'id'
+        foreignKey: 'id_estudiante'
       });
-
       this.belongsTo(models.usuario, {
-        foreignKey: 'id_usuario',
-        as: 'usuario' // This alias can be used when querying
+        foreignKey: 'id_usuario'
       });
     }
   }
