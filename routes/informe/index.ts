@@ -63,6 +63,7 @@ routerInforme.post('/crear', jsonParser, (req: any, res: any) => {
     id_practica: id_practica,
     id_config_informe: id_config_informe,
     horas_trabajadas: horas_trabajadas,
+    fecha: Date.now(),
     key: key
   })
   .then((resultados:any) => {
