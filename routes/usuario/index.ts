@@ -4,6 +4,8 @@ const { Router } = require('express');
 const { usuario, supervisor, estudiante } = require('../../models');
 const routerUsuario = new Router();
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
@@ -119,6 +121,7 @@ routerUsuario.post('/login',jsonParser, async (req:any, res:any) => {
   }
   console.log(3)
   const token = jwt.sign({id:resultados.id.toString()},process.env.SECRET_KEY,{expiresIn:'1h'})
+  console.log(token.length)
   return res.status(200).send({message: 'Incio de sesion correcto', userdata: resultados,token});
 
 })
@@ -200,7 +203,21 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
 
 routerUsuario.post('/logout',jsonParser,(req:any,res:any)=>{
   res.clearCookie("jwt");
-  res.redirect("/");
+  return res.status(200).send({message: 'Cierre de sesion exitoso'});
+})
+
+routerUsuario.post('/resetpwd', jsonParser,async (req: any, res:any)=>{
+  const {email} = req.body;
+  if(!email){
+    return res.status(400).send({message: 'Ingrese email'});
+  }
+  const _usuario = await usuario.findOne({where: {correo: email}})
+  if(!_usuario){
+    return res.status(400).send({message: 'Usuario no encontrado'});
+  }
+  var new_token = crypto.randomBytes(32).toString('hex');
+
+  
 })
 
 module.exports = routerUsuario;
