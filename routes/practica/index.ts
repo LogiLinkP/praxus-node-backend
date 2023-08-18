@@ -113,7 +113,7 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
       estado
     }, {
       where: {
-        id_estudiante, id_config_practica: id_practica
+        id_estudiante, id: id_practica
       }
     });
     console.log(data);

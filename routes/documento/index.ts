@@ -1,7 +1,7 @@
 export { };
 
 const { documento, practica, solicitud_documento } = require("../../models");
-const { uploadFile } = require("../../middleware/file_utils");
+const { uploadFile, deleteFile, checkFileType } = require("../../middleware/file_utils");
 
 const { Router } = require('express');
 const sequelize = require('../../db');
@@ -115,28 +115,6 @@ routerDocumento.post('/crear', jsonParser, (req: any, res: any) => {
     })
 })
 
-//[POST] para subir un documento
-routerDocumento.post('/upload', uploadFile.single("file"), async (req: any, res: any) => {
-  try {
-    console.log(req.file);
-    const _practica = await practica.findOne({
-      where: {
-        id_config_practica: 1,
-        id_estudiante: +req.body.id_estudiante,
-      }
-    });
-    const doc = await documento.create({
-      id_practica: _practica.id,
-      key: req.file.filename,
-    });
-    res.status(200).json({ message: "Archivo subido correctamente" });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Error al subir el archivo" });
-  }
-
-});
-
 //[PUT]
 routerDocumento.put('/actualizar', jsonParser, async (req: any, res: any) => {
   // buscar practica por id
@@ -157,5 +135,37 @@ routerDocumento.put('/actualizar', jsonParser, async (req: any, res: any) => {
     res.sendStatus(404)
   }
 })
+
+
+//[POST] Crear un nuevo registro en la tabla documento y subir el archivo, dado el id de la solicitud y el id de la practica
+routerDocumento.post('/upload', uploadFile.single('file'), async (req: any, res: any) => {
+  try {
+    const { id_solicitud, id_practica } = req.body;
+    if (!id_solicitud || !id_practica) {
+      console.log("No se ingreso id de solicitud o id de practica");
+      deleteFile(req.file.path);
+      return res.sendStatus(400);
+    }
+    const key = req.file.filename;
+    if (!key) {
+      console.log("No se ingreso key de documento");
+      deleteFile(req.file.path);
+      return res.sendStatus(400);
+    }
+    const Documento = await documento.create({
+      id_practica: id_practica,
+      id_solicitud_documento: id_solicitud,
+      key: key,
+      fecha_subida: new Date()
+    });
+    res.status(200).json(Documento);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
+
+
 
 module.exports = routerDocumento;
