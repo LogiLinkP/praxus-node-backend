@@ -1,7 +1,7 @@
 export { };
 
 const { Router } = require('express');
-const { usuario, supervisor, estudiante } = require('../../models');
+const { usuario, supervisor, estudiante, actividad_usuario, token_usuario } = require('../../models');
 const routerUsuario = new Router();
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
@@ -101,7 +101,7 @@ routerUsuario.put('/actualizar', jsonParser, async (req:any, res:any) => {
 })
 
 routerUsuario.post('/login',jsonParser, async (req:any, res:any) => {
-  const {email,password}=req.body
+  const {email,password,useragent}=req.body
 
   console.log(typeof password)
     
@@ -109,20 +109,34 @@ routerUsuario.post('/login',jsonParser, async (req:any, res:any) => {
       return res.status(400).send({message:"Email o password vacios"})
   
   }
-  console.log(1)
   const resultados = await usuario.findOne({where: {correo: email}})
   if(resultados.length===0){
     return res.status(400).send({message: 'Error en usuario y contraseña'});
   }
-  console.log(2)
   let checkout = await bcrypt.compare(password,resultados.password)
   if(checkout===false){
     return res.status(400).send({message: 'Error en usuario y contraseña'});
   }
-  console.log(3)
   const token = jwt.sign({id:resultados.id.toString()},process.env.SECRET_KEY,{expiresIn:'1h'})
-  console.log(token.length)
-  return res.status(200).send({message: 'Incio de sesion correcto', userdata: resultados,token});
+  let date = new Date();
+  let now = date.toLocaleDateString();
+  try{
+    actividad_usuario.create({
+      id_usuario: resultados.id_usuario,
+      accion: "Inicio sesion",
+      fecha: now,
+      useragent: useragent
+    })
+    //por comprobar si es valido hacer esto
+    token_usuario.create({
+      id_usuario: resultados.id_usuario,
+      token: token
+    })
+    return res.status(200).send({message: 'Incio de sesion correcto', userdata: resultados,token});
+  }catch(err){
+      return res.status(400).send({message: 'Error al iniciar sesion'});
+  }
+  
 
 })
 
