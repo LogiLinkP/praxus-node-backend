@@ -133,7 +133,7 @@ routerEstudiante.get('/encargados', async (req: any, res: any) => {
         id: req.query.id_estudiante
       },
       include: [{
-        model: practica, include: [{ model: encargado }]
+        model: practica, include: [{ model: encargado, include: [{ model: usuario }] }]
       }]
     });
     return res.status(200).json(data);
