@@ -1,4 +1,6 @@
 export { };
+import { Server } from 'socket.io';
+import { getIo } from '../../middleware/socketMiddleware';
 
 const { practica, estudiante, config_practica, usuario, empresa, supervisor, informe, documento, solicitud_documento,
         documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe, encargado } = require('../../models');
@@ -161,7 +163,7 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
 });
 
 routerPractica.put("/aprobar", async (req: any, res: any) => {
-  try {
+  try {  
     let { id_estudiante, id_config_practica, aprobacion } = req.body;
     if (typeof id_estudiante === "undefined" || typeof id_config_practica === "undefined" || typeof aprobacion === "undefined") {
       res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_config_practica y aprobacion" });
@@ -174,6 +176,18 @@ routerPractica.put("/aprobar", async (req: any, res: any) => {
         id_estudiante, id_config_practica
       }
     }).then((resultados: any) => {
+      const io: Server = getIo();
+      // send an event through socket.io
+      let roomName = "notificaciones"+id_estudiante;
+      let mensaje = ""
+      if(aprobacion == 1){
+        mensaje = "Tu práctica ha sido aprobada"
+      }
+      else{
+        mensaje = "Tu práctica ha sido reprobada"
+      }
+      io.to(roomName).emit('evento', { message: mensaje });
+      console.log("EMITIENDO EVENTO EN SALA", roomName);
       console.log(resultados);
       res.status(200).json({ message: "Estado actualizado" });
     })
