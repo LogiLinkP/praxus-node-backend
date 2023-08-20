@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
     modalidad: DataTypes.STRING,
     cantidad_tiempo: DataTypes.INTEGER,
     frecuencia_informes: DataTypes.STRING,
-    informe_final: DataTypes.BOOLEAN
+    informe_final: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'config_practica',
