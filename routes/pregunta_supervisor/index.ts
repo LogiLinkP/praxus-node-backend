@@ -57,12 +57,13 @@ routerPregSupervisor.delete('/eliminar', (req:any, res:any) => {
 
 //[POST] Crear una preguntas de supervisor con los datos recibidos
 routerPregSupervisor.post('/crear', jsonParser, (req: any, res: any) => {
-    const {id_config_practica, enunciado, tipo_respuesta} = req.body;
+    const {id_config_practica, enunciado, tipo_respuesta, opciones} = req.body;
     console.log("Request de creacion de preguntas de supervisor recibida");
     pregunta_supervisor.create({
         id_config_practica: id_config_practica,
         enunciado: enunciado,
-        tipo_respuesta: tipo_respuesta
+        tipo_respuesta: tipo_respuesta,
+        opciones: opciones
     })
     .then((resultados:any) => {
         console.log(resultados);

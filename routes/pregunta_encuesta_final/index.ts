@@ -38,13 +38,14 @@ routerPregEncuesta.get('', (req: any, res: any) => {
 
 //[POST] Crear preguntas de practica con los datos recibidos
 routerPregEncuesta.post('/crear', jsonParser, (req: any, res: any) => {
-    const {id_config_practica,enunciado, tipo_respuesta} = req.body;
+    const {id_config_practica,enunciado, tipo_respuesta, opciones} = req.body;
     console.log("Request de creacion de preguntas de practica recibida");
     // hacer post a python backend
     pregunta_encuesta_final.create({
         id_config_practica: id_config_practica,
         enunciado: enunciado,
-        tipo_respuesta: tipo_respuesta
+        tipo_respuesta: tipo_respuesta,
+        opciones: opciones
     })
     .then((resultados:any) => {
         console.log(resultados);
