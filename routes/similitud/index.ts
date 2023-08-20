@@ -15,70 +15,70 @@ const axios = require('axios');
 
 //[POST] Recibir request de calculo de consistencia desde el front
 routerSimilitud.post('/consistencia', jsonParser, async (req: any, res: any) => {
-    const {texto1, texto2, id_alumno_practica} = req.body;
-    console.log("Request de calculo de consistencia recibida");
-    console.log(req.body);
-    var consistencia = 0.0;
+  const { texto1, texto2, id_alumno_practica } = req.body;
+  console.log("Request de calculo de consistencia recibida");
+  console.log(req.body);
+  var consistencia = 0.0;
 
-    // hacer post a python backend
-    const payload = {
-        texto1: texto1,
-        texto2: texto2
-      };
-    await axios.post(process.env.PYTHONBE_CONSISTENCY, payload)
+  // hacer post a python backend
+  const payload = {
+    texto1: texto1,
+    texto2: texto2
+  };
+  await axios.post(process.env.PYTHONBE_CONSISTENCY, payload)
     .then(async (response: any) => {
       console.log("Respuesta recibida desde python backend");
       consistencia = await response.data.score;
-      console.log("La consistencia del informe es:",consistencia);
+      console.log("La consistencia del informe es:", consistencia);
     })
     .catch((error: any) => {
       console.error(error);
       res.status(500).send('Error occurred');
     });
-    
-    // guardar en la BD
-    const estuCursaPract = await sequelize.estudiante_cursa_practica.findOne({ where: { id: id_alumno_practica } })
-    if (estuCursaPract){
-      console.log("Actualizando consistencia de informe para el id", id_alumno_practica, "con consistencia", consistencia);
-        // actualizar estudiante_cursa_practica
-      estuCursaPract.update({ consistencia_informe: consistencia })
-      .then((resultados:any) => {
+
+  // guardar en la BD
+  const estuCursaPract = await sequelize.estudiante_cursa_practica.findOne({ where: { id: id_alumno_practica } })
+  if (estuCursaPract) {
+    console.log("Actualizando consistencia de informe para el id", id_alumno_practica, "con consistencia", consistencia);
+    // actualizar estudiante_cursa_practica
+    estuCursaPract.update({ consistencia_informe: consistencia })
+      .then((resultados: any) => {
         console.log(resultados);
         res.sendStatus(200);
       })
-      .catch((err:any) => {
+      .catch((err: any) => {
         res.send(500)
         console.log('Error al actualizar estudiante_cursa_practica', err);
       })
-    } else {
-        console.log("No existe estudiante_cursa_practica con id: ", req.query.id)
-        res.sendStatus(404)
-    }
+  } else {
+    console.log("No existe estudiante_cursa_practica con id: ", req.query.id)
+    res.sendStatus(404)
+  }
 })
 
 routerSimilitud.post('/comparacion_keywords', jsonParser, (req: any, res: any) => {
-  const {texto1, texto2, id_alumno_practica} = req.body;
+  const { texto1, texto2, id_alumno_practica } = req.body;
   console.log("Request de calculo con keywords recibida");
   console.log(req.body);
   // hacer post a python backend
   const payload = {
-      texto1: texto1,
-      texto2: texto2
-    };
+    texto1: texto1,
+    texto2: texto2
+  };
   axios.post(process.env.PYTHONBE_KEYWORDS, payload)
-  .then((response: any) => {
-    console.log("Respuesta recibida desde python backend");
-    res.status(200).send(response.data);
-  })
-  .catch((error: any) => {
-    console.error(error);
-    res.status(500).send('Error occurred');
-  });
+    .then((response: any) => {
+      console.log("Respuesta recibida desde python backend");
+      res.status(200).send(response.data);
+    })
+    .catch((error: any) => {
+      console.error(error);
+      res.status(500).send('Error occurred');
+    });
   // POR AHORA NO SE GUARDA ESTO
 })
 
 routerSimilitud.post('/consistencia_evaluacion_informe', jsonParser, async (req: any, res: any) => {
-  const {texto, puntaje, puntaje_min, puntaje_max, id_alumno_practica} = req.body;
+  const { texto, puntaje, puntaje_min, puntaje_max, id_alumno_practica } = req.body;
   console.log("Request de calculo de consistencia_evaluacion_informe recibida");
   console.log(req.body);
   var consistencia = 0.0;
@@ -89,20 +89,20 @@ routerSimilitud.post('/consistencia_evaluacion_informe', jsonParser, async (req:
   var datos;
   // hacer post a python backend
   const payload = {
-      texto: texto,
-      puntaje: puntaje,
-      puntaje_min: puntaje_min,
-      puntaje_max: puntaje_max
-    };
+    texto: texto,
+    puntaje: puntaje,
+    puntaje_min: puntaje_min,
+    puntaje_max: puntaje_max
+  };
   await axios.post(process.env.PYTHONBE_EVAL_INFORME, payload)
-  .then(async (response: any) => {
+    .then(async (response: any) => {
       console.log("Respuesta recibida desde python backend");
       datos = await response.data;
       neg = datos.informe.probas.NEG;
       pos = datos.informe.probas.POS;
       neu = datos.informe.probas.NEU;
-      console.log("sentimientos de informe (pos, neg, neu):",pos, neg, neu);
-      console.log("evaluacion:",datos.evaluacion.puntaje);
+      console.log("sentimientos de informe (pos, neg, neu):", pos, neg, neu);
+      console.log("evaluacion:", datos.evaluacion.puntaje);
       producto = neg * 0.2 + pos + neu * 0.6; // ESTOS NUMEROS PUEDEN AJUSTARSE
       // consistencia is the max between producto and puntaje
       if (producto > datos.evaluacion.puntaje) {
@@ -110,31 +110,48 @@ routerSimilitud.post('/consistencia_evaluacion_informe', jsonParser, async (req:
       } else {
         consistencia = producto / datos.evaluacion.puntaje;
       }
-      console.log("La consistencia del informe es:",consistencia);
-  })
-  .catch((error: any) => {
-    console.error(error);
-    res.status(500).send('Error occurred');
-  });
+      console.log("La consistencia del informe es:", consistencia);
+    })
+    .catch((error: any) => {
+      console.error(error);
+      res.status(500).send('Error occurred');
+    });
 
   // guardar en la BD
   const estuCursaPract = await sequelize.estudiante_cursa_practica.findOne({ where: { id: id_alumno_practica } })
-  if (estuCursaPract){
+  if (estuCursaPract) {
     console.log("Actualizando consistencia de informe para el id", id_alumno_practica, "con consistencia", consistencia);
-      // actualizar estudiante_cursa_practica
+    // actualizar estudiante_cursa_practica
     estuCursaPract.update({ consistencia_nota: consistencia })
-    .then((resultados:any) => {
-      console.log(resultados);
-      res.sendStatus(200);
-    })
-    .catch((err:any) => {
-      res.send(500)
-      console.log('Error al actualizar estudiante_cursa_practica', err);
-    })
+      .then((resultados: any) => {
+        console.log(resultados);
+        res.sendStatus(200);
+      })
+      .catch((err: any) => {
+        res.send(500)
+        console.log('Error al actualizar estudiante_cursa_practica', err);
+      })
   } else {
-      console.log("No existe estudiante_cursa_practica con id: ", req.query.id)
-      res.sendStatus(404)
+    console.log("No existe estudiante_cursa_practica con id: ", req.query.id)
+    res.sendStatus(404)
   }
 })
+
+routerSimilitud.get('/frases_representativas', jsonParser, async (req: any, res: any) => {
+  // get texto and cantidad from query string
+  const { texto } = req.query;
+  if (!texto) {
+    res.status(400).json({ error: 'Texto no especificado' });
+    return;
+  }
+  try {
+    const response = await axios.get(`${process.env.URL_PYTHON_BACKEND}/nlp/frases_representativas?texto=${texto}&cantidad=${req.query.cantidad ?? 10}`)
+    return res.status(200).json(response.data);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+
+});
 
 module.exports = routerSimilitud;
