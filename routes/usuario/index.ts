@@ -121,18 +121,18 @@ routerUsuario.post('/login',jsonParser, async (req:any, res:any) => {
   let date = new Date();
   let now = date.toLocaleDateString();
   try{
-    actividad_usuario.create({
+    await actividad_usuario.create({
       id_usuario: resultados.id_usuario,
       accion: "Inicio sesion",
       fecha: now,
       useragent: useragent
     })
     //por comprobar si es valido hacer esto
-    token_usuario.create({
+    await token_usuario.create({
       id_usuario: resultados.id_usuario,
       token: token
     })
-    return res.status(200).send({message: 'Incio de sesion correcto', userdata: resultados,token});
+    return res.status(200).send({message: 'Inicio de sesion correcto', userdata: resultados,token});
   }catch(err){
       return res.status(400).send({message: 'Error al iniciar sesion'});
   }
@@ -182,7 +182,7 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
       console.log(1)
       if(_usuario.es_supervisor){
         try{
-          supervisor.create({
+          await supervisor.create({
             nombre: nombre,
             correo: email,
             carnet_rostro: null,
@@ -196,7 +196,7 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
       }
       if(_usuario.es_estudiante){
         try{
-          estudiante.create({
+          await estudiante.create({
             id_usuario: _usuario.id,
             nombre_id_org: null,
             id_org: null,
