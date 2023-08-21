@@ -1,9 +1,11 @@
 export { };
 
 const { Router } = require('express');
-const { usuario, supervisor, estudiante } = require('../../models');
+const { usuario, supervisor, estudiante, actividad_usuario, token_usuario } = require('../../models');
 const routerUsuario = new Router();
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
@@ -99,7 +101,7 @@ routerUsuario.put('/actualizar', jsonParser, async (req:any, res:any) => {
 })
 
 routerUsuario.post('/login',jsonParser, async (req:any, res:any) => {
-  const {email,password}=req.body
+  const {email,password,useragent}=req.body
 
   console.log(typeof password)
     
@@ -107,19 +109,34 @@ routerUsuario.post('/login',jsonParser, async (req:any, res:any) => {
       return res.status(400).send({message:"Email o password vacios"})
   
   }
-  console.log(1)
   const resultados = await usuario.findOne({where: {correo: email}})
   if(resultados.length===0){
     return res.status(400).send({message: 'Error en usuario y contraseña'});
   }
-  console.log(2)
   let checkout = await bcrypt.compare(password,resultados.password)
   if(checkout===false){
     return res.status(400).send({message: 'Error en usuario y contraseña'});
   }
-  console.log(3)
   const token = jwt.sign({id:resultados.id.toString()},process.env.SECRET_KEY,{expiresIn:'1h'})
-  return res.status(200).send({message: 'Incio de sesion correcto', userdata: resultados,token});
+  let date = new Date();
+  let now = date.toLocaleDateString();
+  try{
+    await actividad_usuario.create({
+      id_usuario: resultados.id_usuario,
+      accion: "Inicio sesion",
+      fecha: now,
+      useragent: useragent
+    })
+    //por comprobar si es valido hacer esto
+    await token_usuario.create({
+      id_usuario: resultados.id_usuario,
+      token: token
+    })
+    return res.status(200).send({message: 'Inicio de sesion correcto', userdata: resultados,token});
+  }catch(err){
+      return res.status(400).send({message: 'Error al iniciar sesion'});
+  }
+  
 
 })
 
@@ -165,7 +182,7 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
       console.log(1)
       if(_usuario.es_supervisor){
         try{
-          supervisor.create({
+          await supervisor.create({
             nombre: nombre,
             correo: email,
             carnet_rostro: null,
@@ -179,7 +196,7 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
       }
       if(_usuario.es_estudiante){
         try{
-          estudiante.create({
+          await estudiante.create({
             id_usuario: _usuario.id,
             nombre_id_org: null,
             id_org: null,
@@ -200,7 +217,21 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
 
 routerUsuario.post('/logout',jsonParser,(req:any,res:any)=>{
   res.clearCookie("jwt");
-  res.redirect("/");
+  return res.status(200).send({message: 'Cierre de sesion exitoso'});
+})
+
+routerUsuario.post('/resetpwd', jsonParser,async (req: any, res:any)=>{
+  const {email} = req.body;
+  if(!email){
+    return res.status(400).send({message: 'Ingrese email'});
+  }
+  const _usuario = await usuario.findOne({where: {correo: email}})
+  if(!_usuario){
+    return res.status(400).send({message: 'Usuario no encontrado'});
+  }
+  var new_token = crypto.randomBytes(32).toString('hex');
+
+  
 })
 
 module.exports = routerUsuario;
