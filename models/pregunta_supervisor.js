@@ -16,7 +16,8 @@ module.exports = (sequelize, DataTypes) => {
   pregunta_supervisor.init({
     id_config_practica: DataTypes.INTEGER,
     enunciado: DataTypes.STRING,
-    tipo_respuesta: DataTypes.STRING
+    tipo_respuesta: DataTypes.STRING,
+    opciones: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'pregunta_supervisor',

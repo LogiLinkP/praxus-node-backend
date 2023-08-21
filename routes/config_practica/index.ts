@@ -28,6 +28,28 @@ routerConfigPracticas.get('', async (req: any, res: any) => {
   }
 });
 
+//[GET] obtener una config_practica con nombre, modalidad y cantidad_tiempo 
+routerConfigPracticas.get('/buscar', async (req: any, res: any) => {
+  try {
+    if (!("nombre" in req.query && "modalidad" in req.query && "cantidad_tiempo" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar nombre, modalidad y cantidad_tiempo" });
+      return;
+    }
+    const data = await config_practica.findOne({
+      where: {
+        nombre: req.query.nombre,
+        modalidad: req.query.modalidad,
+        cantidad_tiempo: req.query.cantidad_tiempo
+      }
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
+
 //[GET] obtener todas las config_practicas por nombre
 routerConfigPracticas.get('/nombre', async (req: any, res: any) => {
   try {

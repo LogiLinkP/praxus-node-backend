@@ -8,6 +8,7 @@ const { Router, json, urlencoded } = require('express');
 // const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const fs = require('fs');
+const crypto = require('crypto');
 dotenv.config();
 
 const router = new Router() // /supervisor
@@ -19,12 +20,24 @@ router.post("/gen_token", (req: any, res: any) => {
         console.log("gen token");
         console.log(req.body);
         if ("correo" in req.body && "nom_sup" in req.body && "nom_estudiante" in req.body) {
-            const { correo, nom_sup, nom_estudiante } = req.body;
-            // const token = jwt.sign({ correo }, process.env.TOKEN_SECRET, { expiresIn: '7 days', algorithm: 'RS256' });
-            // console.log(token);
-            //correo que se envia al supervisor
-            //console.log("enviando correo");
-            sendMail(correo, `Revisión de práctica de ${nom_estudiante}`, "Para evaluar al practicante debe acceder a " + process.env.URL_FRONTEND +"/supervisor/evaluacion", nom_sup);
+            const { id_practica, correo, nom_sup, nom_estudiante } = req.body;
+
+            const encrypt = (text:any) => {
+                const algorithm = process.env.ENCRYPT_ALGORITHM;
+                const key = process.env.ENCRYPT_SECRET_KEY;
+                const iv = crypto.randomBytes(16)              
+                const cipher = crypto.createCipheriv(algorithm, key, iv)              
+                const encrypted = Buffer.concat([cipher.update(text), cipher.final()])              
+                return {
+                  iv: iv.toString('hex'),
+                  content: encrypted.toString('hex')
+                }
+            }
+
+            let encrypted_str = encrypt(req.body.id_practica.toString());
+
+            // send the email with the encrypted id_practica
+            sendMail(correo, `Revisión de práctica de ${nom_estudiante}`, "Para evaluar al practicante debe acceder a " + process.env.URL_FRONTEND + "/supervisor/evaluacion?token=" + encrypted_str.content + "&iv=" + encrypted_str.iv, "Revisión de práctica de " + nom_estudiante);
             //console.log("correo enviado correctamente");
             res.status(200).json({ message: "Correo enviado" });
         } else {

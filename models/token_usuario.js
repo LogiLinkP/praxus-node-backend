@@ -3,26 +3,26 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class pregunta_encuesta_final extends Model {
+  class token_usuario extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
+
     static associate(models) {
       // define association here
+      this.belongsTo(models.usuario, { foreignKey: 'id_usuario' });
     }
   }
-  pregunta_encuesta_final.init({
-    id_config_practica: DataTypes.INTEGER,
-    enunciado: DataTypes.STRING,
-    tipo_respuesta: DataTypes.STRING,
-    opciones: DataTypes.STRING
+  token_usuario.init({
+    id_usuario: DataTypes.INTEGER,
+    token: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'pregunta_encuesta_final',
-    tableName: 'pregunta_encuesta_final',
+    modelName: 'token_usuario',
+    tableName: 'token_usuarios',
     timestamps: false
   });
-  return pregunta_encuesta_final;
+  return token_usuario;
 };

@@ -83,7 +83,14 @@ routerDocumentoExtra.get('/download', async (req: any, res: any) => {
         id: req.query.id
       }
     });
-    return res.download(`./tmp/${data.key}`);
+    if (!data) {
+      res.status(404).json({ message: "No existe documento_extra con id: " + req.query.id });
+      return;
+    }
+    else{
+      const file = `./tmp/${data.key}`;
+      res.download(file);
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error interno" });

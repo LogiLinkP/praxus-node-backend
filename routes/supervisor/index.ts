@@ -70,7 +70,7 @@ routerSupervisor.post('/crear', jsonParser, (req: any, res: any) => {
   })
   .then((resultados:any) => {
       console.log(resultados);
-      res.send("supervisor creado");
+      res.status(200).json({id: resultados.dataValues.id});
   })
   .catch((err:any) => {
       console.log('Error al crear supervisor',err);

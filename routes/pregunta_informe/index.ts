@@ -57,12 +57,13 @@ routerPreguntaInforme.delete('/eliminar', (req:any, res:any) => {
 
 //[POST] Crear un pregunta_informe con los datos recibidos
 routerPreguntaInforme.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_config_informe, enunciado, tipo_respuesta} = req.body;
+  const {id_config_informe, enunciado, tipo_respuesta, opciones} = req.body;
   console.log("Request de creacion de pregunta_informe recibida");
   pregunta_informe.create({
       id_config_informe: id_config_informe,
       enunciado: enunciado,
-      tipo_respuesta: tipo_respuesta
+      tipo_respuesta: tipo_respuesta,
+      opciones: opciones
   })
   .then((resultados:any) => {
       res.send("pregunta_informe creado");

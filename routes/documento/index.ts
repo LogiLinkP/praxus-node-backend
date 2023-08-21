@@ -71,7 +71,16 @@ routerDocumento.get('/download', async (req: any, res: any) => {
         id: req.query.id
       }
     });
-    return res.download(`./tmp/${data.key}`);
+    // check if file exists, if not return 404
+    if (!data) {
+      res.status(404).json({ message: "Documento no encontrado" });
+      return;
+    }
+    else {
+      const file = `./tmp/${data.key}`;
+      res.download(file);
+    }
+
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error interno" });
