@@ -11,6 +11,10 @@ module.exports = {
       {
         id: 2,
         id_usuario: 5
+      },
+      {
+        id: 3,
+        id_usuario: 3
       }
 
     ], {});
