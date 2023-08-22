@@ -164,8 +164,8 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
 
 routerPractica.put("/aprobar", async (req: any, res: any) => {
   try {  
-    let { id_estudiante, id_config_practica, aprobacion } = req.body;
-    if (typeof id_estudiante === "undefined" || typeof id_config_practica === "undefined" || typeof aprobacion === "undefined") {
+    let { id_usuario, id_estudiante, id_config_practica, aprobacion } = req.body;
+    if ( typeof id_usuario === "undefined" || typeof id_estudiante === "undefined" || typeof id_config_practica === "undefined" || typeof aprobacion === "undefined") {
       res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_config_practica y aprobacion" });
       return;
     }
@@ -178,16 +178,17 @@ routerPractica.put("/aprobar", async (req: any, res: any) => {
     }).then((resultados: any) => {
       const io: Server = getIo();
       // send an event through socket.io
-      let roomName = "notificaciones"+id_estudiante;
-      let mensaje = ""
+      let roomName = "notificaciones"+id_usuario;
+      let texto = ""
+      let fecha = new Date().toLocaleString();
       if(aprobacion == 1){
-        mensaje = "Tu práctica ha sido aprobada"
+        texto = "Tu práctica ha sido aprobada"
       }
       else{
-        mensaje = "Tu práctica ha sido reprobada"
+        texto = "Tu práctica ha sido reprobada"
       }
-      io.to(roomName).emit('evento', { message: mensaje });
-      console.log("EMITIENDO EVENTO EN SALA", roomName);
+      io.to(roomName).emit('notificacion', {fecha, texto});
+      console.log("EMITIENDO EVENTO EN SALA", roomName, texto);
       console.log(resultados);
       res.status(200).json({ message: "Estado actualizado" });
     })

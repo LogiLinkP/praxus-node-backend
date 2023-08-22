@@ -15,7 +15,8 @@ routerNotificacion.get('/todos', async (req: any, res: any) => {
   try {
     const data = await notificacion.findAll({
       where: {
-        id_usuario: req.query.id_usuario
+        id_usuario: req.query.id_usuario,
+        visto: false,
       }
     });
     res.status(200).json(data);
@@ -44,6 +45,8 @@ routerNotificacion.delete('/eliminar', (req: any, res: any) => {
     })
 })
 
+
+
 //[POST] 
 routerNotificacion.post('/crear', jsonParser, (req: any, res: any) => {
   const {id_usuario, mensaje} = req.body;
@@ -70,6 +73,28 @@ routerNotificacion.put('/actualizar', jsonParser, async (req: any, res: any) => 
   if (Notificacion) {
     // actualizar practica
     Notificacion.update(req.body)
+      .then((resultados: any) => {
+        console.log(resultados);
+        res.sendStatus(200);
+      })
+      .catch((err: any) => {
+        res.send(500)
+        console.log('Error al actualizar notificacion', err);
+      })
+  } else {
+    console.log("No existe notificacion con id: ", req.query.id)
+    res.sendStatus(404)
+  }
+})
+
+routerNotificacion.put('/visto', jsonParser, async (req: any, res: any) => {
+  // buscar practica por id
+  const Notificaciones = await notificacion.findAll({ where: { id_usuario: req.body.id_usuario } })
+  if (Notificaciones) {
+    // actualizar practica
+    Notificaciones.update({
+      visto: 1
+    })
       .then((resultados: any) => {
         console.log(resultados);
         res.sendStatus(200);
