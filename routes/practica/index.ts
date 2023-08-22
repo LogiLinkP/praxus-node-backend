@@ -35,6 +35,26 @@ routerPractica.get('', async (req: any, res: any) => {
   }
 });
 
+//[GET] para obtener una practica con con su config_practica y las preguntas_supervisor asociadas
+routerPractica.get('/preguntas_supervisor', async (req: any, res: any) => {
+  try {
+    if (!("id" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar id" });
+      return;
+    }
+    const data = await practica.findOne({
+      where: {
+        id: req.query.id
+      },
+      include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, {config_practica, include: [pregunta_supervisor]}]
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
 //[GET] para obtener una practica con el id encriptado (debe venir un token y un iv)
 routerPractica.get('/encrypted', async (req: any, res: any) => {
   try { 
@@ -244,7 +264,7 @@ routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
     })
     .catch((err: any) => {
       res.status(500).json({ mensaje: "error" });
-      console.log('Error al crear practica');
+      console.log('Error al crear practica', err.message, fecha_inicio);
     })
 })
 
