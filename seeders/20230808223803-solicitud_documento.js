@@ -6,6 +6,7 @@ module.exports = {
     
     await queryInterface.bulkInsert('solicitud_documento', [
       {
+        id: 1,
         id_config_practica: 1,
         nombre_solicitud: 'certificado empresa',
         descripcion: 'por favor subir certificado empresa',
