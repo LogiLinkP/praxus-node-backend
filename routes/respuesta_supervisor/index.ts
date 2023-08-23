@@ -42,7 +42,7 @@ routerRespuesta_supervisor.get('/todos', async (req: any, res: any) => {
 //[DELETE] Eliminar
 routerRespuesta_supervisor.delete('/eliminar', (req: any, res: any) => {
   console.log("Eliminando respuesta_supervisor con id: ", req.query.id)
- respuesta_supervisor.destroy({
+  respuesta_supervisor.destroy({
     where: {
       id: req.query.id
     }
@@ -56,25 +56,25 @@ routerRespuesta_supervisor.delete('/eliminar', (req: any, res: any) => {
       console.log('Error al eliminar respuesta_supervisor', err);
     })
 })
+
 //[POST] Crear uno
 routerRespuesta_supervisor.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_pregunta_supervisor,id_supervisor,id_practica,respuesta} = req.body;
+  const { id_pregunta_supervisor, id_practica, respuesta } = req.body;
   console.log("Request de respuesta_supervisor");
- respuesta_supervisor.create({
+  respuesta_supervisor.create({
     id_pregunta_supervisor: id_pregunta_supervisor,
-    id_supervisor: id_supervisor,
     id_practica: id_practica,
     respuesta: respuesta
   })
-  .then((resultados:any) => {
+    .then((resultados: any) => {
       console.log(resultados);
-      res.send(  "respuesta_supervisor creado");
-  })
-  .catch((err:any) => {
-      console.log('Error al crear respuesta_supervisor',err);
-  })
+      res.status(200).json(resultados);
+    })
+    .catch((err: any) => {
+      console.log('Error al crear respuesta_supervisor', err);
+      res.status(500).json({ message: "Error interno" });
+    })
 })
-
 
 //[PUT]
 routerRespuesta_supervisor.put('/actualizar', jsonParser, async (req: any, res: any) => {
@@ -92,8 +92,8 @@ routerRespuesta_supervisor.put('/actualizar', jsonParser, async (req: any, res: 
         console.log('Error al actualizar respuesta_supervisor', err);
       })
   } else {
-    console.log("No existe respuesta_supervisor con id: ", req.query.id)
-    res.sendStatus(404)
+    console.log("No existe respuesta_supervisor con id: ", req.query.id);
+    res.sendStatus(404);
   }
 })
 
