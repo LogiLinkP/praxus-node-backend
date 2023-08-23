@@ -1,6 +1,7 @@
 export { };
 import { Server } from 'socket.io';
 import { getIo } from '../../middleware/socketMiddleware';
+import { sendMail } from '../../utils/email';
 
 const { practica, estudiante, config_practica, usuario, empresa, supervisor, informe, documento, solicitud_documento,
         documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe, encargado } = require('../../models');
@@ -173,13 +174,15 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
         id_estudiante, id: id_practica
       }
     });
-    const io: Server = getIo();
-      // send an event through socket.io
-      let roomName = "notificaciones"+id_estudiante;
-      let mensaje = "El alumno X ha finalizado su práctica y está solicitando una revisión"
 
-      io.to(roomName).emit('evento', { message: mensaje });
-      console.log("EMITIENDO EVENTO EN SALA", roomName);
+    sendMail(, "Praxus: Solicitud de Revisión de Practica", "Un/a alumno/a ha finalizado su práctica y solicita su revisión, ingrese a Praxus.com para proceder", "Praxus: Solicitud de Revisión de Practica")
+    const io: Server = getIo();
+    // send an event through socket.io
+    let roomName = "notificaciones"+id_estudiante;
+    let mensaje = "El alumno X ha finalizado su práctica y está solicitando una revisión"
+
+    io.to(roomName).emit('evento', { message: mensaje });
+    console.log("EMITIENDO EVENTO EN SALA", roomName);
     
     console.log(data);
     res.status(200).json({ message: "Estado actualizado" });
@@ -206,12 +209,15 @@ routerPractica.put("/aprobar", async (req: any, res: any) => {
     }).then((resultados: any) => {
       const io: Server = getIo();
       // send an event through socket.io
+      
       let roomName = "notificaciones"+id_estudiante;
       let mensaje = ""
       if(aprobacion == 1){
+        sendMail(, "Praxus: Resultado Práctica", "Felicidades, tu práctica ha sido aprobada. Muchas gracias por usar Praxus", "Praxus, resultado Práctica");
         mensaje = "Tu práctica ha sido aprobada"
       }
       else{
+        sendMail(, "Praxus: Resultado Práctica", "Desafortunadamente, tu práctica ha sido reprobada. De todas maneras, muchas gracias por usar Praxus", "Praxus, resultado Práctica");
         mensaje = "Tu práctica ha sido reprobada"
       }
       io.to(roomName).emit('evento', { message: mensaje });
@@ -270,6 +276,8 @@ routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
       res.status(200).json({ mensaje: "ok" });
       console.log("practica creada");
       
+
+      sendMail(, "Praxus: Práctica Creada", "El/La alumno/a X ha creado una práctica y usted ha sido escogido para encargarse de su desarrollo. A partir de ahora deberá estar pendiente de Praxus.com por cada cambio que dicho alumno/a realice", "Praxus: Práctica Creada");
       const io: Server = getIo();
       let roomName = "notificaciones"+id_encargado;
       let mensaje = "El alumno X ha ingresado una práctica";
