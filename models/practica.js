@@ -56,6 +56,7 @@ module.exports = (sequelize, DataTypes) => {
     id_supervisor: DataTypes.INTEGER,
     id_empresa: DataTypes.INTEGER,
     id_encargado: DataTypes.INTEGER,
+    id_modalidad: DataTypes.INTEGER,
     estado: DataTypes.STRING,
     fecha_inicio: DataTypes.DATE,
     fecha_termino: DataTypes.DATE,
