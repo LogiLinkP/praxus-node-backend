@@ -206,8 +206,8 @@ routerSimilitud.get('/frases_representativas_practica/:id_practica', jsonParser,
     const [response_informes, response_supervisor] = await Promise.all([_response_informes, _response_supervisor])
 
     return res.status(200).json({
-      informes: response_informes.status == 200 ? response_informes.data : null,
-      supervisor: response_supervisor.status == 200 ? response_supervisor.data : null
+      informes: response_informes.status == 200 ? [response_informes.data, textos_informes] : null,
+      supervisor: response_supervisor.status == 200 ? [response_supervisor.data, textos_supervisor] : null
     });
   } catch (error) {
     console.error(error);
