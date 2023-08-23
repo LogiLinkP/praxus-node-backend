@@ -46,7 +46,7 @@ routerPractica.get('/preguntas_supervisor', async (req: any, res: any) => {
       where: {
         id: req.query.id
       },
-      include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, {config_practica, include: [pregunta_supervisor]}]
+      include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, {model: config_practica, include: [pregunta_supervisor]}]
     });
     res.status(200).json(data);
   } catch (error) {
@@ -80,8 +80,7 @@ routerPractica.get('/encrypted', async (req: any, res: any) => {
       where: {
         id: decrypted_id
       },
-      include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, config_practica, empresa, supervisor, {model: informe, include: [config_informe]}, 
-                {model: documento, include: [solicitud_documento]}, documento_extra, {model:respuesta_supervisor, include: [pregunta_supervisor]}]
+      include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, {model: config_practica, include: [pregunta_supervisor]}]
     });
     res.status(200).json(data);
   } catch (error) {

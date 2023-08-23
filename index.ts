@@ -23,6 +23,7 @@ app.listen(PORT, function (err: any) {
   })
 });
 
+//Socket.io
 const options = {
   cors: {
     origin: 'http://localhost:4200',

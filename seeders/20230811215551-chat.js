@@ -5,6 +5,7 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     queryInterface.bulkInsert('chat', [
       {
+        id: 1,
         id_encargado: 1,
         id_estudiante: 1
       }
