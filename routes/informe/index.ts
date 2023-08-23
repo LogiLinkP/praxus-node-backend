@@ -59,7 +59,7 @@ routerInforme.delete('/eliminar', (req:any, res:any) => {
 
 //[POST] Crear uno
 routerInforme.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_practica, id_config_informe, horas_trabajadas, key} = req.body;
+  const {id_practica, id_config_informe, horas_trabajadas, key, id_encargado} = req.body;
   console.log("Request de creacion de informe");
   informe.create({
     id_practica: id_practica,
@@ -72,7 +72,7 @@ routerInforme.post('/crear', jsonParser, (req: any, res: any) => {
 
     const io: Server = getIo();
     // send an event through socket.io
-    let roomName = "notificaciones"+id_estudiante;
+    let roomName = "notificaciones"+id_encargado;
     let mensaje = "El alumno X ha mandado un informe de su práctica"
     io.to(roomName).emit('evento', { message: mensaje });
     console.log("EMITIENDO EVENTO EN SALA", roomName);
