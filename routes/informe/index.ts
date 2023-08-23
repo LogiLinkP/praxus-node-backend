@@ -1,4 +1,6 @@
 export { };
+import { Server } from 'socket.io';
+import { getIo } from '../../middleware/socketMiddleware';
 
 const { informe } = require('../../models');
 const { Router } = require('express');
@@ -67,8 +69,15 @@ routerInforme.post('/crear', jsonParser, (req: any, res: any) => {
     key: key
   })
   .then((resultados:any) => {
-      console.log(resultados);
-      res.send("informe creado");
+
+    const io: Server = getIo();
+    // send an event through socket.io
+    let roomName = "notificaciones"+id_estudiante;
+    let mensaje = "El alumno X ha mandado un informe de su práctica"
+    io.to(roomName).emit('evento', { message: mensaje });
+    console.log("EMITIENDO EVENTO EN SALA", roomName);
+    console.log(resultados);
+    res.send("informe creado");
   })
   .catch((err:any) => {
       res.sendStatus(500)

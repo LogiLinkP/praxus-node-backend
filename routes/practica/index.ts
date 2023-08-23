@@ -173,8 +173,17 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
         id_estudiante, id: id_practica
       }
     });
+    const io: Server = getIo();
+      // send an event through socket.io
+      let roomName = "notificaciones"+id_estudiante;
+      let mensaje = "El alumno X ha finalizado su práctica y está solicitando una revisión"
+
+      io.to(roomName).emit('evento', { message: mensaje });
+      console.log("EMITIENDO EVENTO EN SALA", roomName);
+    
     console.log(data);
     res.status(200).json({ message: "Estado actualizado" });
+
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error interno" });
@@ -260,6 +269,13 @@ routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
     .then((resultados: any) => {
       res.status(200).json({ mensaje: "ok" });
       console.log("practica creada");
+      
+      const io: Server = getIo();
+      let roomName = "notificaciones"+id_encargado;
+      let mensaje = "El alumno X ha ingresado una práctica";
+      
+      io.to(roomName).emit('notificacion', { message: mensaje });
+      console.log("EMITIENDO EVENTO EN SALA", roomName);
     })
     .catch((err: any) => {
       res.status(500).json({ mensaje: "error" });
