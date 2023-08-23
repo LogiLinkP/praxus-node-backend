@@ -1,3 +1,5 @@
+import { info } from "console";
+
 export { };
 
 require('dotenv').config()
@@ -6,6 +8,10 @@ const { Router } = require('express');
 var bodyParser = require('body-parser');
 
 const sequelize = require('../../db');
+const {
+  practica, informe,
+  respuesta_supervisor, pregunta_supervisor,
+  config_informe, pregunta_informe } = require("../../models");
 
 const routerSimilitud = new Router();
 const jsonParser = bodyParser.json();
@@ -135,7 +141,79 @@ routerSimilitud.post('/consistencia_evaluacion_informe', jsonParser, async (req:
     console.log("No existe estudiante_cursa_practica con id: ", req.query.id)
     res.sendStatus(404)
   }
-})
+});
+
+routerSimilitud.get('/frases_representativas_practica/:id_practica', jsonParser, async (req: any, res: any) => {
+  const { id_practica } = req.params;
+  if (!id_practica) {
+    res.status(400).json({ error: 'Practica no especificada' });
+    return;
+  }
+  try {
+    const _practica = await practica.findOne({
+      where: { id: id_practica },
+      include: [
+        {
+          model: informe,
+          required: true,
+          include: [
+            {
+              model: config_informe,
+              required: true,
+              include: [
+                {
+                  model: pregunta_informe,
+                  required: true,
+                  where: { tipo_respuesta: 'abierta' }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          model: respuesta_supervisor,
+          required: true,
+          include: [
+            {
+              model: pregunta_supervisor,
+              required: true,
+              where: { tipo_respuesta: 'abierta' }
+            }
+          ]
+        }
+      ]
+    });
+    if (!_practica) {
+      res.status(404).json({ error: 'Practica no encontrada' });
+      return;
+    }
+
+    let textos_informes: any = [];
+    for (let informe of _practica.informes) {
+      let ids_preguntas_informe = informe.config_informe.pregunta_informes.map((elem: any) => elem.id.toString());
+      ids_preguntas_informe.forEach((id_pregunta: string) => textos_informes.push(informe.key[id_pregunta]));
+    }
+
+    let textos_supervisor = _practica.respuesta_supervisors.map((elem: any) => elem.respuesta);
+    const url = `${process.env.URL_PYTHON_BACKEND}/nlp/frases_representativas_multi?cantidad=${req.query.cantidad ?? 10}&textos=`;
+
+    const string_textos_informes = textos_informes.join('|||');
+    let _response_informes = axios.get(url + string_textos_informes);
+
+    const string_textos_supervisor = textos_supervisor.join('|||');
+    let _response_supervisor = axios.get(url + string_textos_supervisor);
+
+    const [response_informes, response_supervisor] = await Promise.all([_response_informes, _response_supervisor])
+
+    return res.status(200).json({
+      informes: response_informes.status == 200 ? response_informes.data : null,
+      supervisor: response_supervisor.status == 200 ? response_supervisor.data : null
+    });
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
 
 routerSimilitud.get('/frases_representativas', jsonParser, async (req: any, res: any) => {
   // get texto and cantidad from query string
