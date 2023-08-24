@@ -7,16 +7,12 @@ module.exports = {
       {
         id: 1,
         nombre: 'Práctica Profesional',
-        modalidad: 'meses',
-        cantidad_tiempo: 1,
         frecuencia_informes: 'sinAvance',
         informe_final: "si",
       },
       {
         id: 2,
         nombre: 'Práctica Industrial',
-        modalidad: 'meses',
-        cantidad_tiempo: 2,
         frecuencia_informes: 'semanal',
         informe_final: "no",
       }

@@ -25,5 +25,6 @@ router.use('/notificacion', require('./notificacion'));
 router.use('/chat', require('./chat'));
 router.use('/mensaje', require('./mensaje'));
 router.use('/encargado', require('./encargado'));
+router.use('/modalidad', require('./modalidad'));
 
 module.exports = router;
