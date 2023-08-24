@@ -3,7 +3,7 @@ import { Server } from 'socket.io';
 import { getIo } from '../../middleware/socketMiddleware';
 
 const { practica, estudiante, config_practica, usuario, empresa, supervisor, informe, documento, solicitud_documento,
-        documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe, encargado } = require('../../models');
+        documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe, encargado, modalidad } = require('../../models');
 const { Router, json, urlencoded } = require('express');
 const crypto = require('crypto');
 const routerPractica = new Router(); // /practica
@@ -236,7 +236,7 @@ routerPractica.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] Crear uno
 routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
-  const { id_estudiante, id_config_practica, id_supervisor, id_empresa, id_encargado, estado,
+  const { id_estudiante, id_config_practica, id_supervisor, id_empresa, id_encargado, id_modalidad, estado,
     fecha_inicio, fecha_termino, nota_evaluacion,
     consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos } = req.body;
   console.log("Request de creacion de practica recibida");
@@ -246,6 +246,7 @@ routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
     id_supervisor: id_supervisor,
     id_empresa: id_empresa,
     id_encargado: id_encargado,
+    id_modalidad: id_modalidad,
     estado: estado,
     fecha_inicio: fecha_inicio,
     fecha_termino: fecha_termino,

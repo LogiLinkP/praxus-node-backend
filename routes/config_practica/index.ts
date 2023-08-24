@@ -97,12 +97,10 @@ routerConfigPracticas.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] Crear una config_practica con los datos recibidos
 routerConfigPracticas.post('/crear', jsonParser, (req: any, res: any) => {
-    const {nombre, modalidad, cantidad_tiempo, frecuencia_informes,informe_final} = req.body;
+    const {nombre, frecuencia_informes,informe_final} = req.body;
     console.log("Request de creacion de config_practica recibida");
     config_practica.create({
         nombre: nombre,
-        modalidad: modalidad,
-        cantidad_tiempo: cantidad_tiempo,
         frecuencia_informes: frecuencia_informes,
         informe_final: informe_final
     })

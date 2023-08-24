@@ -66,10 +66,11 @@ routerPregEncuesta.post('/crear', jsonParser, (req: any, res: any) => {
     })
     .then((resultados:any) => {
         console.log(resultados);
-        res.send("preguntas de practica creado");
+        res.status(200).json({ message: "preguntas de practica creada" });
     })
     .catch((err:any) => {
-        console.log('Error al crear preguntas de practica',err);
+        console.log('Error al crear preguntas de practica', err);
+        res.status(500).json({ message: "Error al crear preguntas de practica", error: err});
     })
 })
 

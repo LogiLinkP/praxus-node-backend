@@ -31,8 +31,6 @@ module.exports = (sequelize, DataTypes) => {
   }
   config_practica.init({
     nombre: DataTypes.STRING,
-    modalidad: DataTypes.STRING,
-    cantidad_tiempo: DataTypes.INTEGER,
     frecuencia_informes: DataTypes.STRING,
     informe_final: DataTypes.STRING
   }, {
