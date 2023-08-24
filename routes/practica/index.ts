@@ -153,7 +153,7 @@ routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
 
 routerPractica.put("/finalizar", async (req: any, res: any) => {
   try {
-    let { id_estudiante, id_practica, estado } = req.body;
+    let { id_estudiante, id_practica, estado, correo_encargado } = req.body;
     if (typeof id_estudiante === "undefined" || typeof id_practica === "undefined" || typeof estado === "undefined") {
       res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_practica y estado" });
       return;
@@ -175,7 +175,7 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
       }
     });
 
-    sendMail(, "Praxus: Solicitud de Revisión de Practica", "Un/a alumno/a ha finalizado su práctica y solicita su revisión, ingrese a Praxus.com para proceder", "Praxus: Solicitud de Revisión de Practica")
+    sendMail(correo_encargado, "Praxus: Solicitud de Revisión de Practica", "Un/a alumno/a ha finalizado su práctica y solicita su revisión, ingrese a Praxus.com para proceder", "Praxus: Solicitud de Revisión de Practica")
     const io: Server = getIo();
     // send an event through socket.io
     let roomName = "notificaciones"+id_estudiante;
@@ -195,7 +195,7 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
 
 routerPractica.put("/aprobar", async (req: any, res: any) => {
   try {  
-    let { id_estudiante, id_config_practica, aprobacion } = req.body;
+    let { id_estudiante, id_config_practica, aprobacion, correo_estudiante } = req.body;
     if (typeof id_estudiante === "undefined" || typeof id_config_practica === "undefined" || typeof aprobacion === "undefined") {
       res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_config_practica y aprobacion" });
       return;
@@ -213,11 +213,11 @@ routerPractica.put("/aprobar", async (req: any, res: any) => {
       let roomName = "notificaciones"+id_estudiante;
       let mensaje = ""
       if(aprobacion == 1){
-        sendMail(, "Praxus: Resultado Práctica", "Felicidades, tu práctica ha sido aprobada. Muchas gracias por usar Praxus", "Praxus, resultado Práctica");
+        sendMail(correo_estudiante, "Praxus: Resultado Práctica", "Felicidades, tu práctica ha sido aprobada. Muchas gracias por usar Praxus", "Praxus, resultado Práctica");
         mensaje = "Tu práctica ha sido aprobada"
       }
       else{
-        sendMail(, "Praxus: Resultado Práctica", "Desafortunadamente, tu práctica ha sido reprobada. De todas maneras, muchas gracias por usar Praxus", "Praxus, resultado Práctica");
+        sendMail(correo_estudiante, "Praxus: Resultado Práctica", "Desafortunadamente, tu práctica ha sido reprobada. De todas maneras, muchas gracias por usar Praxus", "Praxus, resultado Práctica");
         mensaje = "Tu práctica ha sido reprobada"
       }
       io.to(roomName).emit('evento', { message: mensaje });
@@ -253,7 +253,7 @@ routerPractica.delete('/eliminar', (req: any, res: any) => {
 routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
   const { id_estudiante, id_config_practica, id_supervisor, id_empresa, id_encargado, estado,
     fecha_inicio, fecha_termino, nota_evaluacion,
-    consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos } = req.body;
+    consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos, correo_encargado } = req.body;
   console.log("Request de creacion de practica recibida");
   practica.create({
     id_estudiante: id_estudiante,
@@ -277,7 +277,7 @@ routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
       console.log("practica creada");
       
 
-      sendMail(, "Praxus: Práctica Creada", "El/La alumno/a X ha creado una práctica y usted ha sido escogido para encargarse de su desarrollo. A partir de ahora deberá estar pendiente de Praxus.com por cada cambio que dicho alumno/a realice", "Praxus: Práctica Creada");
+      sendMail(correo_encargado, "Praxus: Práctica Creada", "El/La alumno/a X ha creado una práctica y usted ha sido escogido para encargarse de su desarrollo. A partir de ahora deberá estar pendiente de Praxus.com por cada cambio que dicho alumno/a realice", "Praxus: Práctica Creada");
       const io: Server = getIo();
       let roomName = "notificaciones"+id_encargado;
       let mensaje = "El alumno X ha ingresado una práctica";

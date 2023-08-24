@@ -60,7 +60,7 @@ routerInforme.delete('/eliminar', (req:any, res:any) => {
 
 //[POST] Crear uno
 routerInforme.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_practica, id_config_informe, horas_trabajadas, key, id_encargado} = req.body;
+  const {id_practica, id_config_informe, horas_trabajadas, key, id_encargado, correo_encargado} = req.body;
   console.log("Request de creacion de informe");
   informe.create({
     id_practica: id_practica,
@@ -71,7 +71,7 @@ routerInforme.post('/crear', jsonParser, (req: any, res: any) => {
   })
   .then((resultados:any) => {
 
-    sendMail(,"Praxus: Informe enviado","El alumno X ha mandado un informe de su práctica. Ingrese a Praxus.com para revisarlo","Praxus: Informe enviado");
+    sendMail(correo_encargado,"Praxus: Informe enviado","El alumno X ha mandado un informe de su práctica. Ingrese a Praxus.com para revisarlo","Praxus: Informe enviado");
     const io: Server = getIo();
     // send an event through socket.io
     let roomName = "notificaciones"+id_encargado;
