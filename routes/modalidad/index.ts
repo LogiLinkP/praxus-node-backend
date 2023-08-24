@@ -66,12 +66,14 @@ routerModalidad.post('/crear', jsonParser, (req: any, res: any) => {
       tipo_modalidad: tipo_modalidad,
       cantidad_tiempo: cantidad_tiempo
     })
-      .then((resultados: any) => {
-        res.send("Modalidad creada");
-      })
-      .catch((err: any) => {
+    .then((resultados:any) => {
+        console.log(resultados);
+        res.status(200).json({ message: "modalidad creada" });
+    })
+    .catch((err:any) => {
         console.log('Error al crear modalidad', err);
-      })
+        res.status(500).json({ message: "Error al crear modalidad", error: err});
+    })
   })
 
 //[PUT]
