@@ -19,6 +19,9 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.supervisor, {
         foreignKey: 'id_supervisor'
       });
+      this.belongsTo(models.modalidad, {
+        foreignKey: 'id_modalidad'
+      });
       this.belongsTo(models.config_practica, {
         foreignKey: 'id_config_practica'
       });

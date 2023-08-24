@@ -28,6 +28,27 @@ routerModalidad.get('', async (req: any, res: any) => {
   }
 });
 
+//[GET] obtener una modalidad de acuerdo a id_config_practica, tipo_modalidad y cantidad_tiempo
+routerModalidad.get('/buscar', async (req: any, res: any) => {
+  try {
+    if (!("id_config_practica" in req.query) || !("tipo_modalidad" in req.query) || !("cantidad_tiempo" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar id_config_practica, tipo_modalidad y cantidad_tiempo" });
+      return;
+    }
+    const data = await modalidad.findOne({
+      where: {
+        id_config_practica: req.query.id_config_practica,
+        tipo_modalidad: req.query.tipo_modalidad,
+        cantidad_tiempo: req.query.cantidad_tiempo
+      }
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
 //[GET] para obtener todos por id config_practica
 routerModalidad.get('/id_config_practica', async (req: any, res: any) => {
     try {
@@ -45,8 +66,7 @@ routerModalidad.get('/id_config_practica', async (req: any, res: any) => {
       console.log(error);
       res.status(500).json({ message: "Error interno" });
     }
-});
-  
+});  
 
 //[GET] mostrar todos
 routerModalidad.get('/todos', async (req: any, res: any) => {
