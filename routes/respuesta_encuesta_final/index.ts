@@ -64,11 +64,13 @@ routerRespuestaPreguntaFinal.post('/crear', jsonParser, (req: any, res: any) => 
       respuesta: respuesta
   })
   .then((resultados:any) => {
-      res.send("respuesta_encuesta_final creado");
-  })
-  .catch((err:any) => {
-      console.log('Error al crear respuesta_encuesta_final',err);
-  })
+    console.log(resultados);
+    res.status(200).json({ message: "respuesta_encuesta_final creada", id: resultados.id });
+})
+.catch((err:any) => {
+    console.log('Error al crear respuesta_encuesta_final', err);
+    res.status(500).json({ message: "Error al crear respuesta_encuesta_final", error: err});
+})
 })
 
 //[PUT]
