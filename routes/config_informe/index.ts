@@ -1,6 +1,6 @@
 export { };
 
-const { config_informe } = require('../../models');
+const { config_informe, pregunta_informe } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerConfigInforme = new Router();
@@ -26,6 +26,26 @@ routerConfigInforme.get('', async (req: any, res: any) => {
     console.log(error);
     res.status(500).json({ message: "Error interno" });
   }
+});
+
+//[GET] para obtener por id config_practica
+routerConfigInforme.get('/id_config_practica', async (req: any, res: any) => {
+    try {
+      if (!("id" in req.query)) {
+        res.status(406).json({ message: "Se requiere ingresar id" });
+        return;
+      }
+      const data = await config_informe.findAll({
+        where: {
+          id_config_practica: req.query.id
+        },
+        include: [pregunta_informe]
+      });
+      res.status(200).json(data);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Error interno" });
+    }
 });
 
 //[GET] mostrar todos
