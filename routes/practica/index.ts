@@ -1,7 +1,4 @@
 export { };
-import { Server } from 'socket.io';
-import { getIo } from '../../middleware/socketMiddleware';
-import { sendMail } from '../../utils/email';
 
 const { practica, estudiante, config_practica, usuario, empresa, supervisor, informe, documento, solicitud_documento,
         documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe, encargado } = require('../../models');
@@ -153,7 +150,7 @@ routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
 
 routerPractica.put("/finalizar", async (req: any, res: any) => {
   try {
-    let { id_estudiante, id_practica, estado, correo_encargado } = req.body;
+    let { id_estudiante, id_practica, estado} = req.body;
     if (typeof id_estudiante === "undefined" || typeof id_practica === "undefined" || typeof estado === "undefined") {
       res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_practica y estado" });
       return;
@@ -175,15 +172,6 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
       }
     });
 
-    sendMail(correo_encargado, "Praxus: Solicitud de Revisión de Practica", "Un/a alumno/a ha finalizado su práctica y solicita su revisión, ingrese a Praxus.com para proceder", "Praxus: Solicitud de Revisión de Practica")
-    const io: Server = getIo();
-    // send an event through socket.io
-    let roomName = "notificaciones"+id_estudiante;
-    let mensaje = "El alumno X ha finalizado su práctica y está solicitando una revisión"
-
-    io.to(roomName).emit('evento', { message: mensaje });
-    console.log("EMITIENDO EVENTO EN SALA", roomName);
-    
     console.log(data);
     res.status(200).json({ message: "Estado actualizado" });
 
@@ -195,7 +183,7 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
 
 routerPractica.put("/aprobar", async (req: any, res: any) => {
   try {  
-    let { id_estudiante, id_config_practica, aprobacion, correo_estudiante } = req.body;
+    let { id_estudiante, id_config_practica, aprobacion} = req.body;
     if (typeof id_estudiante === "undefined" || typeof id_config_practica === "undefined" || typeof aprobacion === "undefined") {
       res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_config_practica y aprobacion" });
       return;
@@ -207,6 +195,7 @@ routerPractica.put("/aprobar", async (req: any, res: any) => {
         id_estudiante, id_config_practica
       }
     }).then((resultados: any) => {
+      /*
       const io: Server = getIo();
       // send an event through socket.io
       
@@ -222,6 +211,8 @@ routerPractica.put("/aprobar", async (req: any, res: any) => {
       }
       io.to(roomName).emit('evento', { message: mensaje });
       console.log("EMITIENDO EVENTO EN SALA", roomName);
+      */
+     
       console.log(resultados);
       res.status(200).json({ message: "Estado actualizado" });
     })
@@ -253,7 +244,7 @@ routerPractica.delete('/eliminar', (req: any, res: any) => {
 routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
   const { id_estudiante, id_config_practica, id_supervisor, id_empresa, id_encargado, estado,
     fecha_inicio, fecha_termino, nota_evaluacion,
-    consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos, correo_encargado } = req.body;
+    consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos} = req.body;
   console.log("Request de creacion de practica recibida");
   practica.create({
     id_estudiante: id_estudiante,
@@ -275,15 +266,7 @@ routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
     .then((resultados: any) => {
       res.status(200).json({ mensaje: "ok" });
       console.log("practica creada");
-      
-
-      sendMail(correo_encargado, "Praxus: Práctica Creada", "El/La alumno/a X ha creado una práctica y usted ha sido escogido para encargarse de su desarrollo. A partir de ahora deberá estar pendiente de Praxus.com por cada cambio que dicho alumno/a realice", "Praxus: Práctica Creada");
-      const io: Server = getIo();
-      let roomName = "notificaciones"+id_encargado;
-      let mensaje = "El alumno X ha ingresado una práctica";
-      
-      io.to(roomName).emit('notificacion', { message: mensaje });
-      console.log("EMITIENDO EVENTO EN SALA", roomName);
+    
     })
     .catch((err: any) => {
       res.status(500).json({ mensaje: "error" });

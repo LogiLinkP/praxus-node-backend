@@ -1,3 +1,7 @@
+import { sendMail } from "../../utils/email";
+import { Server } from 'socket.io';
+import { getIo } from '../../middleware/socketMiddleware';
+
 export { };
 
 const { notificacion } = require('../../models');
@@ -46,7 +50,7 @@ routerNotificacion.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] 
 routerNotificacion.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_usuario, mensaje} = req.body;
+  const {id_usuario, mensaje, correo} = req.body;
   console.log("Request de notificacion");
   notificacion.create({
     id_usuario: id_usuario,
@@ -56,6 +60,15 @@ routerNotificacion.post('/crear', jsonParser, (req: any, res: any) => {
   .then((resultados:any) => {
       console.log(resultados);
       res.send("notificacion creada");
+      let mensaje_correo: string = notificacion.texto + "Visite Praxus para revisar"
+      sendMail(correo,"Hola", mensaje_correo, "");
+
+      const io: Server = getIo();
+      let roomName = "notificaciones"+id_usuario;
+      let mensaje_noti = mensaje;
+      
+      io.to(roomName).emit('notificacion', { message: mensaje_noti });
+      console.log("EMITIENDO EVENTO EN SALA", roomName);
   })
   .catch((err:any) => {
       console.log('Error al crear notificacion',err);

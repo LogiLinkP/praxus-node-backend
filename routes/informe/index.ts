@@ -1,7 +1,4 @@
 export { };
-import { Server } from 'socket.io';
-import { getIo } from '../../middleware/socketMiddleware';
-import { sendMail } from '../../utils/email';
 
 const { informe } = require('../../models');
 const { Router } = require('express');
@@ -70,7 +67,7 @@ routerInforme.post('/crear', jsonParser, (req: any, res: any) => {
     key: key
   })
   .then((resultados:any) => {
-
+    /*
     sendMail(correo_encargado,"Praxus: Informe enviado","El alumno X ha mandado un informe de su práctica. Ingrese a Praxus.com para revisarlo","Praxus: Informe enviado");
     const io: Server = getIo();
     // send an event through socket.io
@@ -78,6 +75,8 @@ routerInforme.post('/crear', jsonParser, (req: any, res: any) => {
     let mensaje = "El alumno X ha mandado un informe de su práctica"
     io.to(roomName).emit('evento', { message: mensaje });
     console.log("EMITIENDO EVENTO EN SALA", roomName);
+    */
+   
     console.log(resultados);
     res.send("informe creado");
   })
