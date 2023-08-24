@@ -108,10 +108,11 @@ routerConfigPracticas.post('/crear', jsonParser, (req: any, res: any) => {
     })
     .then((resultados:any) => {
         console.log(resultados);
-        res.send("config_practica creada");
+        res.status(200).json({ message: "config_practica creada", id: resultados.id });
     })
     .catch((err:any) => {
         console.log('Error al crear config_practica',err);
+        res.status(500).json({ message: "Error al crear config_practica", error: err});
     })
 })
 

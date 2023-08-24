@@ -1,6 +1,4 @@
 export { };
-import { Server } from 'socket.io';
-import { getIo } from '../../middleware/socketMiddleware';
 
 const { practica, estudiante, config_practica, usuario, empresa, supervisor, informe, documento, solicitud_documento,
         documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe, encargado } = require('../../models');
@@ -35,6 +33,26 @@ routerPractica.get('', async (req: any, res: any) => {
   }
 });
 
+//[GET] para obtener una practica con con su config_practica y las preguntas_supervisor asociadas
+routerPractica.get('/preguntas_supervisor', async (req: any, res: any) => {
+  try {
+    if (!("id" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar id" });
+      return;
+    }
+    const data = await practica.findOne({
+      where: {
+        id: req.query.id
+      },
+      include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, {model: config_practica, include: [pregunta_supervisor]}]
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
 //[GET] para obtener una practica con el id encriptado (debe venir un token y un iv)
 routerPractica.get('/encrypted', async (req: any, res: any) => {
   try { 
@@ -60,8 +78,7 @@ routerPractica.get('/encrypted', async (req: any, res: any) => {
       where: {
         id: decrypted_id
       },
-      include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, config_practica, empresa, supervisor, {model: informe, include: [config_informe]}, 
-                {model: documento, include: [solicitud_documento]}, documento_extra, {model:respuesta_supervisor, include: [pregunta_supervisor]}]
+      include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, {model: config_practica, include: [pregunta_supervisor]}]
     });
     res.status(200).json(data);
   } catch (error) {
@@ -133,7 +150,7 @@ routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
 
 routerPractica.put("/finalizar", async (req: any, res: any) => {
   try {
-    let { id_estudiante, id_practica, estado } = req.body;
+    let { id_estudiante, id_practica, estado} = req.body;
     if (typeof id_estudiante === "undefined" || typeof id_practica === "undefined" || typeof estado === "undefined") {
       res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_practica y estado" });
       return;
@@ -154,8 +171,10 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
         id_estudiante, id: id_practica
       }
     });
+
     console.log(data);
     res.status(200).json({ message: "Estado actualizado" });
+
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error interno" });
@@ -164,8 +183,8 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
 
 routerPractica.put("/aprobar", async (req: any, res: any) => {
   try {  
-    let { id_usuario, id_estudiante, id_config_practica, aprobacion } = req.body;
-    if ( typeof id_usuario === "undefined" || typeof id_estudiante === "undefined" || typeof id_config_practica === "undefined" || typeof aprobacion === "undefined") {
+    let { id_estudiante, id_config_practica, aprobacion} = req.body;
+    if (typeof id_estudiante === "undefined" || typeof id_config_practica === "undefined" || typeof aprobacion === "undefined") {
       res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_config_practica y aprobacion" });
       return;
     }
@@ -176,19 +195,24 @@ routerPractica.put("/aprobar", async (req: any, res: any) => {
         id_estudiante, id_config_practica
       }
     }).then((resultados: any) => {
+      /*
       const io: Server = getIo();
       // send an event through socket.io
-      let roomName = "notificaciones"+id_usuario;
-      let texto = ""
-      let fecha = new Date().toLocaleString();
+      
+      let roomName = "notificaciones"+id_estudiante;
+      let mensaje = ""
       if(aprobacion == 1){
-        texto = "Tu práctica ha sido aprobada"
+        sendMail(correo_estudiante, "Praxus: Resultado Práctica", "Felicidades, tu práctica ha sido aprobada. Muchas gracias por usar Praxus", "Praxus, resultado Práctica");
+        mensaje = "Tu práctica ha sido aprobada"
       }
       else{
-        texto = "Tu práctica ha sido reprobada"
+        sendMail(correo_estudiante, "Praxus: Resultado Práctica", "Desafortunadamente, tu práctica ha sido reprobada. De todas maneras, muchas gracias por usar Praxus", "Praxus, resultado Práctica");
+        mensaje = "Tu práctica ha sido reprobada"
       }
-      io.to(roomName).emit('notificacion', {fecha, texto});
-      console.log("EMITIENDO EVENTO EN SALA", roomName, texto);
+      io.to(roomName).emit('evento', { message: mensaje });
+      console.log("EMITIENDO EVENTO EN SALA", roomName);
+      */
+     
       console.log(resultados);
       res.status(200).json({ message: "Estado actualizado" });
     })
@@ -220,7 +244,7 @@ routerPractica.delete('/eliminar', (req: any, res: any) => {
 routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
   const { id_estudiante, id_config_practica, id_supervisor, id_empresa, id_encargado, estado,
     fecha_inicio, fecha_termino, nota_evaluacion,
-    consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos } = req.body;
+    consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos} = req.body;
   console.log("Request de creacion de practica recibida");
   practica.create({
     id_estudiante: id_estudiante,
@@ -242,10 +266,11 @@ routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
     .then((resultados: any) => {
       res.status(200).json({ mensaje: "ok" });
       console.log("practica creada");
+    
     })
     .catch((err: any) => {
       res.status(500).json({ mensaje: "error" });
-      console.log('Error al crear practica');
+      console.log('Error al crear practica', err.message, fecha_inicio);
     })
 })
 

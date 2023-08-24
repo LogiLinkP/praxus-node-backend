@@ -1,9 +1,11 @@
 export { };
 
 const { Router } = require('express');
-const { usuario, supervisor, estudiante } = require('../../models');
+const { usuario, supervisor, estudiante, encargado, actividad_usuarios, token_usuarios } = require('../../models');
 const routerUsuario = new Router();
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
@@ -22,131 +24,154 @@ routerUsuario.get('/todos', async (req: any, res: any) => {
 
 //[GET] para obtener un usuario con su ID
 routerUsuario.get('', (req: any, res: any) => {
-    console.log("Obteniendo usuario de id: ", req.query.id)
-    usuario.findOne({
-        where: {
-            id: req.query.id
-        }
+  console.log("Obteniendo usuario de id: ", req.query.id)
+  usuario.findOne({
+    where: {
+      id: req.query.id
+    }
+  })
+    .then((resultados: any) => {
+      res.send(resultados);
     })
-        .then((resultados: any) => {
-            res.send(resultados);
-        })
-        .catch((err: any) => {
-            console.log('Error al obtener usuario', err);
-        })
+    .catch((err: any) => {
+      console.log('Error al obtener usuario', err);
+    })
 })
 
 //[POST] Crear un usuario con los datos recibidos
 routerUsuario.post('/crear', jsonParser, (req: any, res: any) => {
-    const {correo, password, nombre, es_encargado, es_supervisor, es_estudiante, es_admin, config} = req.body;
-    console.log("Request de creacion de usuario recibida");
-    // hacer post a python backend
-    usuario.create({
-        correo: correo,
-        password: password,
-        nombre: nombre,
-        es_encargado: es_encargado,
-        es_supervisor: es_supervisor,
-        es_estudiante: es_estudiante,
-        es_admin: es_admin,
-        config: config
+  const { correo, password, nombre, es_encargado, es_supervisor, es_estudiante, es_admin, config } = req.body;
+  console.log("Request de creacion de usuario recibida");
+  // hacer post a python backend
+  usuario.create({
+    correo: correo,
+    password: password,
+    nombre: nombre,
+    es_encargado: es_encargado,
+    es_supervisor: es_supervisor,
+    es_estudiante: es_estudiante,
+    es_admin: es_admin,
+    config: config
 
+  })
+    .then((resultados: any) => {
+      console.log(resultados);
+      res.send("Usuario creado");
     })
-    .then((resultados:any) => {
-        console.log(resultados);
-        res.send("Usuario creado");
-    })
-    .catch((err:any) => {
-        console.log('Error al crear usuario',err);
+    .catch((err: any) => {
+      console.log('Error al crear usuario', err);
     })
 })
 
 //[DELETE] Eliminar usuario con su ID
-routerUsuario.delete('/eliminar', (req:any, res:any) => {
-    console.log("Eliminando usuario con id: ", req.query.id)
-    usuario.destroy({
-      where: {
-        id: req.query.id
-      }
-    })
-    .then((resultados:any) => {
+routerUsuario.delete('/eliminar', (req: any, res: any) => {
+  console.log("Eliminando usuario con id: ", req.query.id)
+  usuario.destroy({
+    where: {
+      id: req.query.id
+    }
+  })
+    .then((resultados: any) => {
       console.log(resultados);
       res.sendStatus(200);
     })
-    .catch((err:any) => {
+    .catch((err: any) => {
       res.send(500);
       console.log('Error al eliminar usuario', err);
     })
 })
 
 //[PUT]
-routerUsuario.put('/actualizar', jsonParser, async (req:any, res:any) => {
+routerUsuario.put('/actualizar', jsonParser, async (req: any, res: any) => {
   const Usuario = await usuario.findOne({ where: { id: req.body.id } })
-  if (Usuario){
+  if (Usuario) {
     Usuario.update(req.body)
-    .then((resultados:any) => {
-      console.log(resultados);
-      res.sendStatus(200);
-    })
-    .catch((err:any) => {
-      res.send(500)
-      console.log('Error al actualizar usuario', err);
-    })
+      .then((resultados: any) => {
+        console.log(resultados);
+        res.sendStatus(200);
+      })
+      .catch((err: any) => {
+        res.send(500)
+        console.log('Error al actualizar usuario', err);
+      })
   } else {
-      console.log("No existe usuario con id: ", req.query.id)
-      res.sendStatus(404)
+    console.log("No existe usuario con id: ", req.query.id)
+    res.sendStatus(404)
   }
 })
 
-routerUsuario.post('/login',jsonParser, async (req:any, res:any) => {
-  const {email,password}=req.body
+routerUsuario.post('/login', jsonParser, async (req: any, res: any) => {
+  const { email, password, useragent } = req.body
 
-  console.log(typeof password)
-    
-  if(req.body.email.trim()===''||req.body.password.trim()===''){
-      return res.status(400).send({message:"Email o password vacios"})
-  
+  if (req.body.email.trim() === '' || req.body.password.trim() === '') {
+    return res.status(400).send({ message: "Email o password vacios" })
+
   }
-  console.log(1)
-  const resultados = await usuario.findOne({where: {correo: email}})
-  if(resultados.length===0){
-    return res.status(400).send({message: 'Error en usuario y contraseña'});
+  const resultados = await usuario.findOne({
+    where: { correo: email },
+    include: [
+      { model: estudiante },
+      { model: encargado }
+    ]
+  })
+  if (resultados.length === 0) {
+    return res.status(400).send({ message: 'Error en usuario y contraseña' });
   }
-  console.log(2)
-  let checkout = await bcrypt.compare(password,resultados.password)
-  if(checkout===false){
-    return res.status(400).send({message: 'Error en usuario y contraseña'});
+  let checkout = await bcrypt.compare(password, resultados.password)
+  if (checkout === false) {
+    return res.status(400).send({ message: 'Error en usuario y contraseña' });
   }
-  console.log(3)
-  const token = jwt.sign({id:resultados.id.toString()},process.env.SECRET_KEY,{expiresIn:'1h'})
-  return res.status(200).send({message: 'Incio de sesion correcto', userdata: resultados,token});
+  const token = jwt.sign({ id: resultados.id.toString() }, process.env.SECRET_KEY, { expiresIn: '1h' })
+  let date = new Date();
+  let now = date.toLocaleDateString();
+
+  try {
+    await actividad_usuarios.create({
+      id_usuario: resultados.id,
+      accion: "Inicio sesion",
+      fecha: date,
+      useragent: useragent
+    })
+    console.log(2)
+    //por comprobar si es valido hacer esto
+    await token_usuarios.create({
+      id_usuario: resultados.id_usuario,
+      token: token
+    })
+    console.log(3)
+    return res.status(200).send({ message: 'Inicio de sesion correcto', userdata: resultados, token });
+  } catch (err) {
+    console.error(err)
+    return res.status(400).send({ message: 'Error al iniciar sesion' });
+  }
+
 
 })
 
-routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
-  let {email,password,cnfPwd,nombre,es_encargado,es_supervisor,es_estudiante,es_admin,extras} = req.body;
-  let RUT:any ;
-  if(es_estudiante){
+routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
+  let { email, password, cnfPwd, nombre, es_encargado, es_supervisor, es_estudiante, es_admin, extras } = req.body;
+  let RUT: any;
+  if (es_estudiante) {
     RUT = extras.RUT;
   }
-  const usuarioSend = {email,password,nombre,es_encargado,es_supervisor,es_estudiante,es_admin};
+  const usuarioSend = { email, password, nombre, es_encargado, es_supervisor, es_estudiante, es_admin };
   let pwdHashed = '';
 
-  if(!cnfPwd||password!=cnfPwd){
-    return res.status(400).send({message: 'Contraseñas no coinciden'});
+  if (!cnfPwd || password != cnfPwd) {
+    return res.status(400).send({ message: 'Contraseñas no coinciden' });
   }
   console.log(email);
   // Verifico si correo ya se ocu
-  const data = await usuario.findOne({where:{correo: email}})
-  if(data!=null){
-    return res.status(400).send({message: 'Email ya ocupado'});
+  const data = await usuario.findOne({ where: { correo: email } })
+  if (data != null) {
+    return res.status(400).send({ message: 'Email ya ocupado' });
   }
-  else{
+  else {
     console.log("1")
-    let hash = await bcrypt.hash(password,8)
+    let hash = await bcrypt.hash(password, 8)
     usuarioSend.password = hash;
     pwdHashed = hash;
-    try{
+    try {
       let _usuario = await usuario.create({
         correo: email,
         password: pwdHashed,
@@ -159,48 +184,63 @@ routerUsuario.post('/register',jsonParser, async (req:any, res:any) =>{
       })
 
       console.log(_usuario)
-      if(_usuario.es_encargado){
-        return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+      if (_usuario.es_encargado) {
+        return res.status(200).send({ message: 'Inicio de sesion exitoso', userdata: usuarioSend });
       }
       console.log(1)
-      if(_usuario.es_supervisor){
-        try{
-          supervisor.create({
+      if (_usuario.es_supervisor) {
+        try {
+          await supervisor.create({
             nombre: nombre,
             correo: email,
             carnet_rostro: null,
             es_correo_institucional: null
           })
-          return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+          return res.status(200).send({ message: 'Inicio de sesion exitoso', userdata: usuarioSend });
         }
-        catch(err){
-          return res.status(400).send({message: 'Error al crear super'});
+        catch (err) {
+          return res.status(400).send({ message: 'Error al crear super' });
         }
       }
-      if(_usuario.es_estudiante){
-        try{
-          estudiante.create({
+      if (_usuario.es_estudiante) {
+        try {
+          await estudiante.create({
             id_usuario: _usuario.id,
             nombre_id_org: null,
             id_org: null,
             rut: RUT
           })
-          return res.status(200).send({message: 'Inicio de sesion exitoso',userdata: usuarioSend});
+          return res.status(200).send({ message: 'Inicio de sesion exitoso', userdata: usuarioSend });
         }
-        catch(err){
-          return res.status(400).send({message: 'Error al crear est'});
+        catch (err) {
+          return res.status(400).send({ message: 'Error al crear est' });
         }
       }
-    
+
     }
-    catch(err){
-      return res.status(400).send({message: 'Error al crear usuario'});
-    }}
+    catch (err) {
+      return res.status(400).send({ message: 'Error al crear usuario' });
+    }
+  }
 })
 
-routerUsuario.post('/logout',jsonParser,(req:any,res:any)=>{
+routerUsuario.post('/logout', jsonParser, (req: any, res: any) => {
   res.clearCookie("jwt");
-  res.redirect("/");
+  return res.status(200).send({ message: 'Cierre de sesion exitoso' });
+})
+
+routerUsuario.post('/resetpwd', jsonParser, async (req: any, res: any) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).send({ message: 'Ingrese email' });
+  }
+  const _usuario = await usuario.findOne({ where: { correo: email } })
+  if (!_usuario) {
+    return res.status(400).send({ message: 'Usuario no encontrado' });
+  }
+  var new_token = crypto.randomBytes(32).toString('hex');
+
+
 })
 
 module.exports = routerUsuario;

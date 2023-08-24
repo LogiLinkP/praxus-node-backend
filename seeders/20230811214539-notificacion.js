@@ -6,6 +6,7 @@ module.exports = {
     
     await queryInterface.bulkInsert('notificacion', [
       {
+        id: 1,
         id_usuario: 1,
         texto: 'esta es una notificacion de prueba',
         fecha: '2023-06-11 23:59:59'

@@ -5,6 +5,7 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     queryInterface.bulkInsert('mensaje', [
       {
+        id: 1,
         id_chat: 1,
         emisor: 'encargado',
         texto: 'Hola, soy el encargado',
@@ -12,6 +13,7 @@ module.exports = {
 
       },
       {
+        id: 2,
         id_chat: 1,
         emisor: 'estudiante',
         texto: 'Hola, soy el estudiante',

@@ -6,9 +6,11 @@ module.exports = {
 
     await queryInterface.bulkInsert('documento', [
       {
+        id: 1,
         id_practica: 1,
         id_solicitud_documento: 1,
-        key: 'aqui esta el documento'
+        key: 'aqui esta el documento',
+        fecha_subida: '2021-08-10 01:00:00'
       }
     ], {});
 

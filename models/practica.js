@@ -42,6 +42,12 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.informe, {
         foreignKey: 'id_practica'
       });
+      this.hasMany(models.informe, {
+        foreignKey: 'id_practica'
+      });
+      this.hasMany(models.respuesta_supervisor, {
+        foreignKey: 'id_practica'
+      });
     }
   }
   practica.init({
@@ -58,8 +64,8 @@ module.exports = (sequelize, DataTypes) => {
     consistencia_nota: DataTypes.FLOAT,
     resumen: DataTypes.STRING,
     indice_repeticion: DataTypes.FLOAT,
-    key_repeticiones: DataTypes.STRING,
-    key_fragmentos: DataTypes.STRING
+    key_repeticiones: DataTypes.JSON,
+    key_fragmentos: DataTypes.JSON
   }, {
     sequelize,
     modelName: 'practica',

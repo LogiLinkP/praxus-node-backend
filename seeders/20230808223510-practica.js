@@ -6,10 +6,12 @@ module.exports = {
 
     await queryInterface.bulkInsert('practica', [
       {
+        id: 1,
         id_estudiante: 1,
         id_config_practica: 1,
         id_supervisor: 1,
         id_empresa: 1,
+        id_encargado: 1,
         estado: 'Aprobada',
         fecha_inicio: '2023-06-11 23:59:59',
         fecha_termino: '2023-07-11 23:59:59',
@@ -23,10 +25,12 @@ module.exports = {
 
       },
       {
+        id: 2,
         id_estudiante: 2,
         id_config_practica: 2,
         id_supervisor: 2,
         id_empresa: 2,
+        id_encargado: 2,
         estado: 'En curso',
         fecha_inicio: '2023-07-11 23:59:59'
       }
