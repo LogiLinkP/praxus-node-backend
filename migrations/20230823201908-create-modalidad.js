@@ -12,7 +12,7 @@ module.exports = {
       id_config_practica: {
         type: Sequelize.INTEGER
       },
-      modalidad: {
+      tipo_modalidad: {
         type: Sequelize.STRING
       },
       cantidad_tiempo: {

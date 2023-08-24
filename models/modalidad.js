@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   modalidad.init({
     id_config_practica: DataTypes.INTEGER,
-    modalidad: DataTypes.STRING,
+    tipo_modalidad: DataTypes.STRING,
     cantidad_tiempo: DataTypes.INTEGER
   }, {
     sequelize,

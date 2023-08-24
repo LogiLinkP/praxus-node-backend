@@ -59,15 +59,15 @@ routerModalidad.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] Crear un modalidad con los datos recibidos
 routerModalidad.post('/crear', jsonParser, (req: any, res: any) => {
-    const { id_config_practica, modalidad, cantidad_tiempo} = req.body;
+    const { id_config_practica, tipo_modalidad, cantidad_tiempo} = req.body;
     console.log("Request de creacion de modalidad recibida");
     modalidad.create({
       id_config_practica: id_config_practica,
-      modalidad: modalidad,
+      tipo_modalidad: tipo_modalidad,
       cantidad_tiempo: cantidad_tiempo
     })
       .then((resultados: any) => {
-        res.send("Estudiante creado");
+        res.send("Modalidad creada");
       })
       .catch((err: any) => {
         console.log('Error al crear modalidad', err);

@@ -7,25 +7,25 @@ module.exports = {
       {
         id: 1,
         id_config_practica: 1,
-        modalidad: 'meses',
+        tipo_modalidad: 'meses',
         cantidad_tiempo: 1
       },
       {
         id: 2,
         id_config_practica: 1,
-        modalidad: 'meses',
+        tipo_modalidad: 'meses',
         cantidad_tiempo: 2
       },
       {
         id: 3,
         id_config_practica: 2,
-        modalidad: 'meses',
+        tipo_modalidad: 'meses',
         cantidad_tiempo: 2
       },
       {
         id: 4,
         id_config_practica: 2,
-        modalidad: 'horas',
+        tipo_modalidad: 'horas',
         cantidad_tiempo: 360
       },
 
