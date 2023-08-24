@@ -143,7 +143,7 @@ routerPractica.get('/todos', async (req: any, res: any) => {
 routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
   try {
     const data = await practica.findAll({
-      include: [{model: estudiante, include: [usuario]}, config_practica]
+      include: [{model: estudiante, include: [usuario]}, {model: modalidad, include: [config_practica]}]
     });
     res.status(200).json(data);
   } catch (error) {
