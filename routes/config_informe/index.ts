@@ -66,11 +66,11 @@ routerConfigInforme.post('/crear', jsonParser, (req: any, res: any) => {
     tipo_informe: tipo_informe,
   })
   .then((resultados:any) => {
-      console.log(resultados);
-      res.send("config_informe creado");
+      res.status(200).json({ message: "config_informe creado" });
   })
   .catch((err:any) => {
-      console.log('Error al crear config_informe',err);
+      console.log('Error al crear config_informe', err);
+      res.status(500).json({ message: "Error al crear config_informe", error: err });
   })
 })
 

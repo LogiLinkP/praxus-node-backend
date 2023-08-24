@@ -23,14 +23,14 @@ module.exports = {
         id_pregunta_supervisor: 3,
         id_supervisor: 1,
         id_practica: 1,
-        respuesta: '1,0,1'
+        respuesta: '1,0,1,0,0,0'
       },
       {
         id: 4,
         id_pregunta_supervisor: 4,
         id_supervisor: 1,
         id_practica: 1,
-        respuesta: '0,1,0'
+        respuesta: '1,0,0'
       }
     ], {});
   },

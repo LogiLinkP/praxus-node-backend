@@ -66,10 +66,11 @@ routerPreguntaInforme.post('/crear', jsonParser, (req: any, res: any) => {
       opciones: opciones
   })
   .then((resultados:any) => {
-      res.send("pregunta_informe creado");
+      res.status(200).json({ message: "pregunta_informe creada" });
   })
   .catch((err:any) => {
-      console.log('Error al crear pregunta_informe',err);
+      console.log('Error al crear pregunta_informe', err);
+      res.status(500).json({ message: "Error al crear pregunta_informe", error: err });
   })
 })
 

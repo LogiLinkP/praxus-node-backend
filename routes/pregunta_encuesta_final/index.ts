@@ -20,6 +20,23 @@ routerPregEncuesta.get('/todos', (req:any, res:any) => {
     })
 })
 
+//[GET] obtener todas las preguntas con id_config_practica
+routerPregEncuesta.get('/id_config_practica', (req:any, res:any) => {
+    console.log("Obteniendo todas las preguntas de practica con id_config_practica: ", req.query.id_config_practica)
+    pregunta_encuesta_final.findAll({
+        where: {
+            id_config_practica: req.query.id_config_practica
+        }
+    })
+    .then((resultados:any) => {
+      res.send(resultados)
+    })
+    .catch((err:any) => {
+      console.log('Error al mostrar todas las preguntas de practica', err);
+      res.send('Error al mostrar todas las preguntas de practica', err);
+    })
+})
+
 //[GET] para obtener una pregunta de practica con su ID
 routerPregEncuesta.get('', (req: any, res: any) => {
     console.log("Obteniendo preguntas de practica de id: ", req.query.id)
