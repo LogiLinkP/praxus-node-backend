@@ -102,24 +102,28 @@ routerNotificacion.put('/actualizar', jsonParser, async (req: any, res: any) => 
 
 routerNotificacion.put('/visto', jsonParser, async (req: any, res: any) => {
   // buscar practica por id
+
   const Notificaciones = await notificacion.findAll({ where: { id_usuario: req.body.id_usuario } })
   if (Notificaciones) {
-    // actualizar practica
-    Notificaciones.update({
-      visto: 1
-    })
-      .then((resultados: any) => {
-        console.log(resultados);
-        res.sendStatus(200);
+    for (let noti of Notificaciones){
+      // actualizar practica
+      noti.update({
+        visto: 1
       })
-      .catch((err: any) => {
-        res.send(500)
-        console.log('Error al actualizar notificacion', err);
-      })
+        .then((resultados: any) => {
+          console.log(resultados);
+        })
+        .catch((err: any) => {
+          res.send(500)
+          console.log('Error al actualizar notificacion', err);
+          return;
+        })
+    }
   } else {
     console.log("No existe notificacion con id: ", req.query.id)
     res.sendStatus(404)
   }
+  res.sendStatus(200);
 })
 
 module.exports = routerNotificacion;
