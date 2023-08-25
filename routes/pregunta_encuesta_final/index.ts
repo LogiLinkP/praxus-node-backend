@@ -29,11 +29,12 @@ routerPregEncuesta.get('/id_config_practica', (req:any, res:any) => {
         }
     })
     .then((resultados:any) => {
-      res.send(resultados)
+        console.log(resultados);
+        res.status(200).json(resultados);
     })
     .catch((err:any) => {
-      console.log('Error al mostrar todas las preguntas de practica', err);
-      res.send('Error al mostrar todas las preguntas de practica', err);
+        console.log('Error al obtener preguntas de practica', err);
+        res.status(500).json({ message: "Error al obtener preguntas de practica", error: err});
     })
 })
 
