@@ -3,7 +3,7 @@ import { Server } from 'socket.io';
 import { getIo } from '../../middleware/socketMiddleware';
 
 const { practica, estudiante, config_practica, usuario, empresa, supervisor, informe, documento, solicitud_documento,
-        documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe, encargado, modalidad } = require('../../models');
+  documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe, encargado, modalidad } = require('../../models');
 const { Router, json, urlencoded } = require('express');
 const crypto = require('crypto');
 const routerPractica = new Router(); // /practica
@@ -25,9 +25,9 @@ routerPractica.get('', async (req: any, res: any) => {
       where: {
         id: req.query.id
       },
-      include: [{model: estudiante, include: [usuario]},  {model: modalidad, include: [config_practica]}, empresa, supervisor, 
-                {model: informe, include: [config_informe]}, {model: documento, include: [solicitud_documento]}, documento_extra, 
-                {model:respuesta_supervisor, include: [pregunta_supervisor]}]
+      include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: [config_practica] }, empresa, supervisor,
+      { model: informe, include: [config_informe] }, { model: documento, include: [solicitud_documento] }, documento_extra,
+      { model: respuesta_supervisor, include: [pregunta_supervisor] }]
     });
     res.status(200).json(data);
   } catch (error) {
@@ -47,7 +47,7 @@ routerPractica.get('/preguntas_supervisor', async (req: any, res: any) => {
       where: {
         id: req.query.id
       },
-      include: [{model: estudiante, include: [usuario]}, {model: modalidad, include: [{model:config_practica, include: [pregunta_supervisor]}]}]
+      include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: [{ model: config_practica, include: [pregunta_supervisor] }] }]
     });
     res.status(200).json(data);
   } catch (error) {
@@ -58,22 +58,22 @@ routerPractica.get('/preguntas_supervisor', async (req: any, res: any) => {
 
 //[GET] para obtener una practica con el id encriptado (debe venir un token y un iv)
 routerPractica.get('/encrypted', async (req: any, res: any) => {
-  try { 
+  try {
     if (!("token" in req.query) || !("iv" in req.query)) {
       res.status(406).json({ message: "Se requiere ingresar token e iv" });
       return;
     }
 
     //decrypt the encripted id in req.query.id with the algorith and key in the .env file
-    const decrypt = (hash:any) => {
+    const decrypt = (hash: any) => {
       const algorithm = process.env.ENCRYPT_ALGORITHM;
       const key = process.env.ENCRYPT_SECRET_KEY;
-      const decipher = crypto.createDecipheriv(algorithm, key, Buffer.from(hash.iv, 'hex'))    
-      const decrypted = Buffer.concat([decipher.update(Buffer.from(hash.content, 'hex')), decipher.final()])    
+      const decipher = crypto.createDecipheriv(algorithm, key, Buffer.from(hash.iv, 'hex'))
+      const decrypted = Buffer.concat([decipher.update(Buffer.from(hash.content, 'hex')), decipher.final()])
       return decrypted.toString()
     }
 
-    let decrypted_id = decrypt({content: req.query.token, iv: req.query.iv});
+    let decrypted_id = decrypt({ content: req.query.token, iv: req.query.iv });
 
     console.log("decrypted_id!!!!!", decrypted_id);
 
@@ -81,8 +81,10 @@ routerPractica.get('/encrypted', async (req: any, res: any) => {
       where: {
         id: decrypted_id
       },
-      include: [{model: estudiante, include: [usuario]}, {model: modalidad, include: [
-                {model:config_practica, include: [pregunta_supervisor]}]}]
+      include: [{ model: estudiante, include: [usuario] }, {
+        model: modalidad, include: [
+          { model: config_practica, include: [pregunta_supervisor] }]
+      }]
     });
     res.status(200).json(data);
   } catch (error) {
@@ -98,10 +100,14 @@ routerPractica.get('/get_asEstudiante', (req: any, res: any) => {
     where: {
       id_estudiante: req.query.id_estudiante
     },
-    include: [{model: estudiante, include: [usuario]}, {model: modalidad, include: {model: config_practica, 
-              include: [{model: solicitud_documento, include:[documento]}, config_informe]}}, empresa, 
-              supervisor, {model: informe, include: [config_informe]}, {model: documento, include: [solicitud_documento]}, 
-              documento_extra, {model:respuesta_supervisor, include: [pregunta_supervisor]}, encargado]
+    include: [{ model: estudiante, include: [usuario] }, {
+      model: modalidad, include: {
+        model: config_practica,
+        include: [{ model: solicitud_documento, include: [documento] }, config_informe]
+      }
+    }, empresa,
+      supervisor, { model: informe, include: [config_informe] }, { model: documento, include: [solicitud_documento] },
+      documento_extra, { model: respuesta_supervisor, include: [pregunta_supervisor] }, encargado]
   })
     .then((resultados: any) => {
       res.send(resultados);
@@ -118,8 +124,8 @@ routerPractica.get('/get_asEncargado', (req: any, res: any) => {
     where: {
       id_estudiante: req.query.id_encargado
     },
-    include: [{model: estudiante, include: [usuario]}, config_practica, empresa, supervisor, {model: informe, include: [config_informe]}, 
-              {model: documento, include: [solicitud_documento]}, documento_extra, {model:respuesta_supervisor, include: [pregunta_supervisor]}, encargado]
+    include: [{ model: estudiante, include: [usuario] }, config_practica, empresa, supervisor, { model: informe, include: [config_informe] },
+    { model: documento, include: [solicitud_documento] }, documento_extra, { model: respuesta_supervisor, include: [pregunta_supervisor] }, encargado]
   })
     .then((resultados: any) => {
       res.send(resultados);
@@ -143,7 +149,7 @@ routerPractica.get('/todos', async (req: any, res: any) => {
 routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
   try {
     const data = await practica.findAll({
-      include: [{model: estudiante, include: [usuario]}, config_practica]
+      include: [{ model: estudiante, include: [usuario] }, config_practica]
     });
     res.status(200).json(data);
   } catch (error) {
@@ -184,7 +190,7 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
 });
 
 routerPractica.put("/aprobar", async (req: any, res: any) => {
-  try {  
+  try {
     let { id_estudiante, id_config_practica, aprobacion } = req.body;
     if (typeof id_estudiante === "undefined" || typeof id_config_practica === "undefined" || typeof aprobacion === "undefined") {
       res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_config_practica y aprobacion" });
@@ -199,12 +205,12 @@ routerPractica.put("/aprobar", async (req: any, res: any) => {
     }).then((resultados: any) => {
       const io: Server = getIo();
       // send an event through socket.io
-      let roomName = "notificaciones"+id_estudiante;
+      let roomName = "notificaciones" + id_estudiante;
       let mensaje = ""
-      if(aprobacion == 1){
+      if (aprobacion == 1) {
         mensaje = "Tu práctica ha sido aprobada"
       }
-      else{
+      else {
         mensaje = "Tu práctica ha sido reprobada"
       }
       io.to(roomName).emit('evento', { message: mensaje });
