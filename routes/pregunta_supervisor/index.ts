@@ -84,10 +84,11 @@ routerPregSupervisor.post('/crear', jsonParser, (req: any, res: any) => {
     })
     .then((resultados:any) => {
         console.log(resultados);
-        res.send("preguntas de supervisor creada");
+        res.status(200).json(resultados);
     })
     .catch((err:any) => {
-        console.log('Error al crear preguntas de supervisor',err);
+        console.log('Error al crear preguntas de supervisor', err);
+        res.status(500).json({ message: "Error al crear preguntas de supervisor", error: err});
     })
 })
 
