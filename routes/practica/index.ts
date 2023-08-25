@@ -101,7 +101,7 @@ routerPractica.get('/get_asEstudiante', (req: any, res: any) => {
     include: [{model: estudiante, include: [usuario]}, {model: modalidad, include: {model: config_practica, 
               include: [{model: solicitud_documento, include:[documento]}, config_informe]}}, empresa, 
               supervisor, {model: informe, include: [config_informe]}, {model: documento, include: [solicitud_documento]}, 
-              documento_extra, {model:respuesta_supervisor, include: [pregunta_supervisor]}, encargado]
+              documento_extra, {model:respuesta_supervisor, include: [pregunta_supervisor]}, {model:encargado, include: [usuario]}]
   })
     .then((resultados: any) => {
       res.send(resultados);
