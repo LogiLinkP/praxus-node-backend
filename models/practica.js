@@ -19,6 +19,9 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.supervisor, {
         foreignKey: 'id_supervisor'
       });
+      this.belongsTo(models.modalidad, {
+        foreignKey: 'id_modalidad'
+      });
       this.belongsTo(models.config_practica, {
         foreignKey: 'id_config_practica'
       });
@@ -56,6 +59,7 @@ module.exports = (sequelize, DataTypes) => {
     id_supervisor: DataTypes.INTEGER,
     id_empresa: DataTypes.INTEGER,
     id_encargado: DataTypes.INTEGER,
+    id_modalidad: DataTypes.INTEGER,
     estado: DataTypes.STRING,
     fecha_inicio: DataTypes.DATE,
     fecha_termino: DataTypes.DATE,

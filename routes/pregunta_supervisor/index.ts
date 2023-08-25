@@ -21,6 +21,23 @@ routerPregSupervisor.get('/todas', (req:any, res:any) => {
   })
 })
 
+//[GET] obtener todas las preguntas con id_config_practica
+routerPregSupervisor.get('/id_config_practica', (req:any, res:any) => {
+    console.log("Obteniendo todas las preguntas de practica con id_config_practica: ", req.query.id)
+    pregunta_supervisor.findAll({
+        where: {
+            id_config_practica: req.query.id
+        }
+    })
+    .then((resultados:any) => {
+      res.send(resultados)
+    })
+    .catch((err:any) => {
+      console.log('Error al mostrar todas las preguntas de practica', err);
+      res.send('Error al mostrar todas las preguntas de practica', err);
+    })
+})
+
 //[GET] para obtener una preguntas de supervisor con su ID
 routerPregSupervisor.get('', (req: any, res: any) => {
     console.log("Obteniendo preguntas de supervisor con id: ", req.query.id)

@@ -12,6 +12,7 @@ module.exports = {
         id_supervisor: 1,
         id_empresa: 1,
         id_encargado: 1,
+        id_modalidad: 1,
         estado: 'Aprobada',
         fecha_inicio: '2023-06-11 23:59:59',
         fecha_termino: '2023-07-11 23:59:59',
@@ -31,6 +32,7 @@ module.exports = {
         id_supervisor: 2,
         id_empresa: 2,
         id_encargado: 2,
+        id_modalidad: 3,
         estado: 'En curso',
         fecha_inicio: '2023-07-11 23:59:59'
       }
