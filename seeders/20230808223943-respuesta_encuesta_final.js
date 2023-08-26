@@ -10,7 +10,7 @@ module.exports = {
       },
       {
         id_pregunta_encuesta_final: 2,
-        respuesta: 'me sirvieron harto'
+        respuesta: 'Me sirvieron mucho los conocimientos adquiridos'
       }
     ], {});
   },

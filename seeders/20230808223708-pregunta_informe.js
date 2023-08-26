@@ -7,13 +7,13 @@ module.exports = {
       {
         id: 1,
         id_config_informe: 1,
-        enunciado: '¿Resume el trabajo en tu práctica?',
+        enunciado: 'Resume el trabajo que realizaste en tu práctica',
         tipo_respuesta: 'abierta'
       },
       {
         id: 2,
         id_config_informe: 2,
-        enunciado: '¿Qué tal estuvo el avance de la práctica?',
+        enunciado: 'Resume el trabajo que realizaste en tu práctica',
         tipo_respuesta: 'abierta'
       }
     ], {});

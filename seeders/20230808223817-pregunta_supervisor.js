@@ -7,7 +7,7 @@ module.exports = {
       {
         id: 1,
         id_config_practica: 1,
-        enunciado: 'Evalue al practicante entre 1 y 5 de acuerdo con su desempeño',
+        enunciado: 'Evalúe al practicante entre 1 y 5 de acuerdo con su desempeño general',
         tipo_respuesta: 'evaluacion',
         opciones: ''
       },
@@ -28,14 +28,14 @@ module.exports = {
       {
         id: 4,
         id_config_practica: 1,
-        enunciado: '¿Consideraría contratar a este practicante?',
+        enunciado: '¿Consideraría contratar a este practicante una vez terminada su práctica?',
         tipo_respuesta: 'alternativas',
         opciones: 'Sí;;No;;No sé'
       },
       {
         id: 5,
         id_config_practica: 2,
-        enunciado: 'Evalue al practicante entre 1 y 5 de acuerdo con su desempeño',
+        enunciado: 'Evalúe al practicante entre 1 y 5 de acuerdo con su desempeño general',
         tipo_respuesta: 'evaluacion'
       },
       {
