@@ -89,7 +89,6 @@ routerSolicitudDocumento.post('/crear', jsonParser, (req: any, res: any) => {
   })
   .then((resultados:any) => {
     console.log(resultados);
-    res.send("solicitud_documento creado");
     res.status(200).json(resultados);
   })
   .catch((err:any) => {
