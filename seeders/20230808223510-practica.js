@@ -23,17 +23,38 @@ module.exports = {
         indice_repeticion: 0.7,
         key_repeticiones: 'aca estan los textos que se repiten',
         key_fragmentos: 'estos son los fragmentos que mas influyen en la consistencia'
-
       },
       {
         id: 2,
         id_estudiante: 2,
+        id_config_practica: 1,
+        id_supervisor: 2,
+        id_empresa: 2,
+        id_encargado: 2,
+        id_modalidad: 2,
+        estado: 'En curso',
+        fecha_inicio: '2023-07-11 23:59:59'
+      },
+      {
+        id: 3,
+        id_estudiante: 1,
         id_config_practica: 2,
         id_supervisor: 2,
         id_empresa: 2,
         id_encargado: 2,
         id_modalidad: 3,
         estado: 'En curso',
+        fecha_inicio: '2023-07-11 23:59:59'
+      },
+      {
+        id: 4,
+        id_estudiante: 3,
+        id_config_practica: 1,
+        id_supervisor: 2,
+        id_empresa: 2,
+        id_encargado: 1,
+        id_modalidad: 1,
+        estado: 'Evaluada',
         fecha_inicio: '2023-07-11 23:59:59'
       }
       

@@ -8,7 +8,7 @@ module.exports = {
       {
         id: 1,
         id_usuario: 1,
-        texto: 'esta es una notificacion de prueba',
+        texto: 'Su Práctica ha sido aprobada',
         fecha: '2023-06-11 23:59:59'
       }
     ], {});

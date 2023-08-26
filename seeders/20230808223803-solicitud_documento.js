@@ -8,9 +8,9 @@ module.exports = {
       {
         id: 1,
         id_config_practica: 1,
-        nombre_solicitud: 'certificado empresa',
-        descripcion: 'por favor subir certificado empresa',
-        tipo_archivo:'pdf'
+        nombre_solicitud: 'Contrato firmado de la empresa',
+        descripcion: 'Por favor, se solicita el contrato firmado de la empresa en formato pdf o png.',
+        tipo_archivo:'pdf,png'
       }
     ], {});
 
