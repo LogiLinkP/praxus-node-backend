@@ -53,8 +53,7 @@ routerNotificacion.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] 
 routerNotificacion.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_usuario, fecha, mensaje, correo} = req.body;
-  console.log("Este el correo " + correo);
+  const {id_usuario, fecha, mensaje, correo, estado} = req.body;
   console.log("Request de notificacion");
   notificacion.create({
     id_usuario: id_usuario,
@@ -63,10 +62,12 @@ routerNotificacion.post('/crear', jsonParser, (req: any, res: any) => {
   })
   .then((resultados:any) => {
       console.log(resultados);
-      let mensaje_correo: string = notificacion.texto + "Visite Praxus para revisar."
-      sendMail(correo,"Hola", mensaje_correo, "hola");
-
-      const io: Server = getIo();
+      if(estado == "Notificaciones y Correo" || estado == "Sólo Correo"){
+        let mensaje_correo: string = notificacion.texto + "Visite Praxus para revisar."
+        sendMail(correo,"Hola", mensaje_correo, "hola");
+      }
+      if(estado == "Notificaciones y Correo" || estado == "Sólo Notificaciones"){
+        const io: Server = getIo();
       let roomName = "notificaciones"+id_usuario;
       let mensaje_noti = mensaje;
       
@@ -74,6 +75,8 @@ routerNotificacion.post('/crear', jsonParser, (req: any, res: any) => {
       console.log("EMITIENDO EVENTO EN SALA", roomName);
 
       res.send("notificacion creada");
+      }
+      
   })
   .catch((err:any) => {
       console.log('Error al crear notificacion',err);

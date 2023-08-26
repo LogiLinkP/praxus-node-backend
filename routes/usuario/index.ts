@@ -149,7 +149,7 @@ routerUsuario.post('/login', jsonParser, async (req: any, res: any) => {
 routerUsuario.put('/estado_config', jsonParser, async (req: any, res:any) => {
   const Usuario = await usuario.findOne({ where: { id: req.body.id } })
   if (Usuario) {
-    Usuario.update({config.hdola: req.estado}, {where: {id : req.body.id}})
+    const Usuario_UPdate = await Usuario.update({config.estados_configuracion: req.estado}, {where: {id : req.body.id}})
       .then((resultados: any) => {
         console.log(resultados);
         res.sendStatus(200);
