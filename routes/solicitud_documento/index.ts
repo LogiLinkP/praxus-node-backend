@@ -88,10 +88,13 @@ routerSolicitudDocumento.post('/crear', jsonParser, (req: any, res: any) => {
       descripcion: descripcion
   })
   .then((resultados:any) => {
-      res.send("solicitud_documento creado");
+    console.log(resultados);
+    res.send("solicitud_documento creado");
+    res.status(200).json(resultados);
   })
   .catch((err:any) => {
-      console.log('Error al crear solicitud_documento',err);
+    console.log('Error al crear solicitud_documento', err);
+    res.status(500).json({ message: "Error al crear solicitud_documento", error: err});
   })
 })
 
