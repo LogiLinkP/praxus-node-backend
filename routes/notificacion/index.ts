@@ -15,15 +15,23 @@ const jsonParser = bodyParser.json();
 
 
 //[GET] MODIFICAR mostrar todos por id_usuario
-routerNotificacion.get('/todos', async (req: any, res: any) => {
+routerNotificacion.get('/todos', jsonParser, async (req: any, res: any) => {
+  const {id_usuario, config} = req.body;
+  console.log("\n\n\n");
+  console.log(config);
   try {
     const data = await notificacion.findAll({
       where: {
         id_usuario: req.query.id_usuario,
         visto: false,
-        config: "Sólo notificaciones" || "Correo y Notificaciones",
+        //config: req.query.config,     
       }
     });
+    /*
+    if(req.query.config == "Correos y Notificaciones" || req.query.config == "Sólo Notificaciones"){
+      res.status(200).json(data);
+    }
+    */
     res.status(200).json(data);
   } catch (error) {
     console.log(error);
