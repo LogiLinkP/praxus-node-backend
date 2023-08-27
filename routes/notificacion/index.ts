@@ -21,6 +21,7 @@ routerNotificacion.get('/todos', async (req: any, res: any) => {
       where: {
         id_usuario: req.query.id_usuario,
         visto: false,
+        config: "Sólo notificaciones" || "Correo y Notificaciones",
       }
     });
     res.status(200).json(data);
