@@ -144,8 +144,25 @@ routerUsuario.post('/login', jsonParser, async (req: any, res: any) => {
     console.error(err)
     return res.status(400).send({ message: 'Error al iniciar sesion' });
   }
+})
 
 
+routerUsuario.put('/estado_config', jsonParser, async (req: any, res:any) => {
+  const Usuario = await usuario.findOne({ where: { id: req.body.id } })
+  if (Usuario) {
+    const Usuario_Update = Usuario.update({config: req.estado}, {where: {id : req.body.id}})
+      .then((resultados: any) => {
+        console.log(resultados);
+        res.sendStatus(200);
+      })
+      .catch((err: any) => {
+        res.send(500)
+        console.log('Error al actualizar usuario', err);
+      })
+  } else {
+    console.log("No existe usuario con id: ", req.query.id)
+    res.sendStatus(404)
+  }
 })
 
 routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {

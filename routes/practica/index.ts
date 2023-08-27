@@ -1,6 +1,4 @@
 export { };
-import { Server } from 'socket.io';
-import { getIo } from '../../middleware/socketMiddleware';
 
 const { practica, estudiante, config_practica, usuario, empresa, supervisor, informe, documento, solicitud_documento,
   documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe, encargado, modalidad } = require('../../models');
@@ -160,7 +158,7 @@ routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
 
 routerPractica.put("/finalizar", async (req: any, res: any) => {
   try {
-    let { id_estudiante, id_practica, estado } = req.body;
+    let { id_estudiante, id_practica, estado} = req.body;
     if (typeof id_estudiante === "undefined" || typeof id_practica === "undefined" || typeof estado === "undefined") {
       res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_practica y estado" });
       return;
@@ -181,8 +179,10 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
         id_estudiante, id: id_practica
       }
     });
+
     console.log(data);
     res.status(200).json({ message: "Estado actualizado" });
+
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error interno" });
@@ -190,8 +190,8 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
 });
 
 routerPractica.put("/aprobar", async (req: any, res: any) => {
-  try {
-    let { id_estudiante, id_config_practica, aprobacion } = req.body;
+  try {  
+    let { id_estudiante, id_config_practica, aprobacion} = req.body;
     if (typeof id_estudiante === "undefined" || typeof id_config_practica === "undefined" || typeof aprobacion === "undefined") {
       res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_config_practica y aprobacion" });
       return;
@@ -202,19 +202,7 @@ routerPractica.put("/aprobar", async (req: any, res: any) => {
       where: {
         id_estudiante, id_config_practica
       }
-    }).then((resultados: any) => {
-      const io: Server = getIo();
-      // send an event through socket.io
-      let roomName = "notificaciones" + id_estudiante;
-      let mensaje = ""
-      if (aprobacion == 1) {
-        mensaje = "Tu práctica ha sido aprobada"
-      }
-      else {
-        mensaje = "Tu práctica ha sido reprobada"
-      }
-      io.to(roomName).emit('evento', { message: mensaje });
-      console.log("EMITIENDO EVENTO EN SALA", roomName);
+    }).then((resultados: any) => {   
       console.log(resultados);
       res.status(200).json({ message: "Estado actualizado" });
     })
@@ -246,7 +234,7 @@ routerPractica.delete('/eliminar', (req: any, res: any) => {
 routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
   const { id_estudiante, id_config_practica, id_supervisor, id_empresa, id_encargado, id_modalidad, estado,
     fecha_inicio, fecha_termino, nota_evaluacion,
-    consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos } = req.body;
+    consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos} = req.body;
   console.log("Request de creacion de practica recibida");
   practica.create({
     id_estudiante: id_estudiante,
@@ -269,6 +257,7 @@ routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
     .then((resultados: any) => {
       res.status(200).json({ mensaje: "ok" });
       console.log("practica creada");
+    
     })
     .catch((err: any) => {
       res.status(500).json({ mensaje: "error" });
