@@ -25,9 +25,21 @@ module.exports = {
       {
         id: 4,
         id_config_practica: 2,
+        tipo_modalidad: 'meses',
+        cantidad_tiempo: 1
+      },
+      {
+        id: 5,
+        id_config_practica: 2,
+        tipo_modalidad: 'horas',
+        cantidad_tiempo: 180
+      },
+      {
+        id: 6,
+        id_config_practica: 2,
         tipo_modalidad: 'horas',
         cantidad_tiempo: 360
-      },
+      }
 
     ], {});
   },

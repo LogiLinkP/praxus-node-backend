@@ -16,7 +16,7 @@ module.exports = {
         id_pregunta_supervisor: 2,
         id_supervisor: 1,
         id_practica: 1,
-        respuesta: 'El estudiante se dedicó principalmente al desarrollo de una plataforma web, basada en Angular, para la gestión de proyectos de investigación.'
+        respuesta: 'El estudiante participó de dos etapas principales, la primera ligada a la adquisición de conocimientos, herramientas y manejo de stack utilizado al interior de la empresa. Y la segunda orientada a participar en proyectos en proceso de desarrollo, con la toma de requerimientos a nivel de backend y frontend.'
       },
       {
         id: 3,
@@ -44,7 +44,7 @@ module.exports = {
         id_pregunta_supervisor: 2,
         id_supervisor: 2,
         id_practica: 4,
-        respuesta: 'El estudiante hizo un sistema para leer el estado de los sensores de una planta de tratamiento de aguas servidas.'
+        respuesta: 'Levantamiento y mejoras (automatización) de un proceso de gestión de KPI\'s que consistía en reestructurar la metodología para la obtención de datos, procesamiento y disposición final en un dashboard.'
       },
       {
         id: 7,

@@ -5,12 +5,6 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     
     await queryInterface.bulkInsert('notificacion', [
-      {
-        id: 1,
-        id_usuario: 1,
-        texto: 'Su Práctica ha sido aprobada',
-        fecha: '2023-06-11 23:59:59'
-      }
     ], {});
   },
 

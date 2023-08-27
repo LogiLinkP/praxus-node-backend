@@ -8,14 +8,14 @@ module.exports = {
       {
         id: 1,
         nombre: 'supervisor1',
-        correo: 'correo_supervisor1@gmail.com',
+        correo: 'harold.caballero@sansano.usm.cl',
         carnet_rostro: false,
         es_correo_institucional: false
       },
       {
         id: 2,
         nombre: 'supervisor2',
-        correo: 'correo_supervisor2@gmail.com',
+        correo: 'harold.caballero@sansano.usm.cl',
         carnet_rostro: false,
         es_correo_institucional: false
       }

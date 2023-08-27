@@ -20,9 +20,7 @@ module.exports = {
         consistencia_informe: 0.8,
         consistencia_nota: 0.9,
         resumen: 'hice muchas cosas',
-        indice_repeticion: 0.7,
-        key_repeticiones: 'aca estan los textos que se repiten',
-        key_fragmentos: 'estos son los fragmentos que mas influyen en la consistencia'
+        indice_repeticion: 0.7
       },
       {
         id: 2,

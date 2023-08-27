@@ -14,7 +14,7 @@ module.exports = {
       {
         id: 2,
         id_config_practica: 1,
-        enunciado: '¿Que tanto sintió que le sirvieron los conocimientos aprendidos para rendir en su práctica?',
+        enunciado: '¿Qué tanto sintió que le sirvieron los conocimientos aprendidos para rendir en su práctica?',
         tipo_respuesta: 'abierta'
       },
       {
@@ -27,7 +27,7 @@ module.exports = {
       {
         id: 4,
         id_config_practica: 2,
-        enunciado: '¿Que tanto sintió que le sirvieron los conocimientos aprendidos para rendir en su práctica?',
+        enunciado: '¿Qué tanto sintió que le sirvieron los conocimientos aprendidos para rendir en su práctica?',
         tipo_respuesta: 'abierta'
       }
     ], {});
