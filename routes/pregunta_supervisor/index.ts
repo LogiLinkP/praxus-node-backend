@@ -70,7 +70,25 @@ routerPregSupervisor.delete('/eliminar', (req:any, res:any) => {
       res.send(500)
       console.log('Error al eliminar preguntas de supervisor', err);
     })
-  })
+})
+
+//[DELETE] Eliminar por config_practica
+routerPregSupervisor.delete('/eliminar_config', (req: any, res: any) => {
+    console.log("Eliminando preguntas de practica con id_config_practica: ", req.query.id)
+    pregunta_supervisor.destroy({
+      where: {
+        id_config_practica: req.query.id
+      }
+    })
+      .then((resultados: any) => {
+        console.log(resultados);
+        res.status(200).json(resultados);
+      })
+      .catch((err: any) => {
+        res.status(500).json(err);
+        console.log('Error al eliminar preguntas de practica', err);
+      })
+})
 
 //[POST] Crear una preguntas de supervisor con los datos recibidos
 routerPregSupervisor.post('/crear', jsonParser, (req: any, res: any) => {

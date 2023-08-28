@@ -93,4 +93,22 @@ routerPregEncuesta.delete('/eliminar', (req:any, res:any) => {
     })
 })
 
+//[DELETE] Eliminar por config_practica
+routerPregEncuesta.delete('/eliminar_config', (req: any, res: any) => {
+    console.log("Eliminando preguntas de practica con id_config_practica: ", req.query.id)
+    pregunta_encuesta_final.destroy({
+      where: {
+        id_config_practica: req.query.id
+      }
+    })
+      .then((resultados: any) => {
+        console.log(resultados);
+        res.status(200).json(resultados);
+      })
+      .catch((err: any) => {
+        res.status(500).json(err);
+        console.log('Error al eliminar preguntas de practica', err);
+      })
+})
+
 module.exports = routerPregEncuesta;

@@ -55,6 +55,24 @@ routerPreguntaInforme.delete('/eliminar', (req:any, res:any) => {
     })
 })
 
+//[DELETE] Eliminar por config_informe
+routerPreguntaInforme.delete('/eliminar_config', (req: any, res: any) => {
+    console.log("Eliminando preguntas informe con id_config_informe: ", req.query.id)
+    pregunta_informe.destroy({
+      where: {
+        id_config_practica: req.query.id
+      }
+    })
+      .then((resultados: any) => {
+        console.log(resultados);
+        res.status(200).json(resultados);
+      })
+      .catch((err: any) => {
+        res.status(500).json(err);
+        console.log('Error al eliminar preguntas informe', err);
+      })
+})
+
 //[POST] Crear un pregunta_informe con los datos recibidos
 routerPreguntaInforme.post('/crear', jsonParser, (req: any, res: any) => {
   const {id_config_informe, enunciado, tipo_respuesta, opciones} = req.body;

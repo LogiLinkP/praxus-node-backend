@@ -77,6 +77,24 @@ routerConfigInforme.delete('/eliminar', (req: any, res: any) => {
     })
 })
 
+//[DELETE] Eliminar por config_practica
+routerConfigInforme.delete('/eliminar_config', (req: any, res: any) => {
+    console.log("Eliminando config informe con id: ", req.query.id)
+    config_informe.destroy({
+      where: {
+        id_config_practica: req.query.id
+      }
+    })
+      .then((resultados: any) => {
+        console.log(resultados);
+        res.status(200).json(resultados);
+      })
+      .catch((err: any) => {
+        res.status(500).json(err);
+        console.log('Error al eliminar config informe', err);
+      })
+})
+
 //[POST] Crear uno
 routerConfigInforme.post('/crear', jsonParser, (req: any, res: any) => {
   const {id_config_practica, tipo_informe} = req.body;
