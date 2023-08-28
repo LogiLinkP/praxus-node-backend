@@ -60,7 +60,7 @@ routerPreguntaInforme.delete('/eliminar_config', (req: any, res: any) => {
     console.log("Eliminando preguntas informe con id_config_informe: ", req.query.id)
     pregunta_informe.destroy({
       where: {
-        id_config_practica: req.query.id
+        id_config_informe: req.query.id
       }
     })
       .then((resultados: any) => {
