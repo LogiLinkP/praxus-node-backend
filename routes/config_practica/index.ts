@@ -124,7 +124,7 @@ routerConfigPracticas.put('/actualizar', jsonParser, async (req: any, res: any) 
     Config_practica.update(req.body)
       .then((resultados: any) => {
         console.log(resultados);
-        res.sendStatus(200);
+        res.status(200).json(resultados);
       })
       .catch((err: any) => {
         res.send(500)
