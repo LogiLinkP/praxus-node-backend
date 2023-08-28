@@ -191,16 +191,17 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
 
 routerPractica.put("/aprobar", async (req: any, res: any) => {
   try {  
-    let { id_estudiante, id_config_practica, aprobacion} = req.body;
-    if (typeof id_estudiante === "undefined" || typeof id_config_practica === "undefined" || typeof aprobacion === "undefined") {
-      res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_config_practica y aprobacion" });
+    let { id_estudiante, id_modalidad, aprobacion} = req.body;
+    if (typeof id_estudiante === "undefined" || typeof id_modalidad === "undefined" || typeof aprobacion === "undefined") {
+      res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_modalidad y aprobacion" });
       return;
     }
     const data = await practica.update({
       estado: aprobacion == 1 ? "Aprobada" : "Reprobada"
     }, {
       where: {
-        id_estudiante, id_config_practica
+        id_estudiante,
+        id_modalidad
       }
     }).then((resultados: any) => {   
       console.log(resultados);
