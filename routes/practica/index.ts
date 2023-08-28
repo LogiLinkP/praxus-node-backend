@@ -8,6 +8,8 @@ const routerPractica = new Router(); // /practica
 routerPractica.use(json());
 routerPractica.use(urlencoded({ extended: true }));
 
+import { sendMail } from '../../utils/email';
+
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
@@ -158,16 +160,15 @@ routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
 
 routerPractica.put("/finalizar", async (req: any, res: any) => {
   try {
-    let { id_estudiante, id_practica, estado} = req.body;
+    let { id_estudiante, id_practica, estado } = req.body;
     if (typeof id_estudiante === "undefined" || typeof id_practica === "undefined" || typeof estado === "undefined") {
       res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_practica y estado" });
       return;
     }
     switch (estado) {
-      case "Revisión solicitada":
-      case "Finalizada":
-      case "Observaciones":
-        break;
+      case "Revisión solicitada": break;
+      case "Finalizada": break;
+      case "Observaciones": break;
       default:
         res.status(406).json({ message: "Estado inválido" });
         return;
@@ -180,8 +181,34 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
       }
     });
 
-    console.log(data);
-    res.status(200).json({ message: "Estado actualizado" });
+    console.log("\n\n\n\nLOS DATOS SON\n\n\n", data,req.body);
+
+    // Envio de correo al supervisor
+
+    if ("correo" in req.body && "nom_estudiante" in req.body) {
+      const { correo, nom_estudiante } = req.body;
+
+      const encrypt = (text:any) => {
+          const algorithm = process.env.ENCRYPT_ALGORITHM;
+          const key = process.env.ENCRYPT_SECRET_KEY;
+          const iv = crypto.randomBytes(16)              
+          const cipher = crypto.createCipheriv(algorithm, key, iv)              
+          const encrypted = Buffer.concat([cipher.update(text), cipher.final()])              
+          return {
+            iv: iv.toString('hex'),
+            content: encrypted.toString('hex')
+          }
+      }
+
+      let encrypted_str = encrypt(req.body.id_practica.toString());
+
+      // send the email with the encrypted id_practica
+      sendMail(correo, `Revisión de práctica de ${nom_estudiante}`, "Para evaluar al practicante debe acceder a " + process.env.URL_FRONTEND + "/supervisor/evaluacion?token=" + encrypted_str.content + "&iv=" + encrypted_str.iv, "Revisión de práctica de " + nom_estudiante);
+      //console.log("correo enviado correctamente");
+      res.status(200).json({ message: "Correo enviado y estado actualizado" });
+  } else {
+      res.status(406).json({ message: "Se requiere ingresar correo, el nombre del supervisor y nombre del estudiante" });
+  }
 
   } catch (error) {
     console.log(error);
