@@ -1,3 +1,5 @@
+import { text } from "stream/consumers";
+
 export { };
 
 const { respuesta_supervisor, pregunta_supervisor, practica, informe } = require('../../models');
@@ -59,56 +61,82 @@ routerRespuesta_supervisor.delete('/eliminar', (req: any, res: any) => {
 })
 
 //[POST] Crear uno
-routerRespuesta_supervisor.post('/crear', jsonParser, async(req: any, res: any) => {
-  const { id_pregunta_supervisor, id_practica, respuesta } = req.body;
-  console.log("Request de respuesta_supervisor");
-  try{
-    await respuesta_supervisor.create({
-      id_pregunta_supervisor: id_pregunta_supervisor,
-      id_practica: id_practica,
-      respuesta: respuesta
-    })
-    const _pregunta_supervisor = await pregunta_supervisor.findOne({ where: { id: id_pregunta_supervisor } })
+routerRespuesta_supervisor.post('/responder_encuesta', jsonParser, async(req: any, res: any) => {
+  // se asume que los ids de preguntas y las respuestas vienen en el mismo orden, es decir, respuesta[i] está relacionado a pregunta[i]
+  const { ids_preguntas_supervisor, id_practica, respuestas } = req.body;
 
-    if(_pregunta_supervisor.tipo_respuesta == "abierta"){
-      // buscar si hay informes en la practica asociada a esta respuesta, si los hay, enviar requests para calculo de consistencia
-      const _informes = await informe.findAll({ where: { id_practica: id_practica } })
+  console.log("Ids_preguntas_supervisor:", ids_preguntas_supervisor);
+  console.log("Id_practica:", id_practica);
+  console.log("Request de respuesta_supervisor - las respuestas son:", respuestas);
 
-      if(_informes.length > 0){
-        // concatenar informes en un solo string
-        let texto_informes = "";
-        for(let i = 0; i < _informes.length; i++){
-          texto_informes += _informes[i].key + ". ";
-        }
-        texto_informes = texto_informes.slice(0, -1);
+  const _informes = await informe.findAll({ where: { id_practica: id_practica } })
 
-        // enviar informes y respuesta abierta del supervisor al python backend para calcular consistencia
-        let consistencia_informe = await axios.post(process.env.PYTHONBE_CONSISTENCY, {
-          texto1: texto_informes,
-          texto2: respuesta
-        });
+  let texto_informes = "";
+  let texto_respuestas = "";
 
-        console.log(consistencia_informe.data);
-        await practica.update({
-            estado: "Evaluada",
-            consistencia_informe: consistencia_informe.data.score,
-            interpretacion_informe: consistencia_informe.data.interpretacion
-        }, {
-            where: {
-                id_practica: id_practica
-            }
-        });
-        res.status(200).json({ message: "Data recibida" });
+  if(_informes.length > 0){
+    // concatenar informes en un solo string POR AHORA SE ASUME QUE TODOS LOS INFORMES TIENEN UNA RESPUESTA CON TEXTO LEGIBLE EN EL CAMPO KEY 
+    // (después pueden haber otras cosas dependiendo del tipo de pregunta, y puede haber más de un elemento) 
+    for(let i = 0; i < _informes.length; i++){
+      console.log("INFORME: ", _informes[i].key);
+      let respuestas_informe = _informes[i].key
+      let first_key = Object.keys(respuestas_informe)[0]; // SOLO SE TOMA LA PRIMERA KEY DEL INFORME
+
+      if(respuestas_informe[first_key] != ""){
+        texto_informes += respuestas_informe[first_key] + ". ";
       }
-      
-      
 
     }
+    texto_informes = texto_informes.slice(0, -1);
   }
-  catch(error) {
-      console.log('Error al crear respuesta_supervisor', error);
-      res.status(500).json({ message: "Error interno" });
+
+  for(let i = 0; i < ids_preguntas_supervisor.length; i++){
+    try{
+      await respuesta_supervisor.create({
+        id_pregunta_supervisor: ids_preguntas_supervisor[i],
+        id_practica: id_practica,
+        respuesta: respuestas[i]
+      })
+
+      const _pregunta_supervisor = await pregunta_supervisor.findOne({ where: { id: ids_preguntas_supervisor[i] } })
+
+      if(_pregunta_supervisor.tipo_respuesta == "abierta"){     
+        texto_respuestas += respuestas[i] + ". ";
+      }
+    }
+    catch(error) {
+        console.log('Error al crear respuesta_supervisor', error);
+        res.status(500).json({ message: "Error interno" });
+    }
   }
+
+  console.log("INFORMES:")
+  console.log(texto_informes);
+  console.log("RESPUESTAS:")
+  console.log(texto_respuestas);
+
+  // ENVIAR INFORMES Y RESPUESTAS PARA CALCULO DE CONSISTENCIA:
+
+  
+  let consistencia_informe = await axios.post(process.env.PYTHONBE_CONSISTENCY, {
+    texto1: texto_informes,
+    texto2: texto_respuestas
+  });
+
+  console.log("CONSISTENCIA INFORME: ", consistencia_informe.data);
+
+  console.log(consistencia_informe.data);
+  await practica.update({
+      estado: "Evaluada",
+      consistencia_informe: consistencia_informe.data.score,
+      interpretacion_informe: consistencia_informe.data.interpretacion
+  }, {
+      where: {
+        id: id_practica
+      }
+  });
+  res.status(200).json({ message: "Data recibida" });  
+  
 })
 
 //[PUT]
@@ -133,3 +161,4 @@ routerRespuesta_supervisor.put('/actualizar', jsonParser, async (req: any, res: 
 })
 
 module.exports = routerRespuesta_supervisor;
+
