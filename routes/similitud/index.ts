@@ -488,7 +488,7 @@ routerSimilitud.post('/repeticion_respuestas_informe', jsonParser, async (req: a
   }
   try{
     const informes = await informe.findAll({
-      where: { id_practica: id_practica,id_informe: resx.id}
+      where: { id_practica: id_practica, id_informe: resx.id}
     })
     for(let informe of informes){
       textos.push(informe.respuesta);
