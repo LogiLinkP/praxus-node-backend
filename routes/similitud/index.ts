@@ -422,11 +422,21 @@ routerSimilitud.post('/indice_repeticion', jsonParser, async (req: any, res: any
 })
 
 routerSimilitud.post('/repeticion_respuestas_supervisor', jsonParser, async (req: any, res: any) => {
-  const { id_practica } = req.body;
+  const { id_practica, id_pregunta_supervisor } = req.body;
   const textos = [];
+  let resx: any;
+  try{
+    resx = await sequelize.pregunta_supervisor.findAll({
+      where: { id_pregunta_supervisor: id_pregunta_supervisor }
+    })
+  }
+  catch(err){
+    console.error(err);
+    res.sendStatus(500);
+  }
   try{
     const respuestas = await sequelize.respuesta_supervisor.findAll({
-      where: { id_practica: id_practica}
+      where: { id_practica: id_practica, id_pregunta_supervisor: resx.id}
     })
     for(let respuesta of respuestas){
       textos.push(respuesta.respuesta);
@@ -465,11 +475,20 @@ routerSimilitud.post('/repeticion_respuestas_supervisor', jsonParser, async (req
 })
 
 routerSimilitud.post('/repeticion_respuestas_informe', jsonParser, async (req: any, res: any) => {
-  const { id_practica } = req.body;
+  const { id_practica, id_informe } = req.body;
   const textos = [];
   try{
+    let resx = await sequelize.pregunta_informe.findAll({
+      where: { id_informe: id_informe }
+    })
+  }
+  catch(err){
+    console.error(err);
+    res.sendStatus(500);
+  }
+  try{
     const informes = await informe.findAll({
-      where: { id_practica: id_practica}
+      where: { id_practica: id_practica,id_informe: id_informe}
     })
     for(let informe of informes){
       textos.push(informe.respuesta);
