@@ -393,4 +393,46 @@ routerSimilitud.get('/frases_representativas', jsonParser, async (req: any, res:
 
 });
 
+routerSimilitud.post('/texto_mas_repetido', jsonParser, async (req: any, res: any) => {
+  const { texto1, texto2, id_alumno_practica } = req.body;
+  const payload = { texto1: texto1, texto2: texto2 };
+  await axios.post(process.env.PYTHONBE_MOST_REPEATED, payload)
+    .then((response: any) => {
+      console.log("Respuesta recibida desde python backend");
+      res.status(200).send(response.data);
+    })
+    .catch((error: any) => {
+      console.error(error);
+      res.status(500).send('Error occurred');
+    });
+})
+
+routerSimilitud.post('/indice_repeticion', jsonParser, async (req: any, res: any) => {
+  const { texto1, texto2, id_alumno_practica } = req.body;
+  const payload = { texto1: texto1, texto2: texto2 };
+  await axios.post(process.env.PYTHONBE_REPETITION_INDEX, payload)
+    .then((response: any) => {
+      console.log("Respuesta recibida desde python backend");
+      res.status(200).send(response.data);
+    })
+    .catch((error: any) => {
+      console.error(error);
+      res.status(500).send('Error occurred');
+    });
+})
+
+routerSimilitud.post('/textos_repetidos', jsonParser, async (req: any, res: any) => {
+  const { texto1, id_alumno_practica } = req.body;
+  const payload = { texto1: texto1 };
+  await axios.post(process.env.PYTHONBE_REPEATED_SECTIONS, payload)
+    .then((response: any) => {
+      console.log("Respuesta recibida desde python backend");
+      res.status(200).send(response.data);
+    })
+    .catch((error: any) => {
+      console.error(error);
+      res.status(500).send('Error occurred');
+    });
+})
+
 module.exports = routerSimilitud;
