@@ -11,7 +11,32 @@ module.exports = {
       {
         id_pregunta_encuesta_final: 2,
         respuesta: 'Me sirvieron mucho los conocimientos adquiridos'
+      },
+      {
+        id_pregunta_encuesta_final: 3,
+        respuesta: '0,0,0,0,1'
+      },
+      {
+        id_pregunta_encuesta_final: 3,
+        respuesta: '0,0,1,0,0'
+      },
+      {
+        id_pregunta_encuesta_final: 4,
+        respuesta: 'Me sirvieron mucho los conocimientos adquiridos'
+      },
+      {
+        id_pregunta_encuesta_final: 4,
+        respuesta: 'Me falto preparacion en algunos ambitos'
+      },
+      {
+        id_pregunta_encuesta_final: 5,
+        respuesta: '1,1,1,0,0'
+      },
+      {
+        id_pregunta_encuesta_final: 5,
+        respuesta: '0,0,1,0,1'
       }
+      
     ], {});
   },
 
