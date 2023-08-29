@@ -455,8 +455,7 @@ routerSimilitud.post('/repeticion_respuestas_supervisor', jsonParser, async (req
         if(resp.length > 0){
           practica.update({ key_repeticiones: repeticiones }, { where: { id: id_practica }})
           .then((resultados: any) => {
-            console.log(resultados);
-            res.sendStatus(200);
+            return res.status(200).send({message: "Repeticiones actualizadas", resultados: resultados});
           })
           .catch((err: any) => {
             res.send(500)
@@ -509,8 +508,7 @@ routerSimilitud.post('/repeticion_respuestas_informe', jsonParser, async (req: a
         console.log("Actualizando repeticiones de informe para el id", id_practica, "con repeticiones", repeticiones);
         practica.update({ key_repeticiones: repeticiones }, { where: { id: id_practica }})
         .then((resultados: any) => {
-          console.log(resultados);
-          res.sendStatus(200);
+          return res.status(200).send({message: "Repeticiones actualizadas", resultados: resultados});
         })
         .catch((err: any) => {
           res.send(500)
