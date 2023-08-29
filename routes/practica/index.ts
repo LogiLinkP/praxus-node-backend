@@ -323,7 +323,6 @@ routerPractica.post("/resumen", jsonParser, async (req: any, res: any) => {
   }
 
   try {
-    console.log("id: ", id_practica)
     const Practica = await practica.findOne({
       where: { id: id_practica },
       include: [
@@ -401,8 +400,6 @@ routerPractica.post("/resumen", jsonParser, async (req: any, res: any) => {
     else if (sup_valido)
       resumen.supervisor = resumenes.data[0];
 
-
-    console.log("resumenes: ", resumenes.data)
     await Practica.update({ resumen });
 
     return res.status(200).json(resumen);
