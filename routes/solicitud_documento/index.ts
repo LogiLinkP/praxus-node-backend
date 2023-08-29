@@ -74,7 +74,25 @@ routerSolicitudDocumento.delete('/eliminar', (req: any, res: any) => {
         res.send(500)
         console.log('Error al eliminar solicitud_documento', err);
       })
-  })
+})
+
+//[DELETE] Eliminar por config_practica
+routerSolicitudDocumento.delete('/eliminar_config', (req: any, res: any) => {
+    console.log("Eliminando solicitud documente con id_config_practica: ", req.query.id)
+    solicitud_documento.destroy({
+      where: {
+        id_config_practica: req.query.id
+      }
+    })
+      .then((resultados: any) => {
+        console.log(resultados);
+        res.status(200).json(resultados);
+      })
+      .catch((err: any) => {
+        res.status(500).json(err);
+        console.log('Error al eliminar solicitud documente de practica', err);
+      })
+})
 
 
 //[POST] Crear un solicitud_documento con los datos recibidos

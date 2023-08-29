@@ -88,10 +88,10 @@ routerConfigPracticas.delete('/eliminar', (req: any, res: any) => {
   })
     .then((resultados: any) => {
       console.log(resultados);
-      res.sendStatus(200);
+      res.status(200).json(resultados);
     })
     .catch((err: any) => {
-      res.send(500)
+      res.status(500).json(err)
       console.log('Error al eliminar config_practica', err);
     })
 })
@@ -118,7 +118,7 @@ routerConfigPracticas.post('/crear', jsonParser, (req: any, res: any) => {
 //[PUT]
 routerConfigPracticas.put('/actualizar', jsonParser, async (req: any, res: any) => {
   // buscar practica por id
-  const Config_practica = await config_practica.findOne({ where: { id: req.body.id } })
+  const Config_practica = await config_practica.findOne({ where: { nombre: req.body.nombre } })
   if (Config_practica) {
     // actualizar practica
     Config_practica.update(req.body)

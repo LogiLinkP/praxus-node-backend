@@ -97,6 +97,24 @@ routerModalidad.delete('/eliminar', (req: any, res: any) => {
     })
 })
 
+//[DELETE] Eliminar por config_practica
+routerModalidad.delete('/eliminar_config', (req: any, res: any) => {
+    console.log("Eliminando modalidad con id: ", req.query.id)
+   modalidad.destroy({
+      where: {
+        id_config_practica: req.query.id
+      }
+    })
+      .then((resultados: any) => {
+        console.log(resultados);
+        res.status(200).json(resultados);
+      })
+      .catch((err: any) => {
+        res.status(500).json(err);
+        console.log('Error al eliminar modalidad', err);
+      })
+})
+
 //[POST] Crear un modalidad con los datos recibidos
 routerModalidad.post('/crear', jsonParser, (req: any, res: any) => {
     const { id_config_practica, tipo_modalidad, cantidad_tiempo} = req.body;
