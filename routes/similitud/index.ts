@@ -421,18 +421,96 @@ routerSimilitud.post('/indice_repeticion', jsonParser, async (req: any, res: any
     });
 })
 
-routerSimilitud.post('/textos_repetidos', jsonParser, async (req: any, res: any) => {
-  const { texto1, id_alumno_practica } = req.body;
-  const payload = { texto1: texto1 };
+routerSimilitud.post('/repeticion_respuestas_supervisor', jsonParser, async (req: any, res: any) => {
+  const { id_practica } = req.body;
+  const textos = [];
+  try{
+    const respuestas = await sequelize.respuesta_supervisor.findAll({
+      where: { id_practica: id_practica}
+    })
+    for(let respuesta of respuestas){
+      textos.push(respuesta.respuesta);
+    }
+  }
+  catch(err){
+    console.error(err);
+    res.sendStatus(500);
+  }
+  const payload = { texto1: textos };
   await axios.post(process.env.PYTHONBE_REPEATED_SECTIONS, payload)
     .then((response: any) => {
-      console.log("Respuesta recibida desde python backend");
-      res.status(200).send(response.data);
+      const repeticiones = {respuestas: response.data};
+      try{
+        const resp = practica.findAll({ where: { id: id_practica } });
+        if(resp.length > 0){
+          practica.update({ key_repeticiones: repeticiones }, { where: { id: id_practica }})
+          .then((resultados: any) => {
+            console.log(resultados);
+            res.sendStatus(200);
+          })
+          .catch((err: any) => {
+            res.send(500)
+            console.log('Error al actualizar practica', err);
+          })  
+        }
+      }catch(err){
+        console.error(err);
+        res.sendStatus(500);
+      }
     })
     .catch((error: any) => {
       console.error(error);
       res.status(500).send('Error occurred');
     });
+})
+
+routerSimilitud.post('/repeticion_respuestas_informe', jsonParser, async (req: any, res: any) => {
+  const { id_practica } = req.body;
+  const textos = [];
+  try{
+    const informes = await informe.findAll({
+      where: { id_practica: id_practica}
+    })
+    for(let informe of informes){
+      textos.push(informe.respuesta);
+    }
+  }
+  catch(err){
+    console.error(err);
+    res.sendStatus(500);
+  }
+  const payload = { texto1: textos };
+  await axios.post(process.env.PYTHONBE_REPEATED_SECTIONS, payload)
+  .then((response: any) => {
+    const repeticiones = {respuestas: response.data};
+    try{
+      const resp = practica.findAll({ where: { id: id_practica } });
+      if(resp.length > 0){
+        console.log("Actualizando repeticiones de informe para el id", id_practica, "con repeticiones", repeticiones);
+        practica.update({ key_repeticiones: repeticiones }, { where: { id: id_practica }})
+        .then((resultados: any) => {
+          console.log(resultados);
+          res.sendStatus(200);
+        })
+        .catch((err: any) => {
+          res.send(500)
+          console.log('Error al actualizar practica', err);
+        })
+      }
+      else{
+        console.log("No existe practica con id: ", req.query.id)
+        res.sendStatus(404)
+      }
+    }
+    catch(err){
+      console.error(err);
+      res.sendStatus(500);
+    }
+  })
+  .catch((error: any) => {
+    console.error(error);
+    res.status(500).send('Error occurred');
+  }); 
 })
 
 module.exports = routerSimilitud;
