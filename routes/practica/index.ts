@@ -1,7 +1,7 @@
 export { };
 
 const { practica, estudiante, config_practica, usuario, empresa, supervisor, informe, documento, solicitud_documento,
-  documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe, encargado, modalidad } = require('../../models');
+  documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe, encargado, modalidad, pregunta_informe } = require('../../models');
 const { Router, json, urlencoded } = require('express');
 const crypto = require('crypto');
 const routerPractica = new Router(); // /practica
@@ -101,12 +101,8 @@ routerPractica.get('/get_asEstudiante', (req: any, res: any) => {
       id_estudiante: req.query.id_estudiante
     },
     include: [{ model: estudiante, include: [usuario] }, {
-      model: modalidad, include: {
-        model: config_practica,
-        include: [{ model: solicitud_documento, include: [documento] }, config_informe]
-      }
-    }, empresa,
-      supervisor, { model: informe, include: [config_informe] }, { model: documento, include: [solicitud_documento] },
+      model: modalidad, include: {model: config_practica, include: [{ model: solicitud_documento, include: [documento] },  {model: config_informe, include:[pregunta_informe]}]}}, empresa,
+      supervisor, { model: informe, include: {model: config_informe, include:[pregunta_informe]} }, { model: documento, include: [solicitud_documento] },
       documento_extra, { model: respuesta_supervisor, include: [pregunta_supervisor] }, { model: encargado, include: [usuario] }]
   })
     .then((resultados: any) => {
