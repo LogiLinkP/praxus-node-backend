@@ -477,8 +477,9 @@ routerSimilitud.post('/repeticion_respuestas_supervisor', jsonParser, async (req
 routerSimilitud.post('/repeticion_respuestas_informe', jsonParser, async (req: any, res: any) => {
   const { id_practica, id_informe } = req.body;
   const textos = [];
+  let resx: any;
   try{
-    let resx = await sequelize.pregunta_informe.findAll({
+    resx = await sequelize.pregunta_informe.findAll({
       where: { id_informe: id_informe }
     })
   }
@@ -488,7 +489,7 @@ routerSimilitud.post('/repeticion_respuestas_informe', jsonParser, async (req: a
   }
   try{
     const informes = await informe.findAll({
-      where: { id_practica: id_practica,id_informe: id_informe}
+      where: { id_practica: id_practica,id_informe: resx.id}
     })
     for(let informe of informes){
       textos.push(informe.respuesta);
