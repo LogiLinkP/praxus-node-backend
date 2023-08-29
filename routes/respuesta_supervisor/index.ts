@@ -73,6 +73,8 @@ routerRespuesta_supervisor.post('/responder_encuesta', jsonParser, async(req: an
 
   let texto_informes = "";
   let texto_respuestas = "";
+  let suma_evaluaciones = 0;
+  let cantidad_evaluaciones = 0;
 
   if(_informes.length > 0){
     // concatenar informes en un solo string POR AHORA SE ASUME QUE TODOS LOS INFORMES TIENEN UNA RESPUESTA CON TEXTO LEGIBLE EN EL CAMPO KEY 
@@ -103,6 +105,10 @@ routerRespuesta_supervisor.post('/responder_encuesta', jsonParser, async(req: an
       if(_pregunta_supervisor.tipo_respuesta == "abierta"){     
         texto_respuestas += respuestas[i] + ". ";
       }
+      else if(_pregunta_supervisor.tipo_respuesta == "evaluacion"){
+        suma_evaluaciones += parseInt(respuestas[i]);
+        cantidad_evaluaciones += 1;
+      }
     }
     catch(error) {
         console.log('Error al crear respuesta_supervisor', error);
@@ -117,24 +123,51 @@ routerRespuesta_supervisor.post('/responder_encuesta', jsonParser, async(req: an
 
   // ENVIAR INFORMES Y RESPUESTAS PARA CALCULO DE CONSISTENCIA:
 
-  
-  let consistencia_informe = await axios.post(process.env.PYTHONBE_CONSISTENCY, {
-    texto1: texto_informes,
-    texto2: texto_respuestas
-  });
+  if(texto_respuestas != "" && texto_informes != ""){
+    let consistencia_informe = await axios.post(process.env.PYTHONBE_CONSISTENCY, {
+      texto1: texto_informes,
+      texto2: texto_respuestas
+    });
 
-  console.log("CONSISTENCIA INFORME: ", consistencia_informe.data);
+    console.log("CONSISTENCIA INFORME: ", consistencia_informe.data);
 
-  console.log(consistencia_informe.data);
+    console.log(consistencia_informe.data);
+    await practica.update({
+        consistencia_informe: consistencia_informe.data.score,
+        interpretacion_informe: consistencia_informe.data.interpretacion
+    }, {
+        where: {
+          id: id_practica
+        }
+    });
+  }
+
+  if(cantidad_evaluaciones > 0 && texto_respuestas != ""){
+    let consistencia_evaluacion = await axios.post(process.env.PYTHONBE_EVAL_INFORME, {
+      texto: texto_respuestas,
+      puntaje: +suma_evaluaciones/cantidad_evaluaciones,
+      puntaje_min: 1,
+      puntaje_max: 5
+    });
+    console.log("RESPUESTA DE CONSISTENCIA EVAL:", consistencia_evaluacion.data);
+    await practica.update({
+        consistencia_nota: consistencia_evaluacion.data.evaluacion.similitud,
+        interpretacion_nota: consistencia_evaluacion.data.interpretacion,
+        nota_eval: +suma_evaluaciones/cantidad_evaluaciones
+    }, {
+        where: {
+          id: id_practica
+        }
+    });
+  }
   await practica.update({
-      estado: "Evaluada",
-      consistencia_informe: consistencia_informe.data.score,
-      interpretacion_informe: consistencia_informe.data.interpretacion
-  }, {
-      where: {
-        id: id_practica
-      }
-  });
+    estado: "Evaluada",
+    fecha_termino: new Date()
+    }, {
+    where: {
+      id: id_practica
+    }
+});
   res.status(200).json({ message: "Data recibida" });  
   
 })
