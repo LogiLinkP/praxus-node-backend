@@ -58,7 +58,7 @@ routerPractica.get('/preguntas_supervisor', async (req: any, res: any) => {
 });
 
 //[GET] para obtener todas las practica con config_practica
-routerPractica.get('/preguntas_supervisor', async (req: any, res: any) => {
+routerPractica.get('/configs', async (req: any, res: any) => {
     try {
       if (!("id" in req.query)) {
         res.status(406).json({ message: "Se requiere ingresar id" });
