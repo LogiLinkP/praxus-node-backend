@@ -16,8 +16,9 @@ const jsonParser = bodyParser.json();
 
 //[GET] MODIFICAR mostrar todos por id_usuario
 routerNotificacion.get('/todos', jsonParser, async (req: any, res: any) => {
-  const {id_usuario, config} = req.body;
-
+  console.log(req.query)
+  const {id_usuario, config} = req.query;
+  console.log("REQUEST: " + id_usuario);
   try {
     const data = await notificacion.findAll({
       where: {
