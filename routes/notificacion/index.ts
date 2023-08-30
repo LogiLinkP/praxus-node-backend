@@ -61,8 +61,9 @@ routerNotificacion.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] 
 routerNotificacion.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_usuario, fecha, mensaje, correo, estado} = req.body;
+  const {id_usuario, fecha, mensaje, correo, estado, enlace} = req.body;
   console.log("Request de notificacion");
+  console.log(enlace);
   notificacion.create({
     id_usuario: id_usuario,
     texto: mensaje,
@@ -90,7 +91,7 @@ routerNotificacion.post('/crear', jsonParser, (req: any, res: any) => {
       let roomName = "notificaciones"+id_usuario;
       let mensaje_noti = mensaje;
       
-      io.to(roomName).emit('notificacion', { fecha: fecha, message: mensaje_noti });
+      io.to(roomName).emit('notificacion', { fecha: fecha, message: mensaje_noti , link: enlace});
       console.log("EMITIENDO EVENTO EN SALA", roomName);
 
       res.send("notificacion creada");
