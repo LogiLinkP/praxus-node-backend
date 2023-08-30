@@ -7,6 +7,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    return queryInterface.changeColumn('config_practica', 'informe_final', Sequelize.BOOLEAN)
+    return queryInterface.changeColumn('config_practica', 'informe_final', Sequelize.STRING(2))
   }
 };

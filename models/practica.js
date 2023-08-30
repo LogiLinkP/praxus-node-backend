@@ -69,7 +69,9 @@ module.exports = (sequelize, DataTypes) => {
     resumen: DataTypes.JSON,
     indice_repeticion: DataTypes.FLOAT,
     key_repeticiones: DataTypes.JSON,
-    key_fragmentos: DataTypes.JSON
+    key_fragmentos: DataTypes.JSON,
+    interpretacion_informe: DataTypes.STRING,
+    interpretacion_nota: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'practica',
