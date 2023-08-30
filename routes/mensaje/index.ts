@@ -90,6 +90,7 @@ routerMensaje.post('/crear', jsonParser, (req: any, res: any) => {
           res.send("Error al crear mensaje")
         })
         */
+        res.send( "mensaje creado"); //borrar cuando se descomente lo de arriba
     }else{
       res.send("No existe chat con esos id")
     }   
