@@ -393,46 +393,111 @@ routerSimilitud.get('/frases_representativas', jsonParser, async (req: any, res:
 
 });
 
-routerSimilitud.post('/texto_mas_repetido', jsonParser, async (req: any, res: any) => {
-  const { texto1, texto2, id_alumno_practica } = req.body;
-  const payload = { texto1: texto1, texto2: texto2 };
-  await axios.post(process.env.PYTHONBE_MOST_REPEATED, payload)
-    .then((response: any) => {
-      console.log("Respuesta recibida desde python backend");
-      res.status(200).send(response.data);
-    })
-    .catch((error: any) => {
-      console.error(error);
-      res.status(500).send('Error occurred');
-    });
-})
+// routerSimilitud.post('/texto_mas_repetido', jsonParser, async (req: any, res: any) => {
+//   const { texto1, texto2, id_alumno_practica } = req.body;
+//   const payload = { texto1: texto1, texto2: texto2 };
+//   await axios.post(process.env.PYTHONBE_MOST_REPEATED, payload)
+//     .then((response: any) => {
+//       console.log("Respuesta recibida desde python backend");
+//       res.status(200).send(response.data);
+//     })
+//     .catch((error: any) => {
+//       console.error(error);
+//       res.status(500).send('Error occurred');
+//     });
+// })
 
-routerSimilitud.post('/indice_repeticion', jsonParser, async (req: any, res: any) => {
-  const { texto1, texto2, id_alumno_practica } = req.body;
-  const payload = { texto1: texto1, texto2: texto2 };
-  await axios.post(process.env.PYTHONBE_REPETITION_INDEX, payload)
-    .then((response: any) => {
-      console.log("Respuesta recibida desde python backend");
-      res.status(200).send(response.data);
-    })
-    .catch((error: any) => {
-      console.error(error);
-      res.status(500).send('Error occurred');
-    });
-})
+// routerSimilitud.post('/indice_repeticion', jsonParser, async (req: any, res: any) => {
+//   const { texto1, texto2, id_alumno_practica } = req.body;
+//   const payload = { texto1: texto1, texto2: texto2 };
+//   await axios.post(process.env.PYTHONBE_REPETITION_INDEX, payload)
+//     .then((response: any) => {
+//       console.log("Respuesta recibida desde python backend");
+//       res.status(200).send(response.data);
+//     })
+//     .catch((error: any) => {
+//       console.error(error);
+//       res.status(500).send('Error occurred');
+//     });
+// })
 
 routerSimilitud.post('/textos_repetidos', jsonParser, async (req: any, res: any) => {
-  const { texto1, id_alumno_practica } = req.body;
-  const payload = { texto1: texto1 };
-  await axios.post(process.env.PYTHONBE_REPEATED_SECTIONS, payload)
-    .then((response: any) => {
-      console.log("Respuesta recibida desde python backend");
-      res.status(200).send(response.data);
-    })
-    .catch((error: any) => {
-      console.error(error);
-      res.status(500).send('Error occurred');
+  const { id_practica } = req.body;
+  if (!id_practica) {
+    res.status(400).json({ error: 'Practica no especificada' });
+    return;
+  }
+  try {
+    const Practica = await practica.findOne({
+      where: { id: id_practica },
+      include: [
+        {
+          model: informe,
+          required: false,
+          include: [
+            {
+              model: config_informe,
+              required: false,
+              include: [
+                {
+                  model: pregunta_informe,
+                  required: false,
+                  where: { tipo_respuesta: 'abierta' }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          model: respuesta_supervisor,
+          required: false,
+          include: [
+            {
+              model: pregunta_supervisor,
+              required: false,
+              where: { tipo_respuesta: 'abierta' }
+            }
+          ]
+        }
+      ]
     });
+    if (!Practica) {
+      res.status(404).json({ error: 'Practica no encontrada' });
+      return;
+    }
+    let textos_informes: string[] = [];
+    // let orden_informes: string[][] = [];
+    for (let informe of Practica.informes) {
+      let ids_preguntas_informe = informe.config_informe.pregunta_informes.map((elem: any) => elem.id.toString());
+      ids_preguntas_informe.forEach((id_pregunta: string) => {
+        // orden_informes.push([informe.id.toString(), id_pregunta]);
+        textos_informes.push(informe.key[id_pregunta])
+      });
+    }
+
+    const response = await axios.post(process.env.PYTHONBE_REPEATED_SECTIONS, {
+      texto1: textos_informes
+    })
+    let cant_palabras_repetidas = 0;
+    for (let par of response.data.registro) {
+      cant_palabras_repetidas += par[1] * par[0].split(" ").length;
+    }
+    let cant_palabras_total = 0
+    for (let texto of textos_informes) {
+      cant_palabras_total += texto.split(" ").length;
+    }
+    Practica.update({
+      key_repeticiones: response.data.registro,
+      indice_repeticion: cant_palabras_repetidas / cant_palabras_total
+    })
+    return res.status(200).json({
+      key_repeticiones: response.data.registro,
+      indice_repeticion: cant_palabras_repetidas / cant_palabras_total
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Error occurred' });
+  }
 })
 
 module.exports = routerSimilitud;
