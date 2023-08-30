@@ -16,7 +16,7 @@ const jsonParser = bodyParser.json();
 
 //[GET] MODIFICAR mostrar todos por id_usuario
 routerNotificacion.get('/todos', jsonParser, async (req: any, res: any) => {
-  const {id_usuario, config} = req.body;
+  const { id_usuario, config } = req.query;
 
   try {
     const data = await notificacion.findAll({
@@ -61,13 +61,14 @@ routerNotificacion.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] 
 routerNotificacion.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_usuario, fecha, mensaje, correo, estado} = req.body;
+  const { id_usuario, fecha, mensaje, correo, estado, enlace } = req.body;
   notificacion.create({
     id_usuario: id_usuario,
     texto: mensaje,
     fecha: fecha,
+    link: enlace,
   })
-  .then((resultados:any) => {
+    .then((resultados: any) => {
       console.log(resultados);
       /*
       if(estado == "Notificaciones y Correo" || estado == "Sólo Correo"){
@@ -87,20 +88,20 @@ routerNotificacion.post('/crear', jsonParser, (req: any, res: any) => {
       */
 
       let mensaje_correo: string = mensaje + ". Visite Praxus para revisar.";
-      sendMail(correo,"Hola", mensaje_correo, "hola");
+      sendMail(correo, "Hola", mensaje_correo, "hola");
 
       const io: Server = getIo();
-      let roomName = "notificaciones"+id_usuario;
+      let roomName = "notificaciones" + id_usuario;
       let mensaje_noti = mensaje;
-      
-      io.to(roomName).emit('notificacion', { fecha: fecha, message: mensaje_noti });
+
+      io.to(roomName).emit('notificacion', { fecha: fecha, message: mensaje_noti, link: enlace });
       console.log("EMITIENDO EVENTO EN SALA", roomName);
 
       res.send("notificacion creada");
-  })
-  .catch((err:any) => {
-      console.log('Error al crear notificacion',err);
-  })
+    })
+    .catch((err: any) => {
+      console.log('Error al crear notificacion', err);
+    })
 })
 
 
@@ -128,7 +129,7 @@ routerNotificacion.put('/actualizar', jsonParser, async (req: any, res: any) => 
 
 routerNotificacion.put('/visto', jsonParser, async (req: any, res: any) => {
   // get all notificaciones with findall
-  const Notificaciones = await notificacion.update({visto: true}, {
+  const Notificaciones = await notificacion.update({ visto: true }, {
     where: {
       id_usuario: req.body.id_usuario,
       visto: false,
@@ -148,7 +149,7 @@ routerNotificacion.get('/todas_hasta_vistas', jsonParser, async (req: any, res: 
   try {
     const data = await notificacion.findAll({
       where: {
-        id_usuario: id, 
+        id_usuario: id,
       }
     });
     res.status(200).json(data);
