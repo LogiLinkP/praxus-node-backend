@@ -131,7 +131,7 @@ routerConfigPracticas.put('/actualizar', jsonParser, async (req: any, res: any) 
         console.log('Error al actualizar config_practica', err);
       })
   } else {
-    console.log("No existe config_practica con id: ", req.query.id)
+    console.log("No existe config_practica con nombre: ", req.body.nombre)
     res.sendStatus(404)
   }
 })
