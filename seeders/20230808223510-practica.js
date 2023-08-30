@@ -2,7 +2,7 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
 
     await queryInterface.bulkInsert('practica', [
       {
@@ -19,8 +19,9 @@ module.exports = {
         nota_eval: 90,
         consistencia_informe: 0.8,
         consistencia_nota: 0.9,
-        resumen: 'hice muchas cosas',
-        indice_repeticion: 0.7
+        resumen: null,
+        indice_repeticion: 0.7,
+        interpretacion_nota: "El puntaje de la evaluación es similar la detectada en el informe"
       },
       {
         id: 2,
@@ -53,14 +54,15 @@ module.exports = {
         id_encargado: 1,
         id_modalidad: 1,
         estado: 'Evaluada',
-        fecha_inicio: '2023-07-11 23:59:59'
+        fecha_inicio: '2023-07-11 23:59:59',
+        interpretacion_nota: "El puntaje de la evaluación es similar la detectada en el informe"
       }
-      
+
     ], {});
 
   },
 
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface, Sequelize) {
     await queryInterface.bulkDelete('practica', null, {});
   }
 };

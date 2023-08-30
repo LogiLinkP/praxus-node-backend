@@ -3,10 +3,12 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    queryInterface.bulkInsert('chat', [
-    ], {});
+    await queryInterface.addColumn('notificacion', 'link', Sequelize.STRING);
+    return;
   },
+
   async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('chat', null, {});
+    await queryInterface.removeColumn('notificacion', 'link');
+    return;
   }
 };
