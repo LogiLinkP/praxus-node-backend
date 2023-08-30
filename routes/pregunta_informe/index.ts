@@ -55,20 +55,40 @@ routerPreguntaInforme.delete('/eliminar', (req:any, res:any) => {
     })
 })
 
+//[DELETE] Eliminar por config_informe
+routerPreguntaInforme.delete('/eliminar_config', (req: any, res: any) => {
+    console.log("Eliminando preguntas informe con id_config_informe: ", req.query.id)
+    pregunta_informe.destroy({
+      where: {
+        id_config_informe: req.query.id
+      }
+    })
+      .then((resultados: any) => {
+        console.log(resultados);
+        res.status(200).json(resultados);
+      })
+      .catch((err: any) => {
+        res.status(500).json(err);
+        console.log('Error al eliminar preguntas informe', err);
+      })
+})
+
 //[POST] Crear un pregunta_informe con los datos recibidos
 routerPreguntaInforme.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_config_informe, enunciado, tipo_respuesta} = req.body;
+  const {id_config_informe, enunciado, tipo_respuesta, opciones} = req.body;
   console.log("Request de creacion de pregunta_informe recibida");
   pregunta_informe.create({
       id_config_informe: id_config_informe,
       enunciado: enunciado,
-      tipo_respuesta: tipo_respuesta
+      tipo_respuesta: tipo_respuesta,
+      opciones: opciones
   })
   .then((resultados:any) => {
-      res.send("pregunta_informe creado");
+      res.status(200).json({ message: "pregunta_informe creada" });
   })
   .catch((err:any) => {
-      console.log('Error al crear pregunta_informe',err);
+      console.log('Error al crear pregunta_informe', err);
+      res.status(500).json({ message: "Error al crear pregunta_informe", error: err });
   })
 })
 

@@ -6,11 +6,11 @@ module.exports = {
     await queryInterface.bulkInsert('respuesta_encuesta_final', [
       {
         id_pregunta_encuesta_final: 1,
-        respuesta: '5'
+        respuesta: '0,0,0,0,1'
       },
       {
         id_pregunta_encuesta_final: 2,
-        respuesta: 'me sirvieron harto'
+        respuesta: 'Me sirvieron mucho los conocimientos adquiridos'
       }
     ], {});
   },

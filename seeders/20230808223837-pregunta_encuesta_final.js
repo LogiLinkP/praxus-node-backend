@@ -5,23 +5,29 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.bulkInsert('pregunta_encuesta_final', [
       {
+        id: 1,
         id_config_practica: 1,
-        enunciado: 'Evalue la empresa entre 1 y 5',
-        tipo_respuesta: 'abierta'
+        enunciado: 'Evalúe la empresa entre 1 y 5',
+        tipo_respuesta: 'alternativas',
+        opciones: '1;;2;;3;;4;;5'
       },
       {
+        id: 2,
         id_config_practica: 1,
-        enunciado: '¿Que tanto sintio que le sirvieron los conocimientos aprendidos para rendir en su practica?',
+        enunciado: '¿Qué tanto sintió que le sirvieron los conocimientos aprendidos para rendir en su práctica?',
         tipo_respuesta: 'abierta'
       },
       {
+        id: 3,
         id_config_practica: 2,
-        enunciado: 'Evalue la empresa entre 1 y 5',
-        tipo_respuesta: 'abierta'
+        enunciado: 'Evalúe la empresa entre 1 y 5',
+        tipo_respuesta: 'alternativas',
+        opciones: '1;;2;;3;;4;;5'
       },
       {
+        id: 4,
         id_config_practica: 2,
-        enunciado: '¿Que tanto sintio que le sirvieron los conocimientos aprendidos para rendir en su practica?',
+        enunciado: '¿Qué tanto sintió que le sirvieron los conocimientos aprendidos para rendir en su práctica?',
         tipo_respuesta: 'abierta'
       }
     ], {});

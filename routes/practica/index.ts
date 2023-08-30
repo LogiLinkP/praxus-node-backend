@@ -1,11 +1,15 @@
 export { };
 
 const { practica, estudiante, config_practica, usuario, empresa, supervisor, informe, documento, solicitud_documento,
-        documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe } = require('../../models');
+  documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe, encargado, modalidad, pregunta_informe } = require('../../models');
 const { Router, json, urlencoded } = require('express');
+const crypto = require('crypto');
 const routerPractica = new Router(); // /practica
+const axios = require('axios');
 routerPractica.use(json());
 routerPractica.use(urlencoded({ extended: true }));
+
+import { sendMail } from '../../utils/email';
 
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
@@ -22,8 +26,9 @@ routerPractica.get('', async (req: any, res: any) => {
       where: {
         id: req.query.id
       },
-      include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, config_practica, empresa, supervisor, {model: informe, include: [config_informe]}, 
-                {model: documento, include: [solicitud_documento]}, documento_extra, {model:respuesta_supervisor, include: [pregunta_supervisor]}]
+      include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: {model: config_practica, include: {model: solicitud_documento}}}, 
+      empresa, supervisor, { model: informe, include: [config_informe] }, { model: documento, include: [solicitud_documento] }, documento_extra,
+      { model: respuesta_supervisor, include: [pregunta_supervisor] }]
     });
     res.status(200).json(data);
   } catch (error) {
@@ -31,6 +36,120 @@ routerPractica.get('', async (req: any, res: any) => {
     res.status(500).json({ message: "Error interno" });
   }
 });
+
+//[GET] para obtener una practica con con su config_practica y las preguntas_supervisor asociadas
+routerPractica.get('/preguntas_supervisor', async (req: any, res: any) => {
+  try {
+    if (!("id" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar id" });
+      return;
+    }
+    const data = await practica.findOne({
+      where: {
+        id: req.query.id
+      },
+      include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: [{ model: config_practica, include: [pregunta_supervisor] }] }]
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
+//[GET] para obtener todas las practica con config_practica
+routerPractica.get('/configs', async (req: any, res: any) => {
+    try {
+      if (!("id" in req.query)) {
+        res.status(406).json({ message: "Se requiere ingresar id" });
+        return;
+      }
+      const data = await practica.findAll({
+        where: {
+          id_config_practica: req.query.id
+        }
+      });
+      res.status(200).json(data);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Error interno" });
+    }
+  });
+
+//[GET] para obtener una practica con el id encriptado (debe venir un token y un iv)
+routerPractica.get('/encrypted', async (req: any, res: any) => {
+  try {
+    if (!("token" in req.query) || !("iv" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar token e iv" });
+      return;
+    }
+
+    //decrypt the encripted id in req.query.id with the algorith and key in the .env file
+    const decrypt = (hash: any) => {
+      const algorithm = process.env.ENCRYPT_ALGORITHM;
+      const key = process.env.ENCRYPT_SECRET_KEY;
+      const decipher = crypto.createDecipheriv(algorithm, key, Buffer.from(hash.iv, 'hex'))
+      const decrypted = Buffer.concat([decipher.update(Buffer.from(hash.content, 'hex')), decipher.final()])
+      return decrypted.toString()
+    }
+
+    let decrypted_id = decrypt({ content: req.query.token, iv: req.query.iv });
+
+    console.log("decrypted_id!!!!!", decrypted_id);
+
+    const data = await practica.findOne({
+      where: {
+        id: decrypted_id
+      },
+      include: [{ model: estudiante, include: [usuario] }, {
+        model: modalidad, include: [
+          { model: config_practica, include: [pregunta_supervisor] }]
+      }]
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
+//[GET] para obtener todas las practicas con el id de un estudiante
+routerPractica.get('/get_asEstudiante', (req: any, res: any) => {
+  console.log("Obteniendo practica con id de estudiante: ", req.query.id_estudiante)
+  practica.findAll({
+    where: {
+      id_estudiante: req.query.id_estudiante
+    },
+    include: [{ model: estudiante, include: [usuario] }, {
+      model: modalidad, include: {model: config_practica, include: [{ model: solicitud_documento },  {model: config_informe, include:[pregunta_informe]}]}}, empresa,
+      supervisor, { model: informe, include: {model: config_informe, include:[pregunta_informe]} }, { model: documento, include: [solicitud_documento] },
+      documento_extra, { model: respuesta_supervisor, include: [pregunta_supervisor] }, { model: encargado, include: [usuario] }]
+  })
+    .then((resultados: any) => {
+      res.send(resultados);
+    })
+    .catch((err: any) => {
+      console.log('Error al obtener practica', err);
+    })
+})
+
+//[GET] para obtener todas las practicas con el id de un encargado
+routerPractica.get('/get_asEncargado', (req: any, res: any) => {
+  console.log("Obteniendo practica con id de estudiante: ", req.query.id_encargado)
+  practica.findAll({
+    where: {
+      id_estudiante: req.query.id_encargado
+    },
+    include: [{ model: estudiante, include: [usuario] }, config_practica, empresa, supervisor, { model: informe, include: [config_informe] },
+    { model: documento, include: [solicitud_documento] }, documento_extra, { model: respuesta_supervisor, include: [pregunta_supervisor] }, encargado]
+  })
+    .then((resultados: any) => {
+      res.send(resultados);
+    })
+    .catch((err: any) => {
+      console.log('Error al obtener practica', err);
+    })
+})
 
 //[GET] mostrar todos
 routerPractica.get('/todos', async (req: any, res: any) => {
@@ -46,7 +165,7 @@ routerPractica.get('/todos', async (req: any, res: any) => {
 routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
   try {
     const data = await practica.findAll({
-      include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, config_practica]
+      include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: [config_practica] }]
     });
     res.status(200).json(data);
   } catch (error) {
@@ -63,10 +182,9 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
       return;
     }
     switch (estado) {
-      case "Revisión solicitada":
-      case "Finalizada":
-      case "Observaciones":
-        break;
+      case "Revisión solicitada": break;
+      case "Finalizada": break;
+      case "Observaciones": break;
       default:
         res.status(406).json({ message: "Estado inválido" });
         return;
@@ -75,11 +193,39 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
       estado
     }, {
       where: {
-        id_estudiante, id_config_practica: id_practica
+        id_estudiante, id: id_practica
       }
     });
-    console.log(data);
-    res.status(200).json({ message: "Estado actualizado" });
+
+    console.log("\n\n\n\nLOS DATOS SON\n\n\n", data, req.body);
+
+    // Envio de correo al supervisor
+
+    if ("correo" in req.body && "nom_estudiante" in req.body) {
+      const { correo, nom_estudiante } = req.body;
+
+      const encrypt = (text: any) => {
+        const algorithm = process.env.ENCRYPT_ALGORITHM;
+        const key = process.env.ENCRYPT_SECRET_KEY;
+        const iv = crypto.randomBytes(16)
+        const cipher = crypto.createCipheriv(algorithm, key, iv)
+        const encrypted = Buffer.concat([cipher.update(text), cipher.final()])
+        return {
+          iv: iv.toString('hex'),
+          content: encrypted.toString('hex')
+        }
+      }
+
+      let encrypted_str = encrypt(req.body.id_practica.toString());
+
+      // send the email with the encrypted id_practica
+      sendMail(correo, `Revisión de práctica de ${nom_estudiante}`, "Para evaluar al practicante debe acceder a " + process.env.URL_FRONTEND + "/supervisor/evaluacion?token=" + encrypted_str.content + "&iv=" + encrypted_str.iv, "Revisión de práctica de " + nom_estudiante);
+      //console.log("correo enviado correctamente");
+      res.status(200).json({ message: "Correo enviado y estado actualizado" });
+    } else {
+      res.status(406).json({ message: "Se requiere ingresar correo, el nombre del supervisor y nombre del estudiante" });
+    }
+
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error interno" });
@@ -88,16 +234,17 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
 
 routerPractica.put("/aprobar", async (req: any, res: any) => {
   try {
-    let { id_estudiante, id_config_practica, aprobacion } = req.body;
-    if (typeof id_estudiante === "undefined" || typeof id_config_practica === "undefined" || typeof aprobacion === "undefined") {
-      res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_config_practica y aprobacion" });
+    let { id_estudiante, id_modalidad, aprobacion } = req.body;
+    if (typeof id_estudiante === "undefined" || typeof id_modalidad === "undefined" || typeof aprobacion === "undefined") {
+      res.status(406).json({ message: "Se requiere ingresar id_estudiante, id_modalidad y aprobacion" });
       return;
     }
     const data = await practica.update({
       estado: aprobacion == 1 ? "Aprobada" : "Reprobada"
     }, {
       where: {
-        id_estudiante, id_config_practica
+        id_estudiante,
+        id_modalidad
       }
     }).then((resultados: any) => {
       console.log(resultados);
@@ -129,7 +276,7 @@ routerPractica.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] Crear uno
 routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
-  const { id_estudiante, id_config_practica, id_supervisor, id_empresa, id_encargado, estado,
+  const { id_estudiante, id_config_practica, id_supervisor, id_empresa, id_encargado, id_modalidad, estado,
     fecha_inicio, fecha_termino, nota_evaluacion,
     consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos } = req.body;
   console.log("Request de creacion de practica recibida");
@@ -139,6 +286,7 @@ routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
     id_supervisor: id_supervisor,
     id_empresa: id_empresa,
     id_encargado: id_encargado,
+    id_modalidad: id_modalidad,
     estado: estado,
     fecha_inicio: fecha_inicio,
     fecha_termino: fecha_termino,
@@ -153,10 +301,11 @@ routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
     .then((resultados: any) => {
       res.status(200).json({ mensaje: "ok" });
       console.log("practica creada");
+
     })
     .catch((err: any) => {
       res.status(500).json({ mensaje: "error" });
-      console.log('Error al crear practica');
+      console.log('Error al crear practica', err.message, fecha_inicio);
     })
 })
 
@@ -182,21 +331,100 @@ routerPractica.put('/actualizar', jsonParser, async (req: any, res: any) => {
   }
 })
 
-//[GET] para obtener una practica de acuerdo al id del estudiante (por ahora se asume que tiene una práctica)
-routerPractica.get('/get', (req: any, res: any) => {
-  console.log("Obteniendo practica con id de estudiante: ", req.query.id_estudiante)
-  practica.findOne({
-    where: {
-      id_estudiante: req.query.id_estudiante
-    },
-    include: [{model: estudiante, include: [{model: usuario, as: 'usuario'}]}, config_practica, empresa, supervisor]
-  })
-    .then((resultados: any) => {
-      res.send(resultados);
-    })
-    .catch((err: any) => {
-      console.log('Error al obtener practica', err);
-    })
-})
+routerPractica.post("/resumen", jsonParser, async (req: any, res: any) => {
+  const { id_practica } = req.query;
+  if (!id_practica) {
+    return res.status(406).json({ message: "Se requiere ingresar id_practica" });
+  }
+
+  try {
+    const Practica = await practica.findOne({
+      where: { id: id_practica },
+      include: [
+        {
+          model: informe,
+          required: false,
+          include: [
+            {
+              model: config_informe,
+              required: false,
+              include: [
+                {
+                  model: pregunta_informe,
+                  required: false,
+                  where: { tipo_respuesta: 'abierta' }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          model: respuesta_supervisor,
+          required: false,
+          include: [
+            {
+              model: pregunta_supervisor,
+              required: false,
+              where: { tipo_respuesta: 'abierta' }
+            }
+          ]
+        }
+      ]
+    });
+    if (!Practica) {
+      return res.status(404).json({ message: "No existe practica con id: " + id_practica });
+    }
+    if (Practica.resumen && Object.keys(Practica.resumen).length > 0) {
+      return res.status(200).json(Practica.resumen);
+    }
+    const Informe = Practica.informes;
+    let texto_informe = "";
+    for (let inf of Informe) {
+      let key = inf.key;
+      for (let pregunta of inf.config_informe.pregunta_informes) {
+        texto_informe += pregunta.enunciado + " ";
+        texto_informe += key[pregunta.id] + " ";
+      }
+    }
+    texto_informe = texto_informe.trim();
+    const inf_valido = texto_informe.length > 0;
+
+    const RespuestaSupervisor = Practica.respuesta_supervisors;
+    let texto_supervisor = "";
+    for (let resp of RespuestaSupervisor) {
+      if (!resp.pregunta_supervisor) continue;
+      texto_supervisor += resp.pregunta_supervisor.enunciado + " ";
+      texto_supervisor += resp.respuesta + " ";
+    }
+    texto_supervisor = texto_supervisor.trim();
+    const sup_valido = texto_supervisor.length > 0;
+
+    let textos = [];
+    if (inf_valido) textos.push(texto_informe);
+    if (sup_valido) textos.push(texto_supervisor);
+
+    let url = `${process.env.URL_PYTHON_BACKEND}/nlp/resumen?texto=${textos.join("|||")}`;
+    const resumenes = await axios.get(url);
+
+    let resumen: any = {};
+    if (inf_valido && sup_valido) {
+      resumen.informe = resumenes.data[0];
+      resumen.supervisor = resumenes.data[1];
+    } else if (inf_valido)
+      resumen.informe = resumenes.data[0];
+    else if (sup_valido)
+      resumen.supervisor = resumenes.data[0];
+
+    await Practica.update({ resumen });
+
+    return res.status(200).json(resumen);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error interno" });
+  }
+
+
+});
+
 
 module.exports = routerPractica;

@@ -11,12 +11,20 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.hasMany(models.respuesta_supervisor, {
+        foreignKey: 'id_pregunta_supervisor'
+      });
+
+      this.belongsTo(models.config_practica, {
+        foreignKey: 'id_config_practica'
+      });
     }
   }
   pregunta_supervisor.init({
     id_config_practica: DataTypes.INTEGER,
     enunciado: DataTypes.STRING,
-    tipo_respuesta: DataTypes.STRING
+    tipo_respuesta: DataTypes.STRING,
+    opciones: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'pregunta_supervisor',

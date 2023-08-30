@@ -11,6 +11,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.hasOne(models.token_usuarios, { foreignKey: 'id_usuario' });
+      this.hasMany(models.actividad_usuarios, { foreignKey: 'id_usuario' });
+      this.hasOne(models.estudiante, { foreignKey: 'id_usuario' });
+      this.hasOne(models.encargado, { foreignKey: 'id_usuario' });
     }
   }
   usuario.init({
@@ -21,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     es_supervisor: DataTypes.BOOLEAN,
     es_estudiante: DataTypes.BOOLEAN,
     es_admin: DataTypes.BOOLEAN,
-    config: DataTypes.STRING
+    config: DataTypes.JSON
   }, {
     sequelize,
     modelName: 'usuario',

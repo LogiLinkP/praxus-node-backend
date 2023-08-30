@@ -7,7 +7,8 @@ export function sendMail(to: string, subject: string, text: string, name: string
         auth: {
             user: process.env.EMAIL_ACCOUNT,
             pass: process.env.EMAIL_PASSWORD
-        }
+        },
+        tls : { rejectUnauthorized: false }
     });
     const mailOptions = {
         from: `Praxus Team <${process.env.EMAIL_ACCOUNT}>`,

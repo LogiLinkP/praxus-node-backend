@@ -1,6 +1,6 @@
 export { };
 
-const { config_practica } = require('../../models');
+const { config_practica, modalidad } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerConfigPracticas = new Router();
@@ -28,10 +28,48 @@ routerConfigPracticas.get('', async (req: any, res: any) => {
   }
 });
 
+//[GET] obtener una config_practica con nombre, modalidad y cantidad_tiempo 
+routerConfigPracticas.get('/buscar', async (req: any, res: any) => {
+  try {
+    if (!("nombre" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar nombre de config_practica" });
+      return;
+    }
+    const data = await config_practica.findOne({
+      where: {
+        nombre: req.query.nombre
+      }
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
+
+//[GET] obtener una config_practica por nombre
+routerConfigPracticas.get('/nombre', async (req: any, res: any) => {
+  try {
+    const data = await config_practica.findOne({
+      where: {
+        nombre: req.query.nombre
+      },
+      include: [{model: modalidad}]
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
 //[GET] mostrar todas las config_practicas
 routerConfigPracticas.get('/todos', async (req: any, res: any) => {
   try {
-    const data = await config_practica.findAll();
+    const data = await config_practica.findAll({
+      include: [modalidad]
+    });
     res.status(200).json(data);
   } catch (error) {
     console.log(error);
@@ -50,31 +88,30 @@ routerConfigPracticas.delete('/eliminar', (req: any, res: any) => {
   })
     .then((resultados: any) => {
       console.log(resultados);
-      res.sendStatus(200);
+      res.status(200).json(resultados);
     })
     .catch((err: any) => {
-      res.send(500)
+      res.status(500).json(err)
       console.log('Error al eliminar config_practica', err);
     })
 })
 
 //[POST] Crear una config_practica con los datos recibidos
 routerConfigPracticas.post('/crear', jsonParser, (req: any, res: any) => {
-    const {nombre, modalidad, cantidad_tiempo, frecuencia_informes,informe_final} = req.body;
+    const {nombre, frecuencia_informes,informe_final} = req.body;
     console.log("Request de creacion de config_practica recibida");
     config_practica.create({
         nombre: nombre,
-        modalidad: modalidad,
-        cantidad_tiempo: cantidad_tiempo,
         frecuencia_informes: frecuencia_informes,
         informe_final: informe_final
     })
     .then((resultados:any) => {
         console.log(resultados);
-        res.send("config_practica creada");
+        res.status(200).json({ message: "config_practica creada", id: resultados.id });
     })
     .catch((err:any) => {
         console.log('Error al crear config_practica',err);
+        res.status(500).json({ message: "Error al crear config_practica", error: err});
     })
 })
 
@@ -87,14 +124,14 @@ routerConfigPracticas.put('/actualizar', jsonParser, async (req: any, res: any) 
     Config_practica.update(req.body)
       .then((resultados: any) => {
         console.log(resultados);
-        res.sendStatus(200);
+        res.status(200).json(resultados);
       })
       .catch((err: any) => {
         res.send(500)
         console.log('Error al actualizar config_practica', err);
       })
   } else {
-    console.log("No existe config_practica con id: ", req.query.id)
+    console.log("No existe config_practica con id: ", req.body.id)
     res.sendStatus(404)
   }
 })

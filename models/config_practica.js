@@ -13,16 +13,31 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       // this has many practica
       this.hasMany(models.practica, {
-        foreignKey: 'id'
+        foreignKey: 'id_config_practica'
+      });
+
+      this.hasMany(models.solicitud_documento, {
+        foreignKey: 'id_config_practica'
+      });
+
+      this.hasMany(models.config_informe, {
+        foreignKey: 'id_config_practica'
+      });
+
+      this.hasMany(models.pregunta_supervisor, {
+        foreignKey: 'id_config_practica'
+      });
+
+      this.hasMany(models.modalidad, {
+        foreignKey: 'id_config_practica'
       });
     }
   }
   config_practica.init({
     nombre: DataTypes.STRING,
-    modalidad: DataTypes.STRING,
-    cantidad_tiempo: DataTypes.INTEGER,
     frecuencia_informes: DataTypes.STRING,
-    informe_final: DataTypes.BOOLEAN
+    informe_final: DataTypes.STRING,
+    activada: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'config_practica',

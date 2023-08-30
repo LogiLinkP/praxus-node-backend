@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.config_informe, {
         foreignKey: 'id_config_informe'
       });
+      this.belongsTo(models.practica, {
+        foreignKey: 'id_practica'
+      });
     }
   }
   informe.init({

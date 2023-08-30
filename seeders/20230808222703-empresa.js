@@ -6,13 +6,15 @@ module.exports = {
     
     await queryInterface.bulkInsert('empresa', [
       {
-        nombre_empresa: 'empresa 1',
+        id: 1,
+        nombre_empresa: 'Microsoft',
         rut_empresa: '123456789',
         empresa_verificada: false,
         dominios_empresa: '@empresa1.cl'
       },
       {
-        nombre_empresa: 'empresa 2',
+        id: 2,
+        nombre_empresa: 'Apple',
         rut_empresa: '987654321',
         empresa_verificada: false,
         dominios_empresa: '@empresa2.cl'

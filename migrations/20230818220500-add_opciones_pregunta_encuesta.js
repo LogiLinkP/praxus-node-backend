@@ -3,14 +3,10 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    queryInterface.bulkInsert('chat', [
-      {
-        id_encargado: 1,
-        id_estudiante: 1
-      }
-    ], {});
+    return queryInterface.addColumn('pregunta_encuesta_final', 'opciones', Sequelize.STRING);
   },
+
   async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('chat', null, {});
+    return queryInterface.removeColumn('pregunta_encuesta_final', 'opciones');
   }
 };

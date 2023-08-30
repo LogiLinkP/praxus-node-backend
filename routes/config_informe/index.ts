@@ -1,6 +1,6 @@
 export { };
 
-const { config_informe } = require('../../models');
+const { config_informe, pregunta_informe } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerConfigInforme = new Router();
@@ -26,6 +26,26 @@ routerConfigInforme.get('', async (req: any, res: any) => {
     console.log(error);
     res.status(500).json({ message: "Error interno" });
   }
+});
+
+//[GET] para obtener por id config_practica
+routerConfigInforme.get('/id_config_practica', async (req: any, res: any) => {
+    try {
+      if (!("id" in req.query)) {
+        res.status(406).json({ message: "Se requiere ingresar id" });
+        return;
+      }
+      const data = await config_informe.findAll({
+        where: {
+          id_config_practica: req.query.id
+        },
+        include: [pregunta_informe]
+      });
+      res.status(200).json(data);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Error interno" });
+    }
 });
 
 //[GET] mostrar todos
@@ -57,6 +77,24 @@ routerConfigInforme.delete('/eliminar', (req: any, res: any) => {
     })
 })
 
+//[DELETE] Eliminar por config_practica
+routerConfigInforme.delete('/eliminar_config', (req: any, res: any) => {
+    console.log("Eliminando config informe con id: ", req.query.id)
+    config_informe.destroy({
+      where: {
+        id_config_practica: req.query.id
+      }
+    })
+      .then((resultados: any) => {
+        console.log(resultados);
+        res.status(200).json(resultados);
+      })
+      .catch((err: any) => {
+        res.status(500).json(err);
+        console.log('Error al eliminar config informe', err);
+      })
+})
+
 //[POST] Crear uno
 routerConfigInforme.post('/crear', jsonParser, (req: any, res: any) => {
   const {id_config_practica, tipo_informe} = req.body;
@@ -66,11 +104,11 @@ routerConfigInforme.post('/crear', jsonParser, (req: any, res: any) => {
     tipo_informe: tipo_informe,
   })
   .then((resultados:any) => {
-      console.log(resultados);
-      res.send("config_informe creado");
+      res.status(200).json({ message: "config_informe creado" });
   })
   .catch((err:any) => {
-      console.log('Error al crear config_informe',err);
+      console.log('Error al crear config_informe', err);
+      res.status(500).json({ message: "Error al crear config_informe", error: err });
   })
 })
 

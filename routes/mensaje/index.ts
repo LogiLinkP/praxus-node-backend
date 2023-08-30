@@ -1,3 +1,5 @@
+import { sendMail } from "../../utils/email";
+
 export { };
 
 const { mensaje,chat } = require('../../models');
@@ -78,13 +80,17 @@ routerMensaje.post('/crear', jsonParser, (req: any, res: any) => {
           texto: texto,
           fecha: fecha
         })
+        /*
         .then((resultados:any) => {
-            res.send( "mensaje creado");
+          //sendMail(, "Notificación", "Ha recibido un mensaje en uno de sus chat. Debería revisar Praxus.com para contestar", "Notificación");
+          res.send( "mensaje creado");
         })
         .catch((err:any) => {
-            console.log('Error al crear mensaje',err);
-            res.send("Error al crear mensaje")
+          console.log('Error al crear mensaje',err);
+          res.send("Error al crear mensaje")
         })
+        */
+        res.send( "mensaje creado"); //borrar cuando se descomente lo de arriba
     }else{
       res.send("No existe chat con esos id")
     }   

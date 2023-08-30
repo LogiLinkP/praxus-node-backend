@@ -1,9 +1,9 @@
 export { };
 
-const { encargado } = require('../../models');
+const { encargado, usuario, estudiante, practica } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
-const routerEncargado = new Router();
+const routerEncargado = new Router(); // /encargado
 
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
@@ -28,6 +28,28 @@ routerEncargado.get('', async (req: any, res: any) => {
   }
 });
 
+
+//[GET] para obtener un encargado con su ID de usuario
+routerEncargado.get('/usuario', async (req: any, res: any) => {
+  try {
+    if (!("id_usuario" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar id_usuario" });
+      return;
+    }
+    const data = await encargado.findOne({
+      where: {
+        id_usuario: req.query.id_usuario
+      },
+      include: [{
+        model: usuario
+      }]
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
 //[GET] mostrar todos
 routerEncargado.get('/todos', async (req: any, res: any) => {
   try {
@@ -58,18 +80,18 @@ routerEncargado.delete('/eliminar', (req: any, res: any) => {
 })
 //[POST] Crear uno
 routerEncargado.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_usuario} = req.body;
+  const { id_usuario } = req.body;
   console.log("Request de encargado");
   encargado.create({
     id_usuario: id_usuario
   })
-  .then((resultados:any) => {
+    .then((resultados: any) => {
       console.log(resultados);
       res.send("encargado creada");
-  })
-  .catch((err:any) => {
-      console.log('Error al crear encargado',err);
-  })
+    })
+    .catch((err: any) => {
+      console.log('Error al crear encargado', err);
+    })
 })
 
 
@@ -93,5 +115,29 @@ routerEncargado.put('/actualizar', jsonParser, async (req: any, res: any) => {
     res.sendStatus(404)
   }
 })
+
+//[GET] obtener todos los estudiantes dado un encargado
+routerEncargado.get('/estudiantes', async (req: any, res: any) => {
+  try {
+    console.log(req.query)
+    if (!("id_encargado" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar id_encargado" });
+      return;
+    }
+    console.log(1)
+    const data = await encargado.findAll({
+      where: {
+        id: req.query.id_encargado
+      },
+      include: [{
+        model: practica, include: [{ model: estudiante, include: [{ model: usuario }] }]
+      }]
+    });
+    return res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
 
 module.exports = routerEncargado;
