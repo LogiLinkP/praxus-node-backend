@@ -1,6 +1,6 @@
 export { };
 
-const { solicitud_documento } = require("../../models");
+const { solicitud_documento, documento } = require("../../models");
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerSolicitudDocumento = new Router();
@@ -45,6 +45,31 @@ routerSolicitudDocumento.get('/id_config_practica', async (req: any, res: any) =
       console.log(error);
       res.status(500).json({ message: "Error interno" });
     }
+});  
+
+//[GET] para obtener todos por id config_practica y obteniendo documentos filtrados por id_practica
+routerSolicitudDocumento.get('/todos_docs_practica', async (req: any, res: any) => {
+  try {
+    if (!("id" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar id" });
+      return;
+    }
+    const data = await solicitud_documento.findAll({
+      where: {
+        id_config_practica: req.query.id
+      },
+      include: [{
+        model: documento,
+        where: {
+          id_practica: req.query.id_practica
+        }, required: false
+      }]
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
 });  
 
 //[GET] mostrar todos los solicitud_documentos

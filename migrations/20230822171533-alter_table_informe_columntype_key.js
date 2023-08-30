@@ -7,6 +7,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    return queryInterface.changeColumn('informe', 'key', Sequelize.STRING)
+    return queryInterface.changeColumn('informe', 'key', Sequelize.JSON)
   }
 };

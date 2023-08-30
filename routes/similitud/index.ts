@@ -500,4 +500,62 @@ routerSimilitud.post('/textos_repetidos', jsonParser, async (req: any, res: any)
   }
 })
 
+routerSimilitud.post('/repeticion_respuestas_informe', jsonParser, async (req: any, res: any) => {
+  const { id_practica, id_informe } = req.body;
+  const textos = [];
+  let resx: any;
+  try {
+    resx = await sequelize.pregunta_informe.findAll({
+      where: { id_informe: id_informe, tipo_respuesta: 'abierta' }
+    })
+  }
+  catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+  try {
+    const informes = await informe.findAll({
+      where: { id_practica: id_practica, id_informe: resx.id }
+    })
+    for (let informe of informes) {
+      textos.push(informe.respuesta);
+    }
+  }
+  catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+  const payload = { texto1: textos };
+  await axios.post(process.env.PYTHONBE_REPEATED_SECTIONS, payload)
+    .then((response: any) => {
+      const repeticiones = { respuestas: response.data };
+      try {
+        const resp = practica.findAll({ where: { id: id_practica } });
+        if (resp.length > 0) {
+          console.log("Actualizando repeticiones de informe para el id", id_practica, "con repeticiones", repeticiones);
+          practica.update({ key_repeticiones: repeticiones }, { where: { id: id_practica } })
+            .then((resultados: any) => {
+              return res.status(200).send({ message: "Repeticiones actualizadas", resultados: resultados });
+            })
+            .catch((err: any) => {
+              res.send(500)
+              console.log('Error al actualizar practica', err);
+            })
+        }
+        else {
+          console.log("No existe practica con id: ", req.query.id)
+          res.sendStatus(404)
+        }
+      }
+      catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+      }
+    })
+    .catch((error: any) => {
+      console.error(error);
+      res.status(500).send('Error occurred');
+    });
+})
+
 module.exports = routerSimilitud;
