@@ -427,7 +427,7 @@ routerSimilitud.post('/repeticion_respuestas_supervisor', jsonParser, async (req
   let resx: any;
   try{
     resx = await sequelize.pregunta_supervisor.findAll({
-      where: { id_pregunta_supervisor: id_pregunta_supervisor }
+      where: { id_pregunta_supervisor: id_pregunta_supervisor, tipo_respuesta: 'abierta' }
     })
   }
   catch(err){
@@ -479,7 +479,7 @@ routerSimilitud.post('/repeticion_respuestas_informe', jsonParser, async (req: a
   let resx: any;
   try{
     resx = await sequelize.pregunta_informe.findAll({
-      where: { id_informe: id_informe }
+      where: { id_informe: id_informe, tipo_respuesta: 'abierta' }
     })
   }
   catch(err){
