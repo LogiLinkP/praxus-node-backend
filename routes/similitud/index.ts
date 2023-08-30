@@ -155,15 +155,15 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
       include: [
         {
           model: informe,
-          required: true,
+          required: false,
           include: [
             {
               model: config_informe,
-              required: true,
+              required: false,
               include: [
                 {
                   model: pregunta_informe,
-                  required: true,
+                  required: false,
                   where: { tipo_respuesta: 'abierta' }
                 }
               ]
@@ -172,22 +172,23 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
         },
         {
           model: respuesta_supervisor,
-          required: true,
+          required: false,
           include: [
             {
               model: pregunta_supervisor,
-              required: true,
+              required: false,
               where: { tipo_respuesta: 'abierta' }
             }
           ]
         }
       ]
     });
+    
     if (!_practica) {
       res.status(404).json({ error: 'Practica no encontrada' });
       return;
     }
-
+    
     let textos_informes: any = [];
     let orden_informes: string[][] = [];
     for (let informe of _practica.informes) {
