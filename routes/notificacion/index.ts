@@ -68,6 +68,7 @@ routerNotificacion.post('/crear', jsonParser, (req: any, res: any) => {
     id_usuario: id_usuario,
     texto: mensaje,
     fecha: fecha,
+    link: enlace,
   })
   .then((resultados:any) => {
       console.log(resultados);
