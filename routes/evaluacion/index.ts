@@ -15,6 +15,7 @@ const router = new Router() // /supervisor
 router.use(json());
 router.use(urlencoded({ extended: true }));
 
+/* Ahora se hace en la ruta de finalización de práctica
 router.post("/gen_token", (req: any, res: any) => {
     try {
         console.log("gen token");
@@ -48,8 +49,9 @@ router.post("/gen_token", (req: any, res: any) => {
         console.log(err);
         res.status(500).json({ message: "Error interno" });
     }
-});
+});*/
 
+/* Ahora se hace en ruta de respuesta_supervisor
 router.post("/respuesta", async (req: any, res: any) => {
     try {
         if (typeof req.body !== "object") {
@@ -122,7 +124,7 @@ router.post("/respuesta", async (req: any, res: any) => {
         console.log(error);
         res.status(500).json({ message: "Error interno" });
     }
-});
+});*/
 
 
 router.get("/respuesta", async (req: any, res: any) => {
