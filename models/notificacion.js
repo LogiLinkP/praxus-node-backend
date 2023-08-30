@@ -17,7 +17,8 @@ module.exports = (sequelize, DataTypes) => {
     id_usuario: DataTypes.INTEGER,
     texto: DataTypes.STRING,
     fecha: DataTypes.DATE,
-    visto: DataTypes.BOOLEAN
+    visto: DataTypes.BOOLEAN,
+    link: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'notificacion',
