@@ -16,8 +16,8 @@ const jsonParser = bodyParser.json();
 
 //[GET] MODIFICAR mostrar todos por id_usuario
 routerNotificacion.get('/todos', jsonParser, async (req: any, res: any) => {
-  const {id_usuario, /*config*/} = req.query;
-  console.log(req.query);
+  const {id_usuario, config} = req.body;
+
   try {
     const data = await notificacion.findAll({
       where: {
@@ -62,7 +62,6 @@ routerNotificacion.delete('/eliminar', (req: any, res: any) => {
 //[POST] 
 routerNotificacion.post('/crear', jsonParser, (req: any, res: any) => {
   const {id_usuario, fecha, mensaje, correo, estado} = req.body;
-  console.log("Request de notificacion");
   notificacion.create({
     id_usuario: id_usuario,
     texto: mensaje,
@@ -86,6 +85,10 @@ routerNotificacion.post('/crear', jsonParser, (req: any, res: any) => {
         res.send("notificacion creada");
       }
       */
+
+      let mensaje_correo: string = mensaje + ". Visite Praxus para revisar.";
+      sendMail(correo,"Hola", mensaje_correo, "hola");
+
       const io: Server = getIo();
       let roomName = "notificaciones"+id_usuario;
       let mensaje_noti = mensaje;
