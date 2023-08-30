@@ -82,7 +82,7 @@ routerMensaje.post('/crear', jsonParser, (req: any, res: any) => {
         })
         /*
         .then((resultados:any) => {
-          sendMail(, "Notificación", "Ha recibido un mensaje en uno de sus chat. Debería revisar Praxus.com para contestar", "Notificación");
+          //sendMail(, "Notificación", "Ha recibido un mensaje en uno de sus chat. Debería revisar Praxus.com para contestar", "Notificación");
           res.send( "mensaje creado");
         })
         .catch((err:any) => {
