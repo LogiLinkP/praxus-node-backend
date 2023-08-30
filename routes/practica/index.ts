@@ -26,8 +26,8 @@ routerPractica.get('', async (req: any, res: any) => {
       where: {
         id: req.query.id
       },
-      include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: [config_practica] }, empresa, supervisor,
-      { model: informe, include: [config_informe] }, { model: documento, include: [solicitud_documento] }, documento_extra,
+      include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: {model: config_practica, include: {model: solicitud_documento}}}, 
+      empresa, supervisor, { model: informe, include: [config_informe] }, { model: documento, include: [solicitud_documento] }, documento_extra,
       { model: respuesta_supervisor, include: [pregunta_supervisor] }]
     });
     res.status(200).json(data);
@@ -102,7 +102,7 @@ routerPractica.get('/get_asEstudiante', (req: any, res: any) => {
       id_estudiante: req.query.id_estudiante
     },
     include: [{ model: estudiante, include: [usuario] }, {
-      model: modalidad, include: {model: config_practica, include: [{ model: solicitud_documento, include: [documento] },  {model: config_informe, include:[pregunta_informe]}]}}, empresa,
+      model: modalidad, include: {model: config_practica, include: [{ model: solicitud_documento },  {model: config_informe, include:[pregunta_informe]}]}}, empresa,
       supervisor, { model: informe, include: {model: config_informe, include:[pregunta_informe]} }, { model: documento, include: [solicitud_documento] },
       documento_extra, { model: respuesta_supervisor, include: [pregunta_supervisor] }, { model: encargado, include: [usuario] }]
   })
