@@ -1,7 +1,7 @@
 export { };
 
 const { Router } = require('express');
-const { usuario, supervisor, estudiante, encargado, actividad_usuarios, token_usuarios } = require('../../models');
+const { usuario, supervisor, estudiante, encargado, actividad_usuarios, token_usuarios, practica, empresa } = require('../../models');
 const routerUsuario = new Router();
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
@@ -206,17 +206,13 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
       }
       console.log(1)
       if (_usuario.es_supervisor) {
-        try {
-          await supervisor.create({
-            nombre: nombre,
-            correo: email,
-            carnet_rostro: null,
-            es_correo_institucional: null
-          })
-          return res.status(200).send({ message: 'Inicio de sesion exitoso', userdata: usuarioSend });
+        let trabajador = await supervisor.findAll({ where: { correo: email } })
+        if (trabajador != null && trabajador.correo == email) {
+          return res.status(400).send({ message: 'Email ya ocupado' });
         }
-        catch (err) {
-          return res.status(400).send({ message: 'Error al crear super' });
+        else{
+          supervisor.update({id_usuario: _usuario.id}, {where: {correo: email}})
+          return res.status(200).send({ message: 'Creacion de usuario', userdata: usuarioSend });
         }
       }
       if (_usuario.es_estudiante) {
@@ -258,6 +254,91 @@ routerUsuario.post('/resetpwd', jsonParser, async (req: any, res: any) => {
   var new_token = crypto.randomBytes(32).toString('hex');
 
 
+})
+
+routerUsuario.post('/crear_supervisor', jsonParser, async (req: any, res: any) => {
+  let { email, password, cnfPwd, nombre } = req.body;
+  const usuarioSend = { email, password, nombre };
+  let pwdHashed = '';
+  if (!cnfPwd || password != cnfPwd) {
+    return res.status(400).send({ message: 'Contraseñas no coinciden' });
+  }
+  try{
+    let query = await usuario.findOne({ where: { correo: email } })
+    if (query != null) {
+      return res.status(400).send({ message: 'Email ya ocupado' });
+    }
+    else{
+      let hash = await bcrypt.hash(password, 8)
+      usuarioSend.password = hash;
+      pwdHashed = hash;
+      let _usuario = await usuario.create({
+        correo: email,
+        password: pwdHashed,
+        nombre: nombre,
+        es_encargado: false,
+        es_supervisor: true,
+        es_estudiante: false,
+        es_admin: false,
+        config: null
+      })
+
+      let trabajador = await supervisor.findAll({ where: { correo: email } })
+      if (trabajador != null && trabajador.correo == email) {
+        return res.status(400).send({ message: 'Email ya ocupado' });
+      }
+      else{
+        supervisor.update({id_usuario: _usuario.id}, {where: {correo: email}})
+      }
+    }
+  }
+  catch(err){
+    return res.status(400).send({ message: 'Error al crear supervisor' });
+  }
+})
+
+routerUsuario.post('/estudiantes_revisados', jsonParser, async (req: any, res: any) => {
+  let { id_usuario } = req.body;
+  let nombre = '';
+  let correo = '';
+  let rut_empresa = '';
+  let nombre_empresa = '';
+  let estado = '';
+  let inicio = '';
+  let fin = '';
+  let lista = [];
+  console.log(id_usuario)
+  try{
+    let query = await supervisor.findOne({ where: { id_usuario: id_usuario } })
+    let query2 = await practica.findAll({ where: { id_supervisor: query.id } })
+    console.log("query2")
+    console.log(query2)
+    for(let i = 0; i<query2.length; i++){
+      let query3 = await estudiante.findAll({ where: {id: query2[i].id_estudiante }})
+      for(let j = 0; j<query3.length; j++){
+        let response = await usuario.findOne({where: {id: query3[j].id_usuario}})
+        let enterprise = await empresa.findOne({where: {id: query2[i].id_empresa}})
+        nombre = response.nombre;
+        correo = response.correo;
+        estado = query2[i].estado
+        rut_empresa = enterprise.rut_empresa;
+        nombre_empresa = enterprise.nombre_empresa
+        inicio = query2[i].fecha_inicio;
+        fin = query2[i].fecha_termino;
+        let data = {nombre,correo,estado,rut_empresa,nombre_empresa,inicio,fin}
+        lista.push(data)
+      }
+    }
+    if(lista.length>0){
+      return res.status(200).send({ message: 'Estudiantes obtenidos', body: lista });
+    }
+    else{
+      return res.status(400).send({ message: 'Error al obtener estudiantes2' });
+    }
+  }
+  catch(err){
+    return res.status(400).send({ message: 'Error al obtener estudiantes1' });
+  }
 })
 
 module.exports = routerUsuario;
