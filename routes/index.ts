@@ -26,5 +26,7 @@ router.use('/chat', require('./chat'));
 router.use('/mensaje', require('./mensaje'));
 router.use('/encargado', require('./encargado'));
 router.use('/modalidad', require('./modalidad'));
+router.use('/estadistica', require('./estadistica'));
+router.use('/actualizacion_estadistica', require('./actualizacion_estadistica'));
 
 module.exports = router;
