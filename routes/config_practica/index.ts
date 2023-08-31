@@ -37,7 +37,7 @@ routerConfigPracticas.get('/buscar', async (req: any, res: any) => {
     }
     const data = await config_practica.findOne({
       where: {
-        nombre: req.query.nombre
+        nombre: req.query.nombre,
       }
     });
     res.status(200).json(data);
@@ -48,12 +48,13 @@ routerConfigPracticas.get('/buscar', async (req: any, res: any) => {
 });
 
 
-//[GET] obtener una config_practica por nombre
+//[GET] obtener una config_practica por nombre SÓLO SI ESTÁ ACTIVADA
 routerConfigPracticas.get('/nombre', async (req: any, res: any) => {
   try {
     const data = await config_practica.findOne({
       where: {
-        nombre: req.query.nombre
+        nombre: req.query.nombre,
+        activada: true
       },
       include: [{model: modalidad}]
     });
@@ -63,6 +64,8 @@ routerConfigPracticas.get('/nombre', async (req: any, res: any) => {
     res.status(500).json({ message: "Error interno" });
   }
 });
+
+
 
 //[GET] mostrar todas las config_practicas
 routerConfigPracticas.get('/todos', async (req: any, res: any) => {
@@ -118,7 +121,7 @@ routerConfigPracticas.post('/crear', jsonParser, (req: any, res: any) => {
 //[PUT]
 routerConfigPracticas.put('/actualizar', jsonParser, async (req: any, res: any) => {
   // buscar practica por id
-  const Config_practica = await config_practica.findOne({ where: { nombre: req.body.nombre } })
+  const Config_practica = await config_practica.findOne({ where: { id: req.body.id } })
   if (Config_practica) {
     // actualizar practica
     Config_practica.update(req.body)
@@ -131,7 +134,7 @@ routerConfigPracticas.put('/actualizar', jsonParser, async (req: any, res: any) 
         console.log('Error al actualizar config_practica', err);
       })
   } else {
-    console.log("No existe config_practica con id: ", req.query.id)
+    console.log("No existe config_practica con id: ", req.body.id)
     res.sendStatus(404)
   }
 })
