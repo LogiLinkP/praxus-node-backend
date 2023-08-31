@@ -86,20 +86,18 @@ routerNotificacion.post('/crear', jsonParser, (req: any, res: any) => {
         res.send("notificacion creada");
       }
       */
+      const io: Server = getIo();
+      let roomName = "notificaciones" + id_usuario;
+      let mensaje_noti = mensaje;  
+      io.to(roomName).emit('notificacion', { fecha: fecha, message: mensaje_noti, link: enlace });
+      console.log("EMITIENDO EVENTO EN SALA", roomName);
+
       if(estado == "Notificaciones y Correo" || estado == "Sólo Correo"){
-        let mensaje_correo: string = mensaje + ". Visite Praxus para revisar.";
-        sendMail(correo, "Notificación de Praxus", mensaje_correo, "Notificación de Praxus");
+      let mensaje_correo: string = mensaje + ". Visite Praxus para revisar.";
+      sendMail(correo, "Notificación de Praxus", mensaje_correo, "Notificación de Praxus");        
+      res.send("notificacion creada y correo enviado");
       }
-      else if(estado == "Notificaciones y Correo" || estado == "Sólo Notificaciones"){
-        const io: Server = getIo();
-        let roomName = "notificaciones" + id_usuario;
-        let mensaje_noti = mensaje;
 
-        io.to(roomName).emit('notificacion', { fecha: fecha, message: mensaje_noti, link: enlace });
-        console.log("EMITIENDO EVENTO EN SALA", roomName);
-
-        res.send("notificacion creada");
-      }
     })
     .catch((err: any) => {
       console.log('Error al crear notificacion', err);
