@@ -26,7 +26,7 @@ app.listen(PORT, function (err: any) {
 //Socket.io
 const options = {
   cors: {
-    origin: 'http://localhost:4200',
+    origin: process.env.URL_FRONTEND,
   },
 };
 
@@ -41,9 +41,9 @@ io.on('connection', function (socket: any) {
   console.log(`${chalk.green(`Nuevo dispositivo: ${handshake}`)} conectado a la sala ${nameRoom}`);
   socket.join(nameRoom)
 
-  socket.on('evento', (res:any) => {
+  socket.on('evento', (res: any) => {
     // Emite el mensaje a todos lo miembros de las sala menos a la persona que envia el mensaje 
-    console.log("Evento recibido", res, nameRoom)  
+    console.log("Evento recibido", res, nameRoom)
     socket.to(nameRoom).emit('evento', res);
   })
 
