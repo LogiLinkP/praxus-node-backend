@@ -1,4 +1,6 @@
 import { setupIo } from "./middleware/socketMiddleware";
+import { createServer } from "https";
+import { readFileSync } from "fs";
 
 require('dotenv').config();
 const express = require('express');
@@ -7,6 +9,12 @@ const PORT = process.env.PORT || 3000;
 let cors = require('cors')
 const chalk = require('chalk');
 const sequelize = require('./db');
+
+const httpsServer = createServer({
+  key: readFileSync("/etc/letsencrypt/live/logilink.hopto.org/privkey.pem"),
+  cert: readFileSync("/etc/letsencrypt/live/logilink.hopto.org/cert.pem")
+});
+
 
 app.use(cors());
 
@@ -30,8 +38,8 @@ const options = {
   },
 };
 
-const server = require('http').Server(app);
-const io = setupIo(server, options);
+// const server = require('http').Server(app);
+const io = setupIo(httpsServer, options);
 
 io.on('connection', function (socket: any) {
 
@@ -41,9 +49,9 @@ io.on('connection', function (socket: any) {
   console.log(`${chalk.green(`Nuevo dispositivo: ${handshake}`)} conectado a la sala ${nameRoom}`);
   socket.join(nameRoom)
 
-  socket.on('evento', (res:any) => {
+  socket.on('evento', (res: any) => {
     // Emite el mensaje a todos lo miembros de las sala menos a la persona que envia el mensaje 
-    console.log("Evento recibido", res, nameRoom)  
+    console.log("Evento recibido", res, nameRoom)
     socket.to(nameRoom).emit('evento', res);
   })
 
@@ -52,7 +60,7 @@ io.on('connection', function (socket: any) {
   });
 });
 
-server.listen(5000, function () {
+httpsServer.listen(5000, function () {
   console.log('\n')
   console.log(`>> Socket listo y escuchando por el puerto: ${chalk.green('5000')}`)
 })
