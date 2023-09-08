@@ -162,6 +162,25 @@ routerPractica.get('/todos', async (req: any, res: any) => {
   }
 });
 
+/*
+//[GET] mostrar todos con filtro
+routerPractica.get('/filtrar', async (req:any, res:any) => {
+  practica.findAll({
+    where: {
+      carrera: req.carrera
+    },
+    include: [{ model: estudiante, include: [usuario] }, config_practica, empresa, supervisor, { model: informe, include: [config_informe] },
+    { model: documento, include: [solicitud_documento] }, documento_extra, { model: respuesta_supervisor, include: [pregunta_supervisor] }, encargado]
+  })
+  .then((resultados: any) => {
+      res.send(resultados);
+  })
+    .catch((err: any) => {
+      console.log('Error al obtener practica', err);
+  })
+})
+*/
+
 routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
   try {
     const data = await practica.findAll({
