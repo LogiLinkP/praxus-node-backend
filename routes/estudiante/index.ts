@@ -114,9 +114,30 @@ routerEstudiante.put('/actualizar', jsonParser, async (req: any, res: any) => {
         console.log('Error al actualizar estudiante', err);
       })
   } else {
-    console.log("No existe estudiante con id: ", req.query.id)
+    console.log("No existe estudiante con id: ", req.body.id)
     res.sendStatus(404)
   }
+})
+
+//[PUT] actualizar configuracion de estudiantes
+routerEstudiante.put('/actualizarConfig', jsonParser, async (req: any, res: any) => {
+    // buscar practica por id
+    const Estudiante = await estudiante.findOne({ where: { id: req.body.id } })
+    if (Estudiante) {
+      // actualizar practica
+      Estudiante.update(req.body)
+        .then((resultados: any) => {
+          console.log(resultados);
+          res.status(200).json(resultados);
+        })
+        .catch((err: any) => {
+          res.send(500).json(err)
+          console.log('Error al actualizar estudiante', err);
+        })
+    } else {
+      console.log("No existe estudiante con id: ", req.body.id)
+      res.sendStatus(404)
+    }
 })
 
 //[GET] obtener todos los encargado dado un estudiante

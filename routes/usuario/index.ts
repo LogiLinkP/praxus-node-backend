@@ -114,7 +114,7 @@ routerUsuario.post('/login', jsonParser, async (req: any, res: any) => {
       { model: encargado }
     ]
   })
-  if (resultados.length === 0) {
+  if (!resultados) {
     return res.status(400).send({ message: 'Error en usuario y contraseña' });
   }
   let checkout = await bcrypt.compare(password, resultados.password)
@@ -147,11 +147,11 @@ routerUsuario.post('/login', jsonParser, async (req: any, res: any) => {
 })
 
 
-routerUsuario.put('/estado_config', jsonParser, async (req: any, res:any) => {
+routerUsuario.put('/estado_config', jsonParser, async (req: any, res: any) => {
   const Usuario = await usuario.findOne({ where: { id: req.body.id } })
   console.log(req.body);
   if (Usuario) {
-    const Usuario_Update = usuario.update({config: req.body.estado}, {where: {id : req.body.id}})
+    const Usuario_Update = usuario.update({ config: req.body.estado }, { where: { id: req.body.id } })
       .then((resultados: any) => {
         console.log(resultados);
         return res.status(200).send({ message: 'Estado cambiado con éxito', userdata: Usuario });
@@ -211,8 +211,8 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
         if (trabajador != null && trabajador.correo == email) {
           return res.status(400).send({ message: 'Email ya ocupado' });
         }
-        else{
-          supervisor.update({id_usuario: _usuario.id}, {where: {correo: email}})
+        else {
+          supervisor.update({ id_usuario: _usuario.id }, { where: { correo: email } })
           return res.status(200).send({ message: 'Creacion de usuario', userdata: usuarioSend });
         }
       }
@@ -264,12 +264,12 @@ routerUsuario.post('/crear_supervisor', jsonParser, async (req: any, res: any) =
   if (!cnfPwd || password != cnfPwd) {
     return res.status(400).send({ message: 'Contraseñas no coinciden' });
   }
-  try{
+  try {
     let query = await usuario.findOne({ where: { correo: email } })
     if (query != null) {
       return res.status(400).send({ message: 'Email ya ocupado' });
     }
-    else{
+    else {
       let hash = await bcrypt.hash(password, 8)
       usuarioSend.password = hash;
       pwdHashed = hash;
@@ -288,12 +288,12 @@ routerUsuario.post('/crear_supervisor', jsonParser, async (req: any, res: any) =
       if (trabajador != null && trabajador.correo == email) {
         return res.status(400).send({ message: 'Email ya ocupado' });
       }
-      else{
-        supervisor.update({id_usuario: _usuario.id}, {where: {correo: email}})
+      else {
+        supervisor.update({ id_usuario: _usuario.id }, { where: { correo: email } })
       }
     }
   }
-  catch(err){
+  catch (err) {
     return res.status(400).send({ message: 'Error al crear supervisor' });
   }
 })
@@ -309,16 +309,16 @@ routerUsuario.post('/estudiantes_revisados', jsonParser, async (req: any, res: a
   let fin = '';
   let lista = [];
   console.log(id_usuario)
-  try{
+  try {
     let query = await supervisor.findOne({ where: { id_usuario: id_usuario } })
     let query2 = await practica.findAll({ where: { id_supervisor: query.id } })
     console.log("query2")
     console.log(query2)
-    for(let i = 0; i<query2.length; i++){
-      let query3 = await estudiante.findAll({ where: {id: query2[i].id_estudiante }})
-      for(let j = 0; j<query3.length; j++){
-        let response = await usuario.findOne({where: {id: query3[j].id_usuario}})
-        let enterprise = await empresa.findOne({where: {id: query2[i].id_empresa}})
+    for (let i = 0; i < query2.length; i++) {
+      let query3 = await estudiante.findAll({ where: { id: query2[i].id_estudiante } })
+      for (let j = 0; j < query3.length; j++) {
+        let response = await usuario.findOne({ where: { id: query3[j].id_usuario } })
+        let enterprise = await empresa.findOne({ where: { id: query2[i].id_empresa } })
         nombre = response.nombre;
         correo = response.correo;
         estado = query2[i].estado
@@ -326,18 +326,18 @@ routerUsuario.post('/estudiantes_revisados', jsonParser, async (req: any, res: a
         nombre_empresa = enterprise.nombre_empresa
         inicio = query2[i].fecha_inicio;
         fin = query2[i].fecha_termino;
-        let data = {nombre,correo,estado,rut_empresa,nombre_empresa,inicio,fin}
+        let data = { nombre, correo, estado, rut_empresa, nombre_empresa, inicio, fin }
         lista.push(data)
       }
     }
-    if(lista.length>0){
+    if (lista.length > 0) {
       return res.status(200).send({ message: 'Estudiantes obtenidos', body: lista });
     }
-    else{
+    else {
       return res.status(400).send({ message: 'Error al obtener estudiantes2' });
     }
   }
-  catch(err){
+  catch (err) {
     return res.status(400).send({ message: 'Error al obtener estudiantes1' });
   }
 })
