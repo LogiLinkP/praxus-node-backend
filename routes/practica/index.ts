@@ -184,6 +184,13 @@ routerPractica.get('/filtrar', async (req:any, res:any) => {
 routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
   try {
     const data = await practica.findAll({
+      try: {
+        where: {
+        carrera: req.carrera,
+      }
+    }, catch(){
+      console.log("no hay filtro aplicado");
+    },
       include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: [config_practica] }]
     });
     res.status(200).json(data);
