@@ -31,6 +31,9 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.modalidad, {
         foreignKey: 'id_config_practica'
       });
+      this.belongsTo(models.carrera, {
+        foreignKey: 'id_carrera'
+      });
     }
   }
   config_practica.init({

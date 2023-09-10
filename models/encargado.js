@@ -15,9 +15,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'id_usuario'
       });
 
+      this.belongsTo(models.carrera, {
+        foreignKey: 'id_carrera'
+      });
+
       this.hasMany(models.practica, {
         foreignKey: 'id_encargado'
       });
+
     }
   }
   encargado.init({

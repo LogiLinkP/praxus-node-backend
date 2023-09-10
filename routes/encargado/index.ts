@@ -80,10 +80,12 @@ routerEncargado.delete('/eliminar', (req: any, res: any) => {
 })
 //[POST] Crear uno
 routerEncargado.post('/crear', jsonParser, (req: any, res: any) => {
-  const { id_usuario } = req.body;
+  const { id_usuario, id_carrera, practica_pendiente } = req.body;
   console.log("Request de encargado");
   encargado.create({
-    id_usuario: id_usuario
+    id_usuario: id_usuario,
+    id_carrera: id_carrera,
+    practica_pendiente: practica_pendiente
   })
     .then((resultados: any) => {
       console.log(resultados);

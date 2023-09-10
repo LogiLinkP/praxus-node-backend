@@ -278,7 +278,8 @@ routerPractica.delete('/eliminar', (req: any, res: any) => {
 routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
   const { id_estudiante, id_config_practica, id_supervisor, id_empresa, id_encargado, id_modalidad, estado,
     fecha_inicio, fecha_termino, nota_evaluacion,
-    consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos } = req.body;
+    consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos
+    , calificacion_empresa, comentario_empresa } = req.body;
   console.log("Request de creacion de practica recibida");
   practica.create({
     id_estudiante: id_estudiante,
@@ -296,7 +297,9 @@ routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
     resumen: resumen,
     indice_repeticion: indice_repeticion,
     key_repeticiones: key_repeticiones,
-    key_fragmentos: key_fragmentos
+    key_fragmentos: key_fragmentos,
+    calificacion_empresa: calificacion_empresa,
+    comentario_empresa: comentario_empresa
   })
     .then((resultados: any) => {
       res.status(200).json({ mensaje: "ok" });
