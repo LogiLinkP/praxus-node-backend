@@ -71,7 +71,9 @@ module.exports = (sequelize, DataTypes) => {
     key_repeticiones: DataTypes.JSON,
     key_fragmentos: DataTypes.JSON,
     interpretacion_informe: DataTypes.STRING,
-    interpretacion_nota: DataTypes.STRING
+    interpretacion_nota: DataTypes.STRING,
+    calificacion_empresa: DataTypes.INTEGER,
+    comentario_empresa: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'practica',

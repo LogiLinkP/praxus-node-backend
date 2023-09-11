@@ -26,7 +26,11 @@ module.exports = (sequelize, DataTypes) => {
     id_usuario: DataTypes.INTEGER,
     nombre_id_org: DataTypes.STRING,
     id_org: DataTypes.STRING,
-    rut: DataTypes.STRING
+    rut: DataTypes.STRING,
+    id_carrera: DataTypes.INTEGER,
+    perfil_linkedin: DataTypes.STRING,
+    empresa_destacada: DataTypes.BOOLEAN
+
   }, {
     sequelize,
     modelName: 'estudiante',

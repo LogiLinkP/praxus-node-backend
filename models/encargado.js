@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+const practica = require('./practica');
 module.exports = (sequelize, DataTypes) => {
   class encargado extends Model {
     /**
@@ -26,7 +27,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   encargado.init({
-    id_usuario: DataTypes.INTEGER
+    id_usuario: DataTypes.INTEGER,
+    id_carrera: DataTypes.INTEGER,
+    practica_pendiente: DataTypes.JSON
   }, {
     sequelize,
     modelName: 'encargado',

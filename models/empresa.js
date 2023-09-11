@@ -17,7 +17,9 @@ module.exports = (sequelize, DataTypes) => {
     nombre_empresa: DataTypes.STRING,
     rut_empresa: DataTypes.STRING,
     empresa_verificada: DataTypes.BOOLEAN,
-    dominios_empresa: DataTypes.STRING
+    dominios_empresa: DataTypes.STRING,
+    practicantes_destacados: DataTypes.FLOAT,
+    calificacion_promedio: DataTypes.FLOAT,
   }, {
     sequelize,
     modelName: 'empresa',

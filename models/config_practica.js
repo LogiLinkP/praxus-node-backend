@@ -40,7 +40,8 @@ module.exports = (sequelize, DataTypes) => {
     nombre: DataTypes.STRING,
     frecuencia_informes: DataTypes.STRING,
     informe_final: DataTypes.STRING,
-    activada: DataTypes.BOOLEAN
+    activada: DataTypes.BOOLEAN,
+    id_carrera: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'config_practica',
