@@ -95,13 +95,13 @@ routerNotificacion.post('/crear', jsonParser, (req: any, res: any) => {
       if (estado == "Notificaciones y Correo" || estado == "Sólo Correo") {
         let mensaje_correo: string = mensaje + ". Visite Praxus para revisar.";
         sendMail(correo, "Notificación de Praxus", mensaje_correo, "Notificación de Praxus");
-        res.send("notificacion creada y correo enviado");
+        // res.send("notificacion creada y correo enviado");
       }
-      res.sendStatus(200);
+      return res.sendStatus(200);
     })
     .catch((err: any) => {
       console.log('Error al crear notificacion', err);
-      res.sendStatus(500)
+      return res.sendStatus(500)
     })
 })
 
