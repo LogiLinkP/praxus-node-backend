@@ -82,13 +82,16 @@ routerEstudiante.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] Crear un estudiante con los datos recibidos
 routerEstudiante.post('/crear', jsonParser, (req: any, res: any) => {
-  const { id_usuario, nombre_id_org, id_org, rut } = req.body;
+  const { id_usuario, nombre_id_org, id_org, rut, perfil_linkedin, empresa_destacada, id_carrera } = req.body;
   console.log("Request de creacion de estudiante recibida");
   estudiante.create({
     id_usuario: id_usuario,
     nombre_id_org: nombre_id_org,
     id_org: id_org,
-    rut: rut
+    rut: rut,
+    perfil_linkedin: perfil_linkedin,
+    empresa_destacada: empresa_destacada,
+    id_carrera: id_carrera
   })
     .then((resultados: any) => {
       res.send("Estudiante creado");
