@@ -21,8 +21,8 @@ const options = {
 const PORT = process.env.PORT || 3000;
 const PORT_SOCKET = +(process.env.PORT_SOCKET || 5000);
 
-if (process.env.MODO && process.env.MODO === 'DESARROLLO') {
-  console.log("Modo desarrollo")
+if (!process.env.MODO || (process.env.MODO && process.env.MODO === 'DESARROLLO')) {
+  console.log("Modo DESARROLLO")
 
   app.listen(PORT, function (err: any) {
     if (err) console.log(err);
