@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+const practica = require('./practica');
 module.exports = (sequelize, DataTypes) => {
   class encargado extends Model {
     /**
@@ -15,13 +16,20 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'id_usuario'
       });
 
+      this.belongsTo(models.carrera, {
+        foreignKey: 'id_carrera'
+      });
+
       this.hasMany(models.practica, {
         foreignKey: 'id_encargado'
       });
+
     }
   }
   encargado.init({
-    id_usuario: DataTypes.INTEGER
+    id_usuario: DataTypes.INTEGER,
+    id_carrera: DataTypes.INTEGER,
+    practica_pendiente: DataTypes.JSON
   }, {
     sequelize,
     modelName: 'encargado',

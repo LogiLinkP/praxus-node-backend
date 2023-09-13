@@ -59,13 +59,15 @@ routerEmpresa.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] Crear uno
 routerEmpresa.post('/crear', jsonParser, (req: any, res: any) => {
-  const {nombre_empresa, rut_empresa, empresa_verificada, dominios_empresa} = req.body;
+  const {nombre_empresa, rut_empresa, empresa_verificada, dominios_empresa, practicantes_destacados, calificacion_promedio} = req.body;
   console.log("Request de empresa");
   empresa.create({
     nombre_empresa: nombre_empresa,
     rut_empresa: rut_empresa,
     empresa_verificada: empresa_verificada,
-    dominios_empresa: dominios_empresa
+    dominios_empresa: dominios_empresa,
+    practicantes_destacados: practicantes_destacados,
+    calificacion_promedio: calificacion_promedio
   })
   .then((resultados:any) => {
       console.log(resultados);
