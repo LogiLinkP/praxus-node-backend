@@ -32,6 +32,10 @@ routerEmpresa.get('', async (req: any, res: any) => {
 routerEmpresa.get('/todos', async (req: any, res: any) => {
   try {
     const data = await empresa.findAll();
+    if (!data || data.length == 0) {
+      res.status(404).json({ message: "No existen empresas" });
+      return;
+    }
     res.status(200).json(data);
   } catch (error) {
     console.log(error);
@@ -59,7 +63,7 @@ routerEmpresa.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] Crear uno
 routerEmpresa.post('/crear', jsonParser, (req: any, res: any) => {
-  const {nombre_empresa, rut_empresa, empresa_verificada, dominios_empresa, practicantes_destacados, calificacion_promedio} = req.body;
+  const { nombre_empresa, rut_empresa, empresa_verificada, dominios_empresa, practicantes_destacados, calificacion_promedio } = req.body;
   console.log("Request de empresa");
   empresa.create({
     nombre_empresa: nombre_empresa,
@@ -69,14 +73,14 @@ routerEmpresa.post('/crear', jsonParser, (req: any, res: any) => {
     practicantes_destacados: practicantes_destacados,
     calificacion_promedio: calificacion_promedio
   })
-  .then((resultados:any) => {
+    .then((resultados: any) => {
       console.log(resultados);
-      res.status(200).json({id: resultados.dataValues.id});
-  })
-  .catch((err:any) => {
-      console.log('Error al crear empresa',err);
-      res.sendStatus(500).json({message: "Error interno"});
-  })
+      res.status(200).json({ id: resultados.dataValues.id });
+    })
+    .catch((err: any) => {
+      console.log('Error al crear empresa', err);
+      res.sendStatus(500).json({ message: "Error interno" });
+    })
 })
 
 
