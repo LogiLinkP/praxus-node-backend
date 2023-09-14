@@ -82,13 +82,16 @@ routerEstudiante.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] Crear un estudiante con los datos recibidos
 routerEstudiante.post('/crear', jsonParser, (req: any, res: any) => {
-  const { id_usuario, nombre_id_org, id_org, rut } = req.body;
+  const { id_usuario, nombre_id_org, id_org, rut, perfil_linkedin, empresa_destacada, id_carrera } = req.body;
   console.log("Request de creacion de estudiante recibida");
   estudiante.create({
     id_usuario: id_usuario,
     nombre_id_org: nombre_id_org,
     id_org: id_org,
-    rut: rut
+    rut: rut,
+    perfil_linkedin: perfil_linkedin,
+    empresa_destacada: empresa_destacada,
+    id_carrera: id_carrera
   })
     .then((resultados: any) => {
       res.send("Estudiante creado");
@@ -114,9 +117,30 @@ routerEstudiante.put('/actualizar', jsonParser, async (req: any, res: any) => {
         console.log('Error al actualizar estudiante', err);
       })
   } else {
-    console.log("No existe estudiante con id: ", req.query.id)
+    console.log("No existe estudiante con id: ", req.body.id)
     res.sendStatus(404)
   }
+})
+
+//[PUT] actualizar configuracion de estudiantes
+routerEstudiante.put('/actualizarConfig', jsonParser, async (req: any, res: any) => {
+    // buscar practica por id
+    const Estudiante = await estudiante.findOne({ where: { id: req.body.id } })
+    if (Estudiante) {
+      // actualizar practica
+      Estudiante.update(req.body)
+        .then((resultados: any) => {
+          console.log(resultados);
+          res.status(200).json(resultados);
+        })
+        .catch((err: any) => {
+          res.send(500).json(err)
+          console.log('Error al actualizar estudiante', err);
+        })
+    } else {
+      console.log("No existe estudiante con id: ", req.body.id)
+      res.sendStatus(404)
+    }
 })
 
 //[GET] obtener todos los encargado dado un estudiante

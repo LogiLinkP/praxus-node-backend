@@ -17,7 +17,8 @@ module.exports = (sequelize, DataTypes) => {
     id_config_practica: DataTypes.INTEGER,
     enunciado: DataTypes.STRING,
     tipo_respuesta: DataTypes.STRING,
-    opciones: DataTypes.STRING
+    opciones: DataTypes.STRING,
+    fija: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'pregunta_encuesta_final',

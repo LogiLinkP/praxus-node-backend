@@ -37,7 +37,7 @@ routerConfigPracticas.get('/buscar', async (req: any, res: any) => {
     }
     const data = await config_practica.findOne({
       where: {
-        nombre: req.query.nombre
+        nombre: req.query.nombre,
       }
     });
     res.status(200).json(data);
@@ -48,12 +48,13 @@ routerConfigPracticas.get('/buscar', async (req: any, res: any) => {
 });
 
 
-//[GET] obtener una config_practica por nombre
+//[GET] obtener una config_practica por nombre SÓLO SI ESTÁ ACTIVADA
 routerConfigPracticas.get('/nombre', async (req: any, res: any) => {
   try {
     const data = await config_practica.findOne({
       where: {
-        nombre: req.query.nombre
+        nombre: req.query.nombre,
+        activada: true
       },
       include: [{model: modalidad}]
     });
@@ -63,6 +64,8 @@ routerConfigPracticas.get('/nombre', async (req: any, res: any) => {
     res.status(500).json({ message: "Error interno" });
   }
 });
+
+
 
 //[GET] mostrar todas las config_practicas
 routerConfigPracticas.get('/todos', async (req: any, res: any) => {
@@ -98,12 +101,14 @@ routerConfigPracticas.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] Crear una config_practica con los datos recibidos
 routerConfigPracticas.post('/crear', jsonParser, (req: any, res: any) => {
-    const {nombre, frecuencia_informes,informe_final} = req.body;
+    const {nombre, frecuencia_informes,informe_final, id_carrera, activada} = req.body;
     console.log("Request de creacion de config_practica recibida");
     config_practica.create({
         nombre: nombre,
         frecuencia_informes: frecuencia_informes,
-        informe_final: informe_final
+        informe_final: informe_final,
+        id_carrera: id_carrera,
+        activada: activada
     })
     .then((resultados:any) => {
         console.log(resultados);
