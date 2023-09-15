@@ -48,14 +48,14 @@ routerCarrera.delete('/eliminar', (req: any, res: any) => {
     }
   })
     .then((resultados: any) => {
-      console.log(resultados);
-      res.sendStatus(200);
+      res.status(200).json(resultados);
     })
     .catch((err: any) => {
-      res.send(500)
+      res.status(500).json(err)
       console.log('Error al eliminar carrera', err);
     })
 })
+
 //[POST] Crear uno
 routerCarrera.post('/crear', jsonParser, (req: any, res: any) => {
   const { nombre, ramos, correos_admitidos, estadistica_ramos } = req.body;
@@ -67,10 +67,10 @@ routerCarrera.post('/crear', jsonParser, (req: any, res: any) => {
     estadistica_ramos: estadistica_ramos
   })
     .then((resultados: any) => {
-      console.log(resultados);
-      res.send("carrera creada");
+      res.status(200).json({ message: "carrera creada", id: resultados.id });;
     })
     .catch((err: any) => {
+      res.status(500).json({ message: "Error interno" });
       console.log('Error al crear carrera', err);
     })
 })
@@ -84,16 +84,14 @@ routerCarrera.put('/actualizar', jsonParser, async (req: any, res: any) => {
     // actualizar practica
     Encargado.update(req.body)
       .then((resultados: any) => {
-        console.log(resultados);
-        res.sendStatus(200);
+        res.status(200).json({ resultado: resultados });
       })
       .catch((err: any) => {
-        res.send(500)
-        console.log('Error al actualizar carrera', err);
+        res.status(500).json({ message: "Error al actualizar carrera", error: err });
       })
   } else {
     console.log("No existe carrera con id: ", req.query.id)
-    res.sendStatus(404)
+    res.status(404).json({ message: "No existe carrera con id: " + req.query.id });
   }
 })
 
