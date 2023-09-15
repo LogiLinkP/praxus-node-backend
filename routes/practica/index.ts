@@ -182,19 +182,18 @@ routerPractica.get('/filtrar', async (req:any, res:any) => {
 */
 
 routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
-  //let carreras = ["Ingeniería Civil en Informática", "Ingeniería Civil en Minas, Ingeniería Civil Eléctrica"]
-
-  //practica.update ={...practica, carrera: carreras[Math.floor(Math.random() * carreras.length)]}
- 
   try {
     const data = await practica.findAll({  
-      /*  
+      
+      include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: [config_practica] }],
+
       where: {
-        carrera: req.carrera,
+        id_carrera: req.id_carrera,
       },
-      */
-      include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: [config_practica] }]
-    });
+    }); 
+  
+    console.log("\n\n\n\n HOLA");
+    console.log("Carrera: ", req);
     res.status(200).json(data);
   } catch (error) {
     console.log(error);
