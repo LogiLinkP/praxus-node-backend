@@ -151,6 +151,25 @@ routerPractica.get('/get_asEncargado', (req: any, res: any) => {
     })
 })
 
+//[GET] para obtener todas las practicas de una empresa
+routerPractica.get('/empresa', async (req: any, res: any) => {
+  try {
+    if (!("id" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar id" });
+      return;
+    }
+    const data = await practica.findAll({
+      where: {
+        id_empresa: req.query.id
+      }
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
 //[GET] mostrar todos
 routerPractica.get('/todos', async (req: any, res: any) => {
   try {
