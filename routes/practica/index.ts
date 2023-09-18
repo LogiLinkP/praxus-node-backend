@@ -341,15 +341,15 @@ routerPractica.put('/actualizar', jsonParser, async (req: any, res: any) => {
     Practica.update(req.body)
       .then((resultados: any) => {
         console.log(resultados);
-        res.sendStatus(200);
+        res.status(200).json({ message: "practica actualizada" });
       })
       .catch((err: any) => {
-        res.send(500)
+        res.status(500).json({ message: "Error al actualizar practica", error: err});
         console.log('Error al actualizar practica', err);
       })
   } else {
     console.log("No existe practica con id: ", req.query.id)
-    res.sendStatus(404)
+    res.status(404).json({ message: "No existe practica con el id ingresado" });
   }
 })
 
