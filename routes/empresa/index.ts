@@ -1,10 +1,10 @@
 export { };
 
+const cheerio = require('cheerio');
 const { empresa } = require('../../models');
 const { Router } = require('express');
-const sequelize = require('../../db');
-const routerEmpresa = new Router();
-
+const routerEmpresa = new Router(); // /empresa
+const axios = require("axios");
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
@@ -105,4 +105,56 @@ routerEmpresa.put('/actualizar', jsonParser, async (req: any, res: any) => {
   }
 })
 
+routerEmpresa.get('/check_empresa', jsonParser, async (req: any, res: any) => {
+  const { rut } = req.query;
+  if (!rut) {
+    return res.status(400).json({ message: "Se requiere ingresar rut de empresa" });
+  }
+  try {
+    console.log("Consultando rut: ", rut);
+    // const consulta = await axios.post(`https://r.rutificador.co/er/${rut}`, {});
+    // console.log(consulta.status);
+    // console.log(consulta.data);
+    // if (!consulta || !consulta.data || consulta.status != 200) {
+    //   return res.status(500).json({ message: "Se Ha producido un error" });
+    // }
+    let data = `<tr>
+    <td>ALTECH SPA</td>
+    <td>
+        <p>M - Actividades Profesionales, Cientificas Y Técnicas</p>
+        <p>N - Actividades De Servicios Administrativos Y De Apoyo</p>
+    </td>
+    <td>
+        <p>702 - Actividades De Consultoría De Gestión</p>
+        <p>712 - Ensayos Y Análisis Técnicos</p>
+        <p>721 - Investigaciones Y Desarrollo Experimental En El Campo De Las Ciencias Naturales Y La Ingeniería</p>
+        <p>732 - Estudios De Mercado Y Encuestas De Opinión Pública</p>
+        <p>741 - Actividades Especializadas De Diseño</p>
+        <p>803 - Actividades De Investigación</p>
+    </td>
+    <td>
+        <p>661903 - Empresas De Asesoría Y Consultoría En Inversión Financiera; Sociedades De Apoyo Al Giro</p>
+        <p>702000 - Actividades De Consultoría De Gestión</p>
+        <p>712009 - Otros Servicios De Ensayos Y Análisis Técnicos (Excepto Actividades De Plantas De Revisión
+            Técnica)
+        </p>
+        <p>721000 - Investigaciones Y Desarrollo Experimental En El Campo De Las Ciencias Naturales Y La Ingeniería
+        </p>
+        <p>732000 - Estudios De Mercado Y Encuestas De Opinión Pública</p>
+        <p>741009 - Otras Actividades Especializadas De Diseño N.C.P.</p>
+        <p>803000 - Actividades De Investigación (Incluye Actividades De Investigadores Y Detectives Privados)</p>
+    </td>
+    <td>76.637.851-K</td>
+</tr>`
+    const html = cheerio.load(`<table>${data}</table>`);
+    console.log(html("tr").find("td:first").text());
+
+    return res.status(200).json({ message: "Empresa verificada" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error interno" });
+  }
+
+
+});
 module.exports = routerEmpresa;
