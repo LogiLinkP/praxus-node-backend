@@ -95,4 +95,24 @@ routerCarrera.put('/actualizar', jsonParser, async (req: any, res: any) => {
   }
 })
 
+//Implementar con bulkCreate
+routerCarrera.post('/crear-carrera', jsonParser, async (req: any, res: any) => {
+  let { nombre } = req.body;
+  try {
+    let query = await carrera.findOne({ where: { nombre: nombre } })
+    if (query != null) {
+      return res.status(400).send({ message: 'Carrera ya existente' });
+    }
+    else {
+      let _carrera = await carrera.create({
+        nombre: nombre
+      })
+      return res.status(200).send({ message: 'Carrera creada' });
+    }
+  }
+  catch (err) {
+    return res.status(400).send({ message: 'Error al crear carrera' });
+  }
+});
+
 module.exports = routerCarrera;

@@ -1,7 +1,7 @@
 export { };
 
 const { Router } = require('express');
-const { usuario, supervisor, estudiante, encargado, actividad_usuarios, token_usuarios, practica, empresa } = require('../../models');
+const { usuario, supervisor, estudiante, encargado, actividad_usuarios, token_usuarios, practica, empresa, carrera } = require('../../models');
 const routerUsuario = new Router();
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
