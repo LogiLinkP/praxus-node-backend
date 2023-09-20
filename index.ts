@@ -302,7 +302,7 @@ const actualizar_encuesta_practica = async () => {
   }  
 }
 
-cron.schedule('0 0 */7 * *', () => {
+cron.schedule('59 23 * * 0', () => {
 //cron.schedule('*/5 * * * *', () => {
   console.log('Actualizando estadisticas de ramos, empresas y encuesta practica');
   actualizar_ramos();
