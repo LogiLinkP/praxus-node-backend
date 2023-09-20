@@ -5,6 +5,7 @@ const { empresa } = require('../../models');
 const { Router } = require('express');
 const routerEmpresa = new Router(); // /empresa
 const axios = require("axios");
+const { consulta_rutificador_co, consulta_boletaofactura_com, formatear_rut_empresa } = require('./utilidades_empresa');
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
@@ -24,7 +25,31 @@ routerEmpresa.get('', async (req: any, res: any) => {
     res.status(200).json(data);
   } catch (error) {
     console.log(error);
-    res.sendStatus(500).json({ message: "Error interno" });
+    return res.status(500).json({ message: "Error interno" });
+  }
+});
+
+routerEmpresa.get('/por_rut', async (req: any, res: any) => {
+  let { rut } = req.query;
+  if (!rut || rut == "") {
+    res.status(406).json({ message: "Se requiere ingresar rut" });
+    return;
+  }
+  rut = formatear_rut_empresa(rut);
+  if (rut == "" || rut[0] == "-") {
+    res.status(406).json({ message: "Rut inválido" });
+    return;
+  }
+  try {
+    const Empresa = await empresa.findOne({
+      where: {
+        rut_empresa: rut
+      }
+    });
+    res.status(200).json(Empresa);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error interno" });
   }
 });
 
@@ -105,51 +130,39 @@ routerEmpresa.put('/actualizar', jsonParser, async (req: any, res: any) => {
   }
 })
 
-routerEmpresa.get('/check_empresa', jsonParser, async (req: any, res: any) => {
-  const { rut } = req.query;
+routerEmpresa.post('/agregar_empresa_auto', jsonParser, async (req: any, res: any) => {
+  let { rut } = req.query;
   if (!rut) {
     return res.status(400).json({ message: "Se requiere ingresar rut de empresa" });
   }
   try {
-    console.log("Consultando rut: ", rut);
-    // const consulta = await axios.post(`https://r.rutificador.co/er/${rut}`, {});
-    // console.log(consulta.status);
-    // console.log(consulta.data);
-    // if (!consulta || !consulta.data || consulta.status != 200) {
-    //   return res.status(500).json({ message: "Se Ha producido un error" });
-    // }
-    let data = `<tr>
-    <td>ALTECH SPA</td>
-    <td>
-        <p>M - Actividades Profesionales, Cientificas Y Técnicas</p>
-        <p>N - Actividades De Servicios Administrativos Y De Apoyo</p>
-    </td>
-    <td>
-        <p>702 - Actividades De Consultoría De Gestión</p>
-        <p>712 - Ensayos Y Análisis Técnicos</p>
-        <p>721 - Investigaciones Y Desarrollo Experimental En El Campo De Las Ciencias Naturales Y La Ingeniería</p>
-        <p>732 - Estudios De Mercado Y Encuestas De Opinión Pública</p>
-        <p>741 - Actividades Especializadas De Diseño</p>
-        <p>803 - Actividades De Investigación</p>
-    </td>
-    <td>
-        <p>661903 - Empresas De Asesoría Y Consultoría En Inversión Financiera; Sociedades De Apoyo Al Giro</p>
-        <p>702000 - Actividades De Consultoría De Gestión</p>
-        <p>712009 - Otros Servicios De Ensayos Y Análisis Técnicos (Excepto Actividades De Plantas De Revisión
-            Técnica)
-        </p>
-        <p>721000 - Investigaciones Y Desarrollo Experimental En El Campo De Las Ciencias Naturales Y La Ingeniería
-        </p>
-        <p>732000 - Estudios De Mercado Y Encuestas De Opinión Pública</p>
-        <p>741009 - Otras Actividades Especializadas De Diseño N.C.P.</p>
-        <p>803000 - Actividades De Investigación (Incluye Actividades De Investigadores Y Detectives Privados)</p>
-    </td>
-    <td>76.637.851-K</td>
-</tr>`
-    const html = cheerio.load(`<table>${data}</table>`);
-    console.log(html("tr").find("td:first").text());
+    rut = formatear_rut_empresa(rut);
+    console.log(rut);
+    const Empresa = await empresa.findOne({
+      where: { rut_empresa: rut }
+    });
+    console.log(Empresa);
+    if (Empresa) {
+      return res.status(400).json({ message: "Empresa ya existe" });
+    }
+    let respuesta = await consulta_rutificador_co(rut);
+    if (respuesta === false) {
+      respuesta = await consulta_boletaofactura_com(rut);
+      if (respuesta === false) {
+        return res.status(200).json({ message: "Empresa no encontrada" });
+      }
+    }
+    await empresa.create({
+      nombre_empresa: respuesta,
+      rut_empresa: rut,
+      empresa_verificada: true
+    });
 
-    return res.status(200).json({ message: "Empresa verificada" });
+    return res.status(200).json({
+      message: "Empresa agregada",
+      nombre_empresa: respuesta,
+      rut_empresa: rut,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Error interno" });
@@ -157,4 +170,34 @@ routerEmpresa.get('/check_empresa', jsonParser, async (req: any, res: any) => {
 
 
 });
+
+routerEmpresa.post('/agregar_empresa_manual', jsonParser, async (req: any, res: any) => {
+  let { rut, nombre } = req.query;
+  if (!rut || !nombre || rut == "" || nombre == "") {
+    return res.status(400).json({ message: "Se requiere ingresar rut y nombre de empresa" });
+  }
+  try {
+    rut = formatear_rut_empresa(rut);
+    if (rut == "" || rut[0] == "-") {
+      res.status(406).json({ message: "Rut inválido" });
+      return;
+    }
+    const Empresa = await empresa.create({
+      nombre_empresa: nombre,
+      rut_empresa: rut,
+      empresa_verificada: false
+    });
+    return res.status(200).json({
+      message: "Empresa agregada",
+      nombre_empresa: nombre,
+      rut_empresa: rut,
+      empresa_verificada: false
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error interno" });
+  }
+});
+// agregar_empresa_manual
+
 module.exports = routerEmpresa;
