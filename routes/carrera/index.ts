@@ -97,22 +97,33 @@ routerCarrera.put('/actualizar', jsonParser, async (req: any, res: any) => {
 
 //Implementar con bulkCreate
 routerCarrera.post('/crear-carrera', jsonParser, async (req: any, res: any) => {
-  let { nombre } = req.body;
+  let { lista } = req.body;
+  let listaCarreras = [];
+  let flag = false;
+  for(let i=0; i<lista.length; i++){
+    let json = {nombre: lista[i]};
+    try{
+      const _query = carrera.findOne({ where: json});
+      if(_query.length > 0){
+        flag = true;
+        continue;
+      }
+      else{
+        listaCarreras.push(json);
+      }
+    }catch(error){
+      console.log(error);
+      return res.status(500).send({ message: "Error de conexion" });
+    }
+  }
   try {
-    let query = await carrera.findOne({ where: { nombre: nombre } })
-    if (query != null) {
-      return res.status(400).send({ message: 'Carrera ya existente' });
-    }
-    else {
-      let _carrera = await carrera.create({
-        nombre: nombre
-      })
-      return res.status(200).send({ message: 'Carrera creada' });
-    }
+    const _carreras = await carrera.bulkCreate(listaCarreras);
+    return res.status(200).send({ message: "Carrera(s) creada exitosamente", carreras: _carreras });
   }
-  catch (err) {
-    return res.status(400).send({ message: 'Error al crear carrera' });
+  catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error de conexion" });
   }
-});
+})
 
 module.exports = routerCarrera;
