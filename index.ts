@@ -1,13 +1,16 @@
 import { createServer } from "https";
 import { readFileSync } from "fs";
 import { setupIo } from "./middleware/socketMiddleware";
+
 const express = require('express');
 const chalk = require('chalk');
 const sequelize = require('./db');
-const cors = require('cors')
-require('dotenv').config();
-
+const cors = require('cors');
+const { Scheduler } = require('./scheduler');
 const app = express();
+
+Scheduler.schedule();
+require('dotenv').config();
 app.use(cors());
 app.use("/", require("./routes"));
 

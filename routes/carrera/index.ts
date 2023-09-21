@@ -79,10 +79,10 @@ routerCarrera.post('/crear', jsonParser, (req: any, res: any) => {
 //[PUT]
 routerCarrera.put('/actualizar', jsonParser, async (req: any, res: any) => {
   // buscar practica por id
-  const Encargado = await carrera.findOne({ where: { id: req.body.id } })
-  if (Encargado) {
+  const Carrera = await carrera.findOne({ where: { id: req.body.id } })
+  if (Carrera) {
     // actualizar practica
-    Encargado.update(req.body)
+    Carrera.update(req.body)
       .then((resultados: any) => {
         res.status(200).json({ resultado: resultados });
       })
