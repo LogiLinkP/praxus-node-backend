@@ -1,6 +1,7 @@
 import { createServer } from "https";
 import { readFileSync } from "fs";
 import { setupIo } from "./middleware/socketMiddleware";
+
 const express = require('express');
 const chalk = require('chalk');
 const sequelize = require('./db');
@@ -112,7 +113,8 @@ if (!process.env.MODO || (process.env.MODO && process.env.MODO === 'DESARROLLO')
 
 //procesamiento periodico de datos
 
-const { carrera, respuesta_ramos, empresa, practica, estudiante, config_practica, pregunta_encuesta_final, respuesta_encuesta_final, estadistica } = require('./models');
+const { carrera, respuesta_ramos, empresa, practica, estudiante, config_practica, modalidad, informe,
+        pregunta_encuesta_final, respuesta_encuesta_final, estadistica, config_informe } = require('./models');
 var cron = require('node-cron');
 
 //listo
@@ -301,6 +303,69 @@ const actualizar_encuesta_practica = async () => {
     }
   }  
 }
+
+const crear_informes = async (frecuencia_informes: any) => {
+  const  lista_practicas  = await practica.findAll({where: { estado:"En curso"}, 
+                                                    include: { model: modalidad, 
+                                                               include: { model: config_practica, where: {frecuencia_informes: frecuencia_informes},
+                                                                          include: {model: config_informe, where: {tipo_informe: "informe avance"}}
+                                                                        }
+                                                              }
+                                                   });
+  
+  // por cada practica, crear un informe
+  for (let i=0; i<lista_practicas.length; i++){
+    let practica_aux = lista_practicas[i].dataValues;
+    let modalidad_aux: any;
+    let config_practica_aux: any;
+    let config_informe_aux: any;
+
+    //console.log("PRACTI AUX",practica_aux);
+
+    if (practica_aux.modalidad== null){
+      continue;
+    }
+    modalidad_aux = practica_aux.modalidad.dataValues;
+    //console.log("MODALI AUX",modalidad_aux);
+
+    if (modalidad_aux.config_practica == null){
+      continue;
+    }
+    config_practica_aux = modalidad_aux.config_practica.dataValues;
+    //console.log("CONFIG AUX",config_practica_aux);
+
+    if (config_practica_aux.config_informes[0] == null){
+      continue;
+    }    
+    config_informe_aux = config_practica_aux.config_informes[0].dataValues;
+    //console.log("config INFORME AUX",config_informe_aux);
+  
+    await informe.create({
+      id_practica: practica_aux.id,
+      id_config_informe: config_informe_aux.id,
+      horas_trabajadas: 0
+    })
+  }
+}
+
+// creacion de informes diarios
+cron.schedule('0 0 * * *', () => {
+  console.log('Creando informes diarios');
+  crear_informes("diario");
+});
+
+// creacion de informes semanales
+cron.schedule('0 0 * * 1', () => {
+  console.log('Creando informes semanales');
+  crear_informes("semanal");
+});
+
+// creacion de informes mensuales
+cron.schedule('0 0 1 * *', () => {
+  console.log('Creando informes mensuales');
+  crear_informes("mensual");
+});
+
 
 cron.schedule('59 23 * * 0', () => {
 //cron.schedule('*/5 * * * *', () => {
