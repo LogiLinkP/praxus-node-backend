@@ -7,7 +7,7 @@ const routerEncargado = new Router(); // /encargado
 
 //Librerias para creacion de encargado
 
-const sendMail = require("../utils/email/sendEmail");
+const sendMail = require("../../utils/email");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 
