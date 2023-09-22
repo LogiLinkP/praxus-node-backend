@@ -32,10 +32,10 @@ routerCarrera.get('', async (req: any, res: any) => {
 routerCarrera.get('/todos', async (req: any, res: any) => {
   try {
     const data = await carrera.findAll();
-    res.status(200).json(data);
+    return res.status(200).send(data);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Error interno" });
+    return res.status(500).send({ message: "Error interno" });
   }
 });
 

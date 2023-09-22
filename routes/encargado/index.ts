@@ -7,9 +7,8 @@ const routerEncargado = new Router(); // /encargado
 
 //Librerias para creacion de encargado
 
-const sendMail = require("../../utils/email");
+const {sendMail} = require("../../utils/email");
 const crypto = require("crypto");
-const bcrypt = require("bcrypt");
 
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
@@ -60,10 +59,10 @@ routerEncargado.get('/usuario', async (req: any, res: any) => {
 routerEncargado.get('/todos', async (req: any, res: any) => {
   try {
     const data = await encargado.findAll();
-    res.status(200).json(data);
+    return res.status(200).send(data);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Error interno" });
+    return res.status(500).send({ message: "Error interno" });
   }
 });
 
@@ -150,16 +149,20 @@ routerEncargado.get('/estudiantes', async (req: any, res: any) => {
 
 routerEncargado.post('/crear-encargado', jsonParser, async (req: any, res: any) => {
   let { email } = req.body;
+  console.log(1)
   try {
     let token = crypto.randomBytes(32).toString("hex");
-    const hash = await bcrypt.hash(token, 10);
-    const link = `${process.env.URL_FRONTEND}/encargado/registro/${hash}`;
+    console.log(2)
+    const link = `${process.env.URL_FRONTEND}/encargado/registro/${token}`;
+    console.log(3)
     const texto = "Para registrarse en la plataforma Praxus debe ingresar al siguiente enlace: " + link;
     sendMail(email, "Registro de encargado", texto);
-    return link;
+    console.log(4)
+    return res.status(200).send({ message: "Correo enviado" });
   }
   catch (err) { 
-
+    console.log(err);
+    return res.status(500).send({ message: "Error interno" });
   }
 });
 
