@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     dominios_empresa: DataTypes.STRING,
     practicantes_destacados: DataTypes.FLOAT,
     calificacion_promedio: DataTypes.FLOAT,
+    palabras_clave: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'empresa',
