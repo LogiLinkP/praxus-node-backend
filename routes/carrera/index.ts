@@ -58,13 +58,14 @@ routerCarrera.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] Crear uno
 routerCarrera.post('/crear', jsonParser, (req: any, res: any) => {
-  const { nombre, ramos, correos_admitidos, estadistica_ramos } = req.body;
+  const { nombre, ramos, correos_admitidos, estadistica_ramos, palabras_clave } = req.body;
   console.log("Request de carrera");
   carrera.create({
     nombre: nombre,
     ramos: ramos,
     correos_admitidos: correos_admitidos,
-    estadistica_ramos: estadistica_ramos
+    estadistica_ramos: estadistica_ramos,
+    palabras_clave: palabras_clave
   })
     .then((resultados: any) => {
       res.status(200).json({ message: "carrera creada", id: resultados.id });;
