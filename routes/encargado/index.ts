@@ -57,9 +57,21 @@ routerEncargado.get('/usuario', async (req: any, res: any) => {
 });
 //[GET] mostrar todos
 routerEncargado.get('/todos', async (req: any, res: any) => {
+  let lista = [];
   try {
-    const data = await encargado.findAll();
-    return res.status(200).send(data);
+    let data = await encargado.findAll();
+    for (let i = 0; i < data.length; i++) {
+      let user = await usuario.findOne({ where: { id: data[i].id_usuario } })
+      let nombre = user.nombre
+      let correo = user.correo
+      let id_encargado = data[i].id
+      let id_usuario = data[i].id_usuario
+      let id_carrera = data[i].id_carrera
+      if (user) {
+        lista.push({id: id_encargado,id_usuario: id_usuario, id_carrera: id_carrera, nombre: nombre, correo: correo })
+      }
+    }
+    return res.status(200).send({data: lista}); 
   } catch (error) {
     console.log(error);
     return res.status(500).send({ message: "Error interno" });
@@ -67,21 +79,31 @@ routerEncargado.get('/todos', async (req: any, res: any) => {
 });
 
 //[DELETE] Eliminar
-routerEncargado.delete('/eliminar', (req: any, res: any) => {
+routerEncargado.delete('/eliminar', async (req: any, res: any) => {
   console.log("Eliminando encargado con id: ", req.query.id)
-  encargado.destroy({
-    where: {
-      id: req.query.id
+  try {
+    let data = await encargado.findOne({where: {id: req.query.id}})
+    if (data) {
+      console.log("Encargado existe")
+      let user = await usuario.findOne({where: {id: data.id_usuario}})
+      if (user) {
+        console.log("Usuario existe")
+        usuario.destroy({where: {id: data.id_usuario}})
+        encargado.destroy({
+          where: {
+            id: req.query.id
+          }
+        })
+        return res.sendStatus(200);
+      }
+    } else {
+      return res.status(500).send({ message: "Encargado no encontrado" })
     }
-  })
-    .then((resultados: any) => {
-      console.log(resultados);
-      res.sendStatus(200);
-    })
-    .catch((err: any) => {
-      res.send(500)
-      console.log('Error al eliminar encargado', err);
-    })
+  }
+  catch (err) {
+    console.log(err);
+    return res.status(500).send({ message: "Error interno" });
+  }
 })
 //[POST] Crear uno
 routerEncargado.post('/crear', jsonParser, (req: any, res: any) => {
