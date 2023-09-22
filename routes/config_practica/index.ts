@@ -1,3 +1,5 @@
+import { where } from "sequelize";
+
 export { };
 
 const { config_practica, modalidad } = require('../../models');
@@ -31,19 +33,22 @@ routerConfigPracticas.get('', async (req: any, res: any) => {
 //[GET] obtener una config_practica con nombre, modalidad y cantidad_tiempo 
 routerConfigPracticas.get('/buscar', async (req: any, res: any) => {
   try {
-    if (!("nombre" in req.query)) {
+    const { nombre } = req.query;
+    if (!nombre) {
       res.status(406).json({ message: "Se requiere ingresar nombre de config_practica" });
       return;
     }
-    const data = await config_practica.findOne({
-      where: {
-        nombre: req.query.nombre,
-      }
-    });
-    res.status(200).json(data);
+    const activada = req.query.activada == "true";
+    let where: any = { nombre };
+    if (activada) {
+      where["activada"] = activada;
+    }
+
+    const data = await config_practica.findOne({ where });
+    return res.status(200).json(data);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Error interno" });
+    return res.status(500).json({ message: "Error interno" });
   }
 });
 
@@ -56,7 +61,7 @@ routerConfigPracticas.get('/nombre', async (req: any, res: any) => {
         nombre: req.query.nombre,
         activada: true
       },
-      include: [{model: modalidad}]
+      include: [{ model: modalidad }]
     });
     res.status(200).json(data);
   } catch (error) {
@@ -101,22 +106,22 @@ routerConfigPracticas.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] Crear una config_practica con los datos recibidos
 routerConfigPracticas.post('/crear', jsonParser, (req: any, res: any) => {
-    const {nombre, frecuencia_informes,informe_final, id_carrera, activada} = req.body;
-    console.log("Request de creacion de config_practica recibida");
-    config_practica.create({
-        nombre: nombre,
-        frecuencia_informes: frecuencia_informes,
-        informe_final: informe_final,
-        id_carrera: id_carrera,
-        activada: activada
+  const { nombre, frecuencia_informes, informe_final, id_carrera, activada } = req.body;
+  console.log("Request de creacion de config_practica recibida");
+  config_practica.create({
+    nombre: nombre,
+    frecuencia_informes: frecuencia_informes,
+    informe_final: informe_final,
+    id_carrera: id_carrera,
+    activada: activada
+  })
+    .then((resultados: any) => {
+      console.log(resultados);
+      res.status(200).json({ message: "config_practica creada", id: resultados.id });
     })
-    .then((resultados:any) => {
-        console.log(resultados);
-        res.status(200).json({ message: "config_practica creada", id: resultados.id });
-    })
-    .catch((err:any) => {
-        console.log('Error al crear config_practica',err);
-        res.status(500).json({ message: "Error al crear config_practica", error: err});
+    .catch((err: any) => {
+      console.log('Error al crear config_practica', err);
+      res.status(500).json({ message: "Error al crear config_practica", error: err });
     })
 })
 
