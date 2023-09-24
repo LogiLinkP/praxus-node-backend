@@ -48,7 +48,7 @@ export class Scheduler {
         });
 
         //scrape linkedins
-        cron.schedule("*/1 * * * *", () => {
+        cron.schedule("0 0 1 0,6 *", () => {
             console.log('Scrapeando linkedins');
             save_linkedin_data();
         })
