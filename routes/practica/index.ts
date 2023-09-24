@@ -187,9 +187,6 @@ routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
       
       include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: [config_practica] }],
 
-      where: {
-        id_carrera: req.id_carrera,
-      },
     }); 
   
     console.log("\n\n\n\n HOLA");
