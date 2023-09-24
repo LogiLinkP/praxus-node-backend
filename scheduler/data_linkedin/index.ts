@@ -1,4 +1,4 @@
-import { LinkedInProfileScraper } from '../../linkedin-profile-scraper/src';
+import { LinkedInProfileScraper } from '../../linkedin-profile-scraper';
 const { data_linkedin, estudiante } = require("../../models");
 const { Op } = require("sequelize");
 
