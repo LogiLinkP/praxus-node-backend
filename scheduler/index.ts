@@ -3,6 +3,7 @@ const { crear_informes } = require('./informe');
 const { actualizar_ramos } = require('./carrera');
 const { actualizar_empresa } = require('./empresa');
 const { actualizar_encuesta_practica } = require('./config_practica');
+const { save_linkedin_data } = require('./data_linkedin');
 
 
 // cron basics:
@@ -38,7 +39,6 @@ export class Scheduler {
             crear_informes("mensual");
         });
 
-
         cron.schedule('59 23 * * 0', () => {
             //cron.schedule('*/5 * * * *', () => {
             console.log('Actualizando estadisticas de ramos, empresas y encuesta practica');
@@ -46,6 +46,12 @@ export class Scheduler {
             actualizar_empresa();
             actualizar_encuesta_practica();
         });
+
+        //scrape linkedins
+        cron.schedule("0 0 1 1,7 *", () => {
+            console.log('Scrapeando linkedins');
+            save_linkedin_data();
+        })
     }
 }
 
