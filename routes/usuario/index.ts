@@ -169,8 +169,12 @@ routerUsuario.put('/estado_config', jsonParser, async (req: any, res: any) => {
 routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
   let { email, password, cnfPwd, nombre, es_encargado, es_supervisor, es_estudiante, es_admin, extras } = req.body;
   let RUT: any;
+  let id_carrera;
+
   if (es_estudiante) {
     RUT = extras.RUT;
+    id_carrera = extras.id_carrera;
+
   }
   const usuarioSend = { email, password, nombre, es_encargado, es_supervisor, es_estudiante, es_admin };
   let pwdHashed = '';
@@ -222,7 +226,9 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
             id_usuario: _usuario.id,
             nombre_id_org: null,
             id_org: null,
-            rut: RUT
+            rut: RUT,
+            id_carrera: id_carrera
+
           })
           return res.status(200).send({ message: 'Inicio de sesion exitoso', userdata: usuarioSend });
         }
