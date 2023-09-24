@@ -8,31 +8,31 @@ var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
 routerAdmin.post('/asignar-encargado', jsonParser, async (req: any, res: any) => {
-    let lista = [];
-    let { pares } = req.body;
-    console.log(pares);
-    if(pares.length == 1){
-        try{
-            let _carrera = await carrera.findOne({where: {id: pares[0].id_carrera}});
-            if(!_carrera){
-                return res.status(500).send({message: "Carrera no encontrada"});
-            }
-            else{
-                let _encargado = await encargado.findOne({where: {id: pares[0].id_encargado}});
-                if(!_encargado){
-                    return res.status(500).send({message: "Encargado no encontrado"});
-                }
-                else{
-                    await encargado.update({id_carrera: pares[0].id_carrera}, {where: {id: pares[0].id_encargado}});
-                    return res.status(200).send({message: "Encargado asignado exitosamente"});
-                }
-            }
-        }
-        catch(error){
-            console.log(error);
-            return res.status(500).send({message: "Error de conexion"});
-        }
+    let { id_encargado, id_carrera } = req.body;
+    if(id_carrera == -1){
+      id_carrera = null;
     }
+    try{
+      let _carrera = await carrera.findOne({where: {id: id_carrera}});
+      if(!_carrera){
+          return res.status(500).json({message: "Carrera no encontrada"});
+      }
+      else{
+          let _encargado = await encargado.findOne({where: {id: id_encargado}});
+          if(!_encargado){
+              return res.status(500).json({message: "Encargado no encontrado"});
+          }
+          else{
+              await encargado.update({id_carrera: id_carrera}, {where: {id: id_encargado}});
+              return res.status(200).json({message: "Encargado asignado exitosamente"});
+          }
+      }
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).json({message: "Error de conexion"});
+    }
+    
 
 });
 
@@ -51,15 +51,15 @@ routerAdmin.post('/eliminar-encargado', jsonParser, async (req: any, res: any) =
                 id: req.body.id
               }
             })
-            return res.sendStatus(200);
+            return res.status(200).json({message: "Encargado eliminado exitosamente"});
           }
         } else {
-          return res.status(500).send({ message: "Encargado no encontrado" })
+          return res.status(500).json({ message: "Encargado no encontrado" })
         }
       }
       catch (err) {
         console.log(err);
-        return res.status(500).send({ message: "Error interno" });
+        return res.status(500).json({ message: "Error interno" });
       }
 });
 

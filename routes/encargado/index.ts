@@ -1,6 +1,6 @@
 export { };
 
-const { encargado, usuario, estudiante, practica } = require('../../models');
+const { carrera, encargado, usuario, estudiante, practica } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerEncargado = new Router(); // /encargado
@@ -57,24 +57,12 @@ routerEncargado.get('/usuario', async (req: any, res: any) => {
 });
 //[GET] mostrar todos
 routerEncargado.get('/todos', async (req: any, res: any) => {
-  let lista = [];
   try {
-    let data = await encargado.findAll();
-    for (let i = 0; i < data.length; i++) {
-      let user = await usuario.findOne({ where: { id: data[i].id_usuario } })
-      let nombre = user.nombre
-      let correo = user.correo
-      let id_encargado = data[i].id
-      let id_usuario = data[i].id_usuario
-      let id_carrera = data[i].id_carrera
-      if (user) {
-        lista.push({id: id_encargado,id_usuario: id_usuario, id_carrera: id_carrera, nombre: nombre, correo: correo })
-      }
-    }
-    return res.status(200).send({data: lista}); 
+    let data = await encargado.findAll({include: [{model: usuario},{model: carrera}]});
+    return res.status(200).json({data}); 
   } catch (error) {
     console.log(error);
-    return res.status(500).send({ message: "Error interno" });
+    return res.status(500).json({ message: "Error interno" });
   }
 });
 
