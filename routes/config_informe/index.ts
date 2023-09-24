@@ -104,7 +104,7 @@ routerConfigInforme.post('/crear', jsonParser, (req: any, res: any) => {
     tipo_informe: tipo_informe,
   })
   .then((resultados:any) => {
-      res.status(200).json({ message: "config_informe creado" });
+      res.status(200).json({ message: "config_informe creado" , id: resultados.id});
   })
   .catch((err:any) => {
       console.log('Error al crear config_informe', err);
