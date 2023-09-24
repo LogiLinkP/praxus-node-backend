@@ -1,0 +1,3 @@
+[submodule "linkedin-profile-scraper"]
+	path = linkedin-profile-scraper
+	url = https://github.com/LogiLinkP/linkedin-profile-scraper.git
