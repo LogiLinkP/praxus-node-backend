@@ -83,14 +83,16 @@ routerAdmin.get('/todos-encargados-carreras', async (req: any, res: any) => {
 
 routerAdmin.post('/editar-carrera', jsonParser ,async (req: any, res: any) => {
   console.log(req.body)
-  let { id_carrera, nombre_carrera, correos_admitidos } = req.body;
+  let { id_carrera, nombre, correos_admitidos } = req.body;
+  let nombre_carrera = nombre;
+  console.log(nombre_carrera)
   try{
     let _carrera = await carrera.findOne({where: {id: id_carrera}});
     if(!_carrera){
         return res.status(500).json({message: "Carrera no encontrada"});
     }
     else{
-        await carrera.update({nombre: nombre_carrera, correos_admitidos: correos_admitidos}, {where: {id: id_carrera}});
+        await carrera.update({nombre: nombre_carrera,correos_admitidos: correos_admitidos}, {where: {id: id_carrera}});
         return res.status(200).json({message: "Carrera editada exitosamente"});
     }
   }
