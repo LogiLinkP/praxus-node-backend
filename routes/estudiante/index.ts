@@ -168,12 +168,29 @@ routerEstudiante.get('/encargados', async (req: any, res: any) => {
 });
 
 routerEstudiante.put('/linkedin', jsonParser, async (req: any, res: any) => {
-  console.log("HOLAAAAAAAAAAAAAAAAAAAAAa")
-  console.log(req)
   const Estudiante = await estudiante.findOne({ where: { id: req.body.id } })
   if (Estudiante) {
     // actualizar practica
     Estudiante.update({ perfil_linkedin: req.body.link })
+      .then((resultados: any) => {
+        console.log(resultados);
+        res.sendStatus(200);
+      })
+      .catch((err: any) => {
+        res.send(500)
+        console.log('Error al actualizar estudiante', err);
+      })
+  } else {
+    console.log("No existe estudiante con id: ", req.body.id)
+    res.sendStatus(404)
+  }
+})
+
+routerEstudiante.put('/carrera', jsonParser, async (req: any, res: any) => {
+  const Estudiante = await estudiante.findOne({ where: { id: req.body.id } })
+  if (Estudiante) {
+    // actualizar practica
+    Estudiante.update({ id_carrera: req.body.id_carrera })
       .then((resultados: any) => {
         console.log(resultados);
         res.sendStatus(200);
