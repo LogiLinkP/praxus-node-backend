@@ -32,10 +32,10 @@ routerCarrera.get('', async (req: any, res: any) => {
 routerCarrera.get('/todos', async (req: any, res: any) => {
   try {
     const data = await carrera.findAll();
-    res.status(200).json(data);
+    return res.status(200).send(data);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Error interno" });
+    return res.status(500).send({ message: "Error interno" });
   }
 });
 
@@ -93,6 +93,37 @@ routerCarrera.put('/actualizar', jsonParser, async (req: any, res: any) => {
   } else {
     console.log("No existe carrera con id: ", req.query.id)
     res.status(404).json({ message: "No existe carrera con id: " + req.query.id });
+  }
+})
+
+//Implementar con bulkCreate
+routerCarrera.post('/crear-carrera', jsonParser, async (req: any, res: any) => {
+  let { lista } = req.body;
+  let listaCarreras = [];
+  let flag = false;
+  for(let i=0; i<lista.length; i++){
+    let json = {nombre: lista[i]};
+    try{
+      const _query = carrera.findOne({ where: json});
+      if(_query.length > 0){
+        flag = true;
+        continue;
+      }
+      else{
+        listaCarreras.push(json);
+      }
+    }catch(error){
+      console.log(error);
+      return res.status(500).send({ message: "Error de conexion" });
+    }
+  }
+  try {
+    const _carreras = await carrera.bulkCreate(listaCarreras);
+    return res.status(200).send({ message: "Carrera(s) creada exitosamente", carreras: _carreras });
+  }
+  catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error de conexion" });
   }
 })
 

@@ -1,9 +1,14 @@
 export { };
 
-const { encargado, usuario, estudiante, practica } = require('../../models');
+const { carrera, encargado, usuario, estudiante, practica } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerEncargado = new Router(); // /encargado
+
+//Librerias para creacion de encargado
+
+const {sendMail} = require("../../utils/email");
+const crypto = require("crypto");
 
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
@@ -53,30 +58,40 @@ routerEncargado.get('/usuario', async (req: any, res: any) => {
 //[GET] mostrar todos
 routerEncargado.get('/todos', async (req: any, res: any) => {
   try {
-    const data = await encargado.findAll();
-    res.status(200).json(data);
+    let data = await encargado.findAll({include: [{model: usuario},{model: carrera}]});
+    return res.status(200).json({data}); 
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Error interno" });
+    return res.status(500).json({ message: "Error interno" });
   }
 });
 
 //[DELETE] Eliminar
-routerEncargado.delete('/eliminar', (req: any, res: any) => {
+routerEncargado.delete('/eliminar', async (req: any, res: any) => {
   console.log("Eliminando encargado con id: ", req.query.id)
-  encargado.destroy({
-    where: {
-      id: req.query.id
+  try {
+    let data = await encargado.findOne({where: {id: req.query.id}})
+    if (data) {
+      console.log("Encargado existe")
+      let user = await usuario.findOne({where: {id: data.id_usuario}})
+      if (user) {
+        console.log("Usuario existe")
+        usuario.destroy({where: {id: data.id_usuario}})
+        encargado.destroy({
+          where: {
+            id: req.query.id
+          }
+        })
+        return res.sendStatus(200);
+      }
+    } else {
+      return res.status(500).send({ message: "Encargado no encontrado" })
     }
-  })
-    .then((resultados: any) => {
-      console.log(resultados);
-      res.sendStatus(200);
-    })
-    .catch((err: any) => {
-      res.send(500)
-      console.log('Error al eliminar encargado', err);
-    })
+  }
+  catch (err) {
+    console.log(err);
+    return res.status(500).send({ message: "Error interno" });
+  }
 })
 //[POST] Crear uno
 routerEncargado.post('/crear', jsonParser, (req: any, res: any) => {
@@ -139,6 +154,25 @@ routerEncargado.get('/estudiantes', async (req: any, res: any) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error interno" });
+  }
+});
+
+routerEncargado.post('/crear-encargado', jsonParser, async (req: any, res: any) => {
+  let { email } = req.body;
+  console.log(1)
+  try {
+    let token = crypto.randomBytes(32).toString("hex");
+    console.log(2)
+    const link = `${process.env.URL_FRONTEND}/encargado/registro/${token}`;
+    console.log(3)
+    const texto = "Para registrarse en la plataforma Praxus debe ingresar al siguiente enlace: " + link;
+    sendMail(email, "Registro de encargado", texto);
+    console.log(4)
+    return res.status(200).send({ message: "Correo enviado" });
+  }
+  catch (err) { 
+    console.log(err);
+    return res.status(500).send({ message: "Error interno" });
   }
 });
 

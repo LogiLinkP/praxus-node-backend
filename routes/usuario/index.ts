@@ -1,7 +1,7 @@
 export { };
 
 const { Router } = require('express');
-const { usuario, supervisor, estudiante, encargado, actividad_usuarios, token_usuarios, practica, empresa } = require('../../models');
+const { usuario, supervisor, estudiante, encargado, actividad_usuarios, token_usuarios, practica, empresa, carrera } = require('../../models');
 const routerUsuario = new Router();
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
@@ -189,7 +189,6 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
     return res.status(400).send({ message: 'Email ya ocupado' });
   }
   else {
-    console.log("1")
     let hash = await bcrypt.hash(password, 8)
     usuarioSend.password = hash;
     pwdHashed = hash;
@@ -204,12 +203,28 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
         es_admin: es_admin,
         config: null
       })
-
-      console.log(_usuario)
+      console.log(_usuario.es_encargado)
       if (_usuario.es_encargado) {
-        return res.status(200).send({ message: 'Inicio de sesion exitoso', userdata: usuarioSend });
+        try {
+          let _encargado = await encargado.findOne({
+            where: { id_usuario: _usuario.id }
+          })
+          console.log(_encargado)
+          if (_encargado != null) {
+            return res.status(400).send({ message: 'Encargado ya existe' });
+          }
+          else{
+            console.log(1)
+            await encargado.create({ id_usuario: _usuario.id, id_carrera: null, practica_pendiente: null });
+            console.log(2)
+            return res.status(200).send({ message: 'Inicio de sesion exitoso', userdata: usuarioSend });
+          }
+        }
+        catch (err) {
+          return res.status(400).send({ message: 'Error al crear encargado' });
+        }
+        
       }
-      console.log(1)
       if (_usuario.es_supervisor) {
         let trabajador = await supervisor.findAll({ where: { correo: email } })
         if (trabajador != null && trabajador.correo == email) {
