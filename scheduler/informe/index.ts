@@ -46,7 +46,8 @@ export async function crear_informes(frecuencia_informes: string) {
         await informe.create({
             id_practica: practica_aux.id,
             id_config_informe: config_informe_aux.id,
-            horas_trabajadas: 0
+            horas_trabajadas: 0,
+            fecha: new Date(),
         })
     }
 }
