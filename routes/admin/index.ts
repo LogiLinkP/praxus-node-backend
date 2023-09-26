@@ -9,20 +9,22 @@ const jsonParser = bodyParser.json();
 
 routerAdmin.post('/asignar-encargado', jsonParser, async (req: any, res: any) => {
     let { id_encargado, id_carrera } = req.body;
-    if(id_carrera == -1){
-      id_carrera = null;
-    }
+    console.log(id_encargado, id_carrera)
     try{
+      console.log(1)
       let _carrera = await carrera.findOne({where: {id: id_carrera}});
+      console.log(_carrera)
       if(!_carrera){
           return res.status(500).json({message: "Carrera no encontrada"});
       }
       else{
+          console.log(2)
           let _encargado = await encargado.findOne({where: {id: id_encargado}});
           if(!_encargado){
               return res.status(500).json({message: "Encargado no encontrado"});
           }
           else{
+              console.log(3)
               await encargado.update({id_carrera: id_carrera}, {where: {id: id_encargado}});
               return res.status(200).json({message: "Encargado asignado exitosamente"});
           }
@@ -74,6 +76,7 @@ routerAdmin.get('/todos-encargados-carreras', async (req: any, res: any) => {
         id: req.query.id
       }, include: [{model: encargado, include: [{model: usuario}]}]
     });
+    console.log(data)
     res.status(200).json(data);
   } catch (error) {
     console.log(error);
