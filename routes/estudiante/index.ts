@@ -1,6 +1,6 @@
 export { };
 
-const { estudiante, usuario, practica, encargado } = require('../../models');
+const { estudiante, usuario, practica, encargado, carrera } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerEstudiante = new Router();
@@ -152,12 +152,12 @@ routerEstudiante.get('/encargados', async (req: any, res: any) => {
       return;
     }
     console.log(1)
-    const data = await estudiante.findAll({
+    const data = await estudiante.findOne({
       where: {
         id: req.query.id_estudiante
       },
       include: [{
-        model: practica, include: [{ model: encargado, include: [{ model: usuario }] }]
+        model: carrera, include:{ model: encargado, include: { model: usuario } } 
       }]
     });
     return res.status(200).json(data);
@@ -166,5 +166,43 @@ routerEstudiante.get('/encargados', async (req: any, res: any) => {
     res.status(500).json({ message: "Error interno" });
   }
 });
+
+routerEstudiante.put('/linkedin', jsonParser, async (req: any, res: any) => {
+  const Estudiante = await estudiante.findOne({ where: { id: req.body.id } })
+  if (Estudiante) {
+    // actualizar practica
+    Estudiante.update({ perfil_linkedin: req.body.link })
+      .then((resultados: any) => {
+        console.log(resultados);
+        res.sendStatus(200);
+      })
+      .catch((err: any) => {
+        res.send(500)
+        console.log('Error al actualizar estudiante', err);
+      })
+  } else {
+    console.log("No existe estudiante con id: ", req.body.id)
+    res.sendStatus(404)
+  }
+})
+
+routerEstudiante.put('/carrera', jsonParser, async (req: any, res: any) => {
+  const Estudiante = await estudiante.findOne({ where: { id: req.body.id } })
+  if (Estudiante) {
+    // actualizar practica
+    Estudiante.update({ id_carrera: req.body.id_carrera })
+      .then((resultados: any) => {
+        console.log(resultados);
+        res.sendStatus(200);
+      })
+      .catch((err: any) => {
+        res.send(500)
+        console.log('Error al actualizar estudiante', err);
+      })
+  } else {
+    console.log("No existe estudiante con id: ", req.body.id)
+    res.sendStatus(404)
+  }
+})
 
 module.exports = routerEstudiante;

@@ -38,6 +38,22 @@ routerPregSupervisor.get('/id_config_practica', (req:any, res:any) => {
     })
 })
 
+//[GET] obtener aptitudes de una practica
+routerPregSupervisor.get('/aptitudes', (req:any, res:any) => {
+    pregunta_supervisor.findOne({
+        where: {
+            id_config_practica: req.query.id,
+            tipo_respuesta: "evaluacion"
+        }
+    })
+    .then((resultados:any) => {
+      res.status(200).json(resultados);
+    })
+    .catch((err:any) => {
+      res.status(500).json(err);
+    })
+})
+
 //[GET] para obtener una preguntas de supervisor con su ID
 routerPregSupervisor.get('', (req: any, res: any) => {
     console.log("Obteniendo preguntas de supervisor con id: ", req.query.id)

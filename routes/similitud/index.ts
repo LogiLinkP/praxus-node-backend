@@ -172,11 +172,11 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
         },
         {
           model: respuesta_supervisor,
-          required: false,
+          required: true,
           include: [
             {
               model: pregunta_supervisor,
-              required: false,
+              required: true,
               where: { tipo_respuesta: 'abierta' }
             }
           ]
@@ -212,7 +212,7 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
     ) {
       return res.status(200).json(_practica.key_fragmentos);
     }
-
+    console.log("HOLA HOLA ESTOY HACIENDO UNA REQUEST AL PYTHON", textos_supervisor)
     const url = `${process.env.URL_PYTHON_BACKEND}/nlp/frases_representativas_multi?cantidad=${req.query.cantidad ?? 10}&textos=`;
 
     const string_textos_informes = textos_informes.join('|||');
@@ -451,11 +451,11 @@ routerSimilitud.post('/textos_repetidos', jsonParser, async (req: any, res: any)
         },
         {
           model: respuesta_supervisor,
-          required: false,
+          required: true,
           include: [
             {
               model: pregunta_supervisor,
-              required: false,
+              required: true,
               where: { tipo_respuesta: 'abierta' }
             }
           ]

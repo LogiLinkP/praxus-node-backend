@@ -151,6 +151,25 @@ routerPractica.get('/get_asEncargado', (req: any, res: any) => {
     })
 })
 
+//[GET] para obtener todas las practicas de una empresa
+routerPractica.get('/empresa', async (req: any, res: any) => {
+  try {
+    if (!("id" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar id" });
+      return;
+    }
+    const data = await practica.findAll({
+      where: {
+        id_empresa: req.query.id
+      }
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
 //[GET] mostrar todos
 routerPractica.get('/todos', async (req: any, res: any) => {
   try {
@@ -162,11 +181,35 @@ routerPractica.get('/todos', async (req: any, res: any) => {
   }
 });
 
+/*
+//[GET] mostrar todos con filtro
+routerPractica.get('/filtrar', async (req:any, res:any) => {
+  practica.findAll({
+    where: {
+      carrera: req.carrera
+    },
+    include: [{ model: estudiante, include: [usuario] }, config_practica, empresa, supervisor, { model: informe, include: [config_informe] },
+    { model: documento, include: [solicitud_documento] }, documento_extra, { model: respuesta_supervisor, include: [pregunta_supervisor] }, encargado]
+  })
+  .then((resultados: any) => {
+      res.send(resultados);
+  })
+    .catch((err: any) => {
+      console.log('Error al obtener practica', err);
+  })
+})
+*/
+
 routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
   try {
-    const data = await practica.findAll({
-      include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: [config_practica] }]
-    });
+    const data = await practica.findAll({  
+      
+      include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: [config_practica] }],
+
+    }); 
+  
+    console.log("\n\n\n\n HOLA");
+    console.log("Carrera: ", req);
     res.status(200).json(data);
   } catch (error) {
     console.log(error);
@@ -322,15 +365,15 @@ routerPractica.put('/actualizar', jsonParser, async (req: any, res: any) => {
     Practica.update(req.body)
       .then((resultados: any) => {
         console.log(resultados);
-        res.sendStatus(200);
+        res.status(200).json({ message: "practica actualizada" });
       })
       .catch((err: any) => {
-        res.send(500)
+        res.status(500).json({ message: "Error al actualizar practica", error: err});
         console.log('Error al actualizar practica', err);
       })
   } else {
     console.log("No existe practica con id: ", req.query.id)
-    res.sendStatus(404)
+    res.status(404).json({ message: "No existe practica con el id ingresado" });
   }
 })
 
