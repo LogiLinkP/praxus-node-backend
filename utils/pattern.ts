@@ -10,7 +10,7 @@ export function checkMail(email: string, dominios: any) {
     }
     let set = new Set(lista);
     lista = [...set];
-    if(lista.length > 1){
+    if(lista.length > 2){
         return false;
     }
     if (lista.includes(correo[1])) {
