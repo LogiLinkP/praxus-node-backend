@@ -90,7 +90,7 @@ routerNotificacion.post('/crear', jsonParser, (req: any, res: any) => {
       let roomName = "notificaciones" + id_usuario;
       let mensaje_noti = mensaje;
       io.to(roomName).emit('notificacion', { fecha: fecha, message: mensaje_noti, link: enlace });
-      console.log("EMITIENDO EVENTO EN SALA", roomName);
+      //console.log("EMITIENDO EVENTO EN SALA", roomName);
 
       if (estado == "Notificaciones y Correo" || estado == "Sólo Correo") {
         let mensaje_correo: string = mensaje + ". Visite Praxus para revisar.";
