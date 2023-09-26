@@ -7,6 +7,8 @@ const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const {checkMail} = require("../../utils/pattern");
+
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 require('dotenv').config();
@@ -174,6 +176,16 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
   if (es_estudiante) {
     RUT = extras.RUT;
     id_carrera = extras.id_carrera;
+    try{
+      let dominios = await carrera.findAll();
+      console.log(dominios)
+      if(!checkMail(email,dominios)){
+        return res.status(400).json({ message: 'Email no valido' });
+      }
+    }
+    catch(err){
+      return res.status(400).json({ message: 'Error al consultar carreras' });
+    }
 
   }
   const usuarioSend = { email, password, nombre, es_encargado, es_supervisor, es_estudiante, es_admin };
