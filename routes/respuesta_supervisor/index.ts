@@ -3,7 +3,7 @@ import { Op } from "sequelize";
 
 export { };
 
-const { respuesta_supervisor, pregunta_supervisor, practica, informe } = require('../../models');
+const { respuesta_supervisor, pregunta_supervisor, practica, informe, config_informe, pregunta_informe } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerRespuesta_supervisor = new Router();
@@ -64,7 +64,7 @@ routerRespuesta_supervisor.delete('/eliminar', (req: any, res: any) => {
 //[POST] Crear uno
 routerRespuesta_supervisor.post('/responder_encuesta', jsonParser, async (req: any, res: any) => {
   // se asume que los ids de preguntas y las respuestas vienen en el mismo orden, es decir, respuesta[i] está relacionado a pregunta[i]
-  const { ids_preguntas_supervisor, id_practica, respuestas } = req.body;
+  const { ids_preguntas_supervisor, id_practica, respuestas } = req.body; 
 
   console.log("Ids_preguntas_supervisor:", ids_preguntas_supervisor);
   console.log("Id_practica:", id_practica);
@@ -74,7 +74,8 @@ routerRespuesta_supervisor.post('/responder_encuesta', jsonParser, async (req: a
     where: {
       id_practica: id_practica,
       key: { [Op.ne]: null }
-    }
+    },
+    include: {model: config_informe, require: true , include: {model: pregunta_informe, require: true}}
   })
 
   let texto_informes = "";
@@ -82,22 +83,24 @@ routerRespuesta_supervisor.post('/responder_encuesta', jsonParser, async (req: a
   let suma_evaluaciones = 0;
   let cantidad_evaluaciones = 0;
 
+  // Concatenar informes para calculo de consistencia (tomar solo respuestas abiertas)
   if (_informes.length > 0) {
-    // concatenar informes en un solo string POR AHORA SE ASUME QUE TODOS LOS INFORMES TIENEN UNA RESPUESTA CON TEXTO LEGIBLE EN EL CAMPO KEY 
-    // (después pueden haber otras cosas dependiendo del tipo de pregunta, y puede haber más de un elemento) 
+    
     for (let i = 0; i < _informes.length; i++) {
-      console.log("INFORME: ", _informes[i].key);
-      let respuestas_informe = _informes[i].key
-      let first_key = Object.keys(respuestas_informe)[0]; // SOLO SE TOMA LA PRIMERA KEY DEL INFORME
-
-      if (respuestas_informe[first_key] != "") {
-        texto_informes += respuestas_informe[first_key] + ". ";
+      console.log("INFORME: ", _informes[i]);
+      let respuestas_informe = _informes[i].key // la columna key guarda todas las respuestas del informe
+      for (let j = 0; j < Object.keys(respuestas_informe).length; j++) {
+        // find the pregunta_informe tha has the same id as the one in the informe
+        let _pregunta_informe = _informes[i].config_informe.pregunta_informes.find((pregunta: any) => pregunta.id == Object.keys(respuestas_informe)[j]);
+        if (_pregunta_informe.tipo_respuesta == "abierta") {
+          texto_informes += respuestas_informe[Object.keys(respuestas_informe)[j]] + ". ";
+        }
       }
-
     }
     texto_informes = texto_informes.slice(0, -1);
   }
 
+  // Crear respuestas en la bd y concatenar textos de respuestas abiertas para calculo de consistencia
   for (let i = 0; i < ids_preguntas_supervisor.length; i++) {
     try {
       await respuesta_supervisor.create({

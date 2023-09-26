@@ -142,12 +142,12 @@ routerEncargado.get('/estudiantes', async (req: any, res: any) => {
       return;
     }
     console.log(1)
-    const data = await encargado.findAll({
+    const data = await encargado.findOne({
       where: {
         id: req.query.id_encargado
       },
       include: [{
-        model: practica, include: [{ model: estudiante, include: [{ model: usuario }] }]
+        model: carrera, include:{ model: estudiante, include: { model: usuario } } 
       }]
     });
     return res.status(200).json(data);
