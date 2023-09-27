@@ -163,7 +163,7 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
               include: [
                 {
                   model: pregunta_informe,
-                  required: false,
+                  required: true,
                   where: { tipo_respuesta: 'abierta' }
                 }
               ]
@@ -172,7 +172,7 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
         },
         {
           model: respuesta_supervisor,
-          required: true,
+          required: false,
           include: [
             {
               model: pregunta_supervisor,
@@ -183,12 +183,12 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
         }
       ]
     });
-    
+
     if (!_practica) {
-      res.status(404).json({ error: 'Practica no encontrada' });
+      res.status(404).json({ error: 'Practica no encontrada o no tiene respuestas abiertas' });
       return;
     }
-    
+
     let textos_informes: any = [];
     let orden_informes: string[][] = [];
     for (let informe of _practica.informes) {
@@ -265,11 +265,11 @@ routerSimilitud.get('/frases_representativas_practica/:id_practica', jsonParser,
       include: [
         {
           model: informe,
-          required: true,
+          required: false,
           include: [
             {
               model: config_informe,
-              required: true,
+              required: false,
               include: [
                 {
                   model: pregunta_informe,
@@ -282,7 +282,7 @@ routerSimilitud.get('/frases_representativas_practica/:id_practica', jsonParser,
         },
         {
           model: respuesta_supervisor,
-          required: true,
+          required: false,
           include: [
             {
               model: pregunta_supervisor,
@@ -294,7 +294,7 @@ routerSimilitud.get('/frases_representativas_practica/:id_practica', jsonParser,
       ]
     });
     if (!_practica) {
-      res.status(404).json({ error: 'Practica no encontrada' });
+      res.status(404).json({ error: 'Practica no encontrada o no tiene respuestas abiertas' });
       return;
     }
 
