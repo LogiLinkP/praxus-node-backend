@@ -2,19 +2,12 @@ require('dotenv').config();
 
 export function checkMail(email: string, dominios: any) {
     let correo = email.split("@");
-    let lista = [];
-    for(let dominio of dominios){
-        if(dominio.correos_admitidos != null&& dominio.correos_admitidos != ""){
-            lista.push(dominio.correos_admitidos);
+    for (let dominio of dominios) {
+        if (dominio.correos_admitidos && dominio.correos_admitidos != "") {
+            if (correo[1] == dominio.correos_admitidos) {
+                return true;
+            }
         }
-    }
-    let set = new Set(lista);
-    lista = [...set];
-    if(lista.length > 2){
-        return false;
-    }
-    if (lista.includes(correo[1])) {
-        return true;
     }
     return false;
 }
