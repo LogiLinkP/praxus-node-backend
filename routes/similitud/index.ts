@@ -475,13 +475,23 @@ routerSimilitud.post('/textos_repetidos', jsonParser, async (req: any, res: any)
       let ids_preguntas_informe = informe.config_informe.pregunta_informes.map((elem: any) => elem.id.toString());
       ids_preguntas_informe.forEach((id_pregunta: string) => {
         // orden_informes.push([informe.id.toString(), id_pregunta]);
-        textos_informes.push(informe.key[id_pregunta])
+        if (informe.key)
+          textos_informes.push(informe.key[id_pregunta])
       });
     }
-
+    if (textos_informes.length == 0) {
+      Practica.update({
+        key_repeticiones: [],
+        indice_repeticion: 0
+      });
+      return res.status(200).json({
+        key_repeticiones: [],
+        indice_repeticion: 0
+      });
+    }
     const response = await axios.post(process.env.PYTHONBE_REPEATED_SECTIONS, {
       texto1: textos_informes
-    })
+    });
     let cant_palabras_repetidas = 0;
     for (let par of response.data.registro) {
       cant_palabras_repetidas += par[1] * par[0].split(" ").length;
@@ -492,11 +502,11 @@ routerSimilitud.post('/textos_repetidos', jsonParser, async (req: any, res: any)
     }
     Practica.update({
       key_repeticiones: response.data.registro,
-      indice_repeticion: cant_palabras_repetidas / cant_palabras_total
+      indice_repeticion: cant_palabras_total == 0 ? 0 : cant_palabras_repetidas / cant_palabras_total
     })
     return res.status(200).json({
       key_repeticiones: response.data.registro,
-      indice_repeticion: cant_palabras_repetidas / cant_palabras_total
+      indice_repeticion: cant_palabras_total == 0 ? 0 : cant_palabras_repetidas / cant_palabras_total
     });
   } catch (error) {
     console.error(error);
@@ -536,7 +546,6 @@ routerSimilitud.post('/repeticion_respuestas_informe', jsonParser, async (req: a
       try {
         const resp = practica.findAll({ where: { id: id_practica } });
         if (resp.length > 0) {
-          console.log("Actualizando repeticiones de informe para el id", id_practica, "con repeticiones", repeticiones);
           practica.update({ key_repeticiones: repeticiones }, { where: { id: id_practica } })
             .then((resultados: any) => {
               return res.status(200).send({ message: "Repeticiones actualizadas", resultados: resultados });
