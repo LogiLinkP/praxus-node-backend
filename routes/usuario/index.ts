@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const {checkMail} = require("../../utils/pattern");
+const { checkMail } = require("../../utils/pattern");
 
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
@@ -176,14 +176,16 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
   if (es_estudiante) {
     RUT = extras.RUT;
     id_carrera = extras.id_carrera;
-    try{
+    try {
       let dominios = await carrera.findAll();
-      console.log(dominios)
-      if(!checkMail(email,dominios)){
+      dominios.forEach((element: any) => {
+        console.log(element.correos_admitidos)
+      });
+      if (!checkMail(email, dominios)) {
         return res.status(400).json({ message: 'Email no valido' });
       }
     }
-    catch(err){
+    catch (err) {
       return res.status(400).json({ message: 'Error al consultar carreras' });
     }
 
@@ -225,7 +227,7 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
           if (_encargado != null) {
             return res.status(400).send({ message: 'Encargado ya existe' });
           }
-          else{
+          else {
             console.log(1)
             await encargado.create({ id_usuario: _usuario.id, id_carrera: null, practica_pendiente: null });
             console.log(2)
@@ -235,7 +237,7 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
         catch (err) {
           return res.status(400).send({ message: 'Error al crear encargado' });
         }
-        
+
       }
       if (_usuario.es_supervisor) {
         let trabajador = await supervisor.findAll({ where: { correo: email } })
