@@ -56,10 +56,16 @@ routerConfigPracticas.get('/buscar', async (req: any, res: any) => {
 //[GET] obtener una config_practica por nombre SÓLO SI ESTÁ ACTIVADA
 routerConfigPracticas.get('/nombre', async (req: any, res: any) => {
   try {
+    const { nombre, id_carrera } = req.query;
+    if (!nombre || !id_carrera) {
+      res.status(406).json({ message: "Se requiere ingresar nombre e id_carrera de config_practica" });
+      return;
+    }
     const data = await config_practica.findOne({
       where: {
-        nombre: req.query.nombre,
-        activada: true
+        nombre: nombre,
+        activada: true,
+        id_carrera: id_carrera
       },
       include: [{ model: modalidad }]
     });
