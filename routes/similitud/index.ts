@@ -145,10 +145,12 @@ routerSimilitud.post('/consistencia_evaluacion_informe', jsonParser, async (req:
 
 routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser, async (req: any, res: any) => {
   const { id_practica } = req.params;
+  console.log("id_practica", id_practica)
   if (!id_practica) {
     res.status(400).json({ error: 'Practica no especificada' });
     return;
   }
+  console.log(1);
   try {
     const _practica = await practica.findOne({
       where: { id: id_practica },
@@ -163,7 +165,7 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
               include: [
                 {
                   model: pregunta_informe,
-                  required: false,
+                  required: true,
                   where: { tipo_respuesta: 'abierta' }
                 }
               ]
@@ -172,7 +174,7 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
         },
         {
           model: respuesta_supervisor,
-          required: true,
+          required: false,
           include: [
             {
               model: pregunta_supervisor,
@@ -183,19 +185,18 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
         }
       ]
     });
-    
     if (!_practica) {
-      res.status(404).json({ error: 'Practica no encontrada' });
+      res.status(404).json({ error: 'Practica no encontrada o no tiene respuestas abiertas' });
       return;
     }
-    
     let textos_informes: any = [];
     let orden_informes: string[][] = [];
     for (let informe of _practica.informes) {
       let ids_preguntas_informe = informe.config_informe.pregunta_informes.map((elem: any) => elem.id.toString());
       ids_preguntas_informe.forEach((id_pregunta: string) => {
         orden_informes.push([informe.id.toString(), id_pregunta]);
-        textos_informes.push(informe.key[id_pregunta])
+        if (informe.key)
+          textos_informes.push(informe.key[id_pregunta])
       });
     }
 
@@ -265,11 +266,11 @@ routerSimilitud.get('/frases_representativas_practica/:id_practica', jsonParser,
       include: [
         {
           model: informe,
-          required: true,
+          required: false,
           include: [
             {
               model: config_informe,
-              required: true,
+              required: false,
               include: [
                 {
                   model: pregunta_informe,
@@ -282,7 +283,7 @@ routerSimilitud.get('/frases_representativas_practica/:id_practica', jsonParser,
         },
         {
           model: respuesta_supervisor,
-          required: true,
+          required: false,
           include: [
             {
               model: pregunta_supervisor,
@@ -294,7 +295,7 @@ routerSimilitud.get('/frases_representativas_practica/:id_practica', jsonParser,
       ]
     });
     if (!_practica) {
-      res.status(404).json({ error: 'Practica no encontrada' });
+      res.status(404).json({ error: 'Practica no encontrada o no tiene respuestas abiertas' });
       return;
     }
 
@@ -303,8 +304,10 @@ routerSimilitud.get('/frases_representativas_practica/:id_practica', jsonParser,
     for (let informe of _practica.informes) {
       let ids_preguntas_informe = informe.config_informe.pregunta_informes.map((elem: any) => elem.id.toString());
       ids_preguntas_informe.forEach((id_pregunta: string) => {
-        orden_informes.push([informe.id.toString(), id_pregunta]);
-        textos_informes.push(informe.key[id_pregunta])
+        if (informe.key) {
+          orden_informes.push([informe.id.toString(), id_pregunta]);
+          textos_informes.push(informe.key[id_pregunta])
+        }
       });
     }
 
@@ -472,13 +475,23 @@ routerSimilitud.post('/textos_repetidos', jsonParser, async (req: any, res: any)
       let ids_preguntas_informe = informe.config_informe.pregunta_informes.map((elem: any) => elem.id.toString());
       ids_preguntas_informe.forEach((id_pregunta: string) => {
         // orden_informes.push([informe.id.toString(), id_pregunta]);
-        textos_informes.push(informe.key[id_pregunta])
+        if (informe.key)
+          textos_informes.push(informe.key[id_pregunta])
       });
     }
-
+    if (textos_informes.length == 0) {
+      Practica.update({
+        key_repeticiones: [],
+        indice_repeticion: 0
+      });
+      return res.status(200).json({
+        key_repeticiones: [],
+        indice_repeticion: 0
+      });
+    }
     const response = await axios.post(process.env.PYTHONBE_REPEATED_SECTIONS, {
       texto1: textos_informes
-    })
+    });
     let cant_palabras_repetidas = 0;
     for (let par of response.data.registro) {
       cant_palabras_repetidas += par[1] * par[0].split(" ").length;
@@ -489,11 +502,11 @@ routerSimilitud.post('/textos_repetidos', jsonParser, async (req: any, res: any)
     }
     Practica.update({
       key_repeticiones: response.data.registro,
-      indice_repeticion: cant_palabras_repetidas / cant_palabras_total
+      indice_repeticion: cant_palabras_total == 0 ? 0 : cant_palabras_repetidas / cant_palabras_total
     })
     return res.status(200).json({
       key_repeticiones: response.data.registro,
-      indice_repeticion: cant_palabras_repetidas / cant_palabras_total
+      indice_repeticion: cant_palabras_total == 0 ? 0 : cant_palabras_repetidas / cant_palabras_total
     });
   } catch (error) {
     console.error(error);
@@ -533,7 +546,6 @@ routerSimilitud.post('/repeticion_respuestas_informe', jsonParser, async (req: a
       try {
         const resp = practica.findAll({ where: { id: id_practica } });
         if (resp.length > 0) {
-          console.log("Actualizando repeticiones de informe para el id", id_practica, "con repeticiones", repeticiones);
           practica.update({ key_repeticiones: repeticiones }, { where: { id: id_practica } })
             .then((resultados: any) => {
               return res.status(200).send({ message: "Repeticiones actualizadas", resultados: resultados });
