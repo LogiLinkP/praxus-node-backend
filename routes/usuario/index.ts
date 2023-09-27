@@ -182,7 +182,7 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
         console.log(element.correos_admitidos)
       });
       if (!checkMail(email, dominios)) {
-        return res.status(400).json({ message: 'Email no valido' });
+        return res.status(400).json({ message: 'Dominio de correo no valido' });
       }
     }
     catch (err) {
