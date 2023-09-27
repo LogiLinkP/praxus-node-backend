@@ -26,8 +26,8 @@ routerPractica.get('', async (req: any, res: any) => {
       where: {
         id: req.query.id
       },
-      include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: {model: config_practica, include: {model: solicitud_documento}}}, 
-      empresa, supervisor, { model: informe, include: [config_informe] }, { model: documento, include: [solicitud_documento] }, documento_extra,
+      include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: { model: config_practica, include: { model: solicitud_documento } } },
+        empresa, supervisor, { model: informe, include: [config_informe] }, { model: documento, include: [solicitud_documento] }, documento_extra,
       { model: respuesta_supervisor, include: [pregunta_supervisor] }]
     });
     res.status(200).json(data);
@@ -59,22 +59,22 @@ routerPractica.get('/preguntas_supervisor', async (req: any, res: any) => {
 
 //[GET] para obtener todas las practica con config_practica
 routerPractica.get('/configs', async (req: any, res: any) => {
-    try {
-      if (!("id" in req.query)) {
-        res.status(406).json({ message: "Se requiere ingresar id" });
-        return;
-      }
-      const data = await practica.findAll({
-        where: {
-          id_config_practica: req.query.id
-        }
-      });
-      res.status(200).json(data);
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: "Error interno" });
+  try {
+    if (!("id" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar id" });
+      return;
     }
-  });
+    const data = await practica.findAll({
+      where: {
+        id_config_practica: req.query.id
+      }
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
 
 //[GET] para obtener una practica con el id encriptado (debe venir un token y un iv)
 routerPractica.get('/encrypted', async (req: any, res: any) => {
@@ -121,8 +121,9 @@ routerPractica.get('/get_asEstudiante', (req: any, res: any) => {
       id_estudiante: req.query.id_estudiante
     },
     include: [{ model: estudiante, include: [usuario] }, {
-      model: modalidad, include: {model: config_practica, include: [{ model: solicitud_documento },  {model: config_informe, include:[pregunta_informe]}]}}, empresa,
-      supervisor, { model: informe, include: {model: config_informe, include:[pregunta_informe]} }, { model: documento, include: [solicitud_documento] },
+      model: modalidad, include: { model: config_practica, include: [{ model: solicitud_documento }, { model: config_informe, include: [pregunta_informe] }] }
+    }, empresa,
+      supervisor, { model: informe, include: { model: config_informe, include: [pregunta_informe] } }, { model: documento, include: [solicitud_documento] },
       documento_extra, { model: respuesta_supervisor, include: [pregunta_supervisor] }, { model: encargado, include: [usuario] }]
   })
     .then((resultados: any) => {
@@ -202,12 +203,12 @@ routerPractica.get('/filtrar', async (req:any, res:any) => {
 
 routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
   try {
-    const data = await practica.findAll({  
-      
+    const data = await practica.findAll({
+
       include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: [config_practica] }],
 
-    }); 
-  
+    });
+
     console.log("\n\n\n\n HOLA");
     console.log("Carrera: ", req);
     res.status(200).json(data);
@@ -368,7 +369,7 @@ routerPractica.put('/actualizar', jsonParser, async (req: any, res: any) => {
         res.status(200).json({ message: "practica actualizada" });
       })
       .catch((err: any) => {
-        res.status(500).json({ message: "Error al actualizar practica", error: err});
+        res.status(500).json({ message: "Error al actualizar practica", error: err });
         console.log('Error al actualizar practica', err);
       })
   } else {
@@ -427,9 +428,10 @@ routerPractica.post("/resumen", jsonParser, async (req: any, res: any) => {
     let texto_informe = "";
     for (let inf of Informe) {
       let key = inf.key;
+      if (!key) continue;
       for (let pregunta of inf.config_informe.pregunta_informes) {
         texto_informe += pregunta.enunciado + " ";
-        texto_informe += key[pregunta.id] + " ";
+        texto_informe += (key[pregunta.id] || "") + " ";
       }
     }
     texto_informe = texto_informe.trim();
@@ -440,7 +442,7 @@ routerPractica.post("/resumen", jsonParser, async (req: any, res: any) => {
     for (let resp of RespuestaSupervisor) {
       if (!resp.pregunta_supervisor) continue;
       texto_supervisor += resp.pregunta_supervisor.enunciado + " ";
-      texto_supervisor += resp.respuesta + " ";
+      texto_supervisor += (resp.respuesta || "") + " ";
     }
     texto_supervisor = texto_supervisor.trim();
     const sup_valido = texto_supervisor.length > 0;
