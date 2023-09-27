@@ -145,10 +145,12 @@ routerSimilitud.post('/consistencia_evaluacion_informe', jsonParser, async (req:
 
 routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser, async (req: any, res: any) => {
   const { id_practica } = req.params;
+  console.log("id_practica", id_practica)
   if (!id_practica) {
     res.status(400).json({ error: 'Practica no especificada' });
     return;
   }
+  console.log(1);
   try {
     const _practica = await practica.findOne({
       where: { id: id_practica },
@@ -183,19 +185,18 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
         }
       ]
     });
-
     if (!_practica) {
       res.status(404).json({ error: 'Practica no encontrada o no tiene respuestas abiertas' });
       return;
     }
-
     let textos_informes: any = [];
     let orden_informes: string[][] = [];
     for (let informe of _practica.informes) {
       let ids_preguntas_informe = informe.config_informe.pregunta_informes.map((elem: any) => elem.id.toString());
       ids_preguntas_informe.forEach((id_pregunta: string) => {
         orden_informes.push([informe.id.toString(), id_pregunta]);
-        textos_informes.push(informe.key[id_pregunta])
+        if (informe.key)
+          textos_informes.push(informe.key[id_pregunta])
       });
     }
 
@@ -303,8 +304,10 @@ routerSimilitud.get('/frases_representativas_practica/:id_practica', jsonParser,
     for (let informe of _practica.informes) {
       let ids_preguntas_informe = informe.config_informe.pregunta_informes.map((elem: any) => elem.id.toString());
       ids_preguntas_informe.forEach((id_pregunta: string) => {
-        orden_informes.push([informe.id.toString(), id_pregunta]);
-        textos_informes.push(informe.key[id_pregunta])
+        if (informe.key) {
+          orden_informes.push([informe.id.toString(), id_pregunta]);
+          textos_informes.push(informe.key[id_pregunta])
+        }
       });
     }
 
