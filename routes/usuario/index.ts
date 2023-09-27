@@ -26,7 +26,6 @@ routerUsuario.get('/todos', async (req: any, res: any) => {
 
 //[GET] para obtener un usuario con su ID
 routerUsuario.get('', (req: any, res: any) => {
-  console.log("Obteniendo usuario de id: ", req.query.id)
   usuario.findOne({
     where: {
       id: req.query.id
@@ -43,7 +42,6 @@ routerUsuario.get('', (req: any, res: any) => {
 //[POST] Crear un usuario con los datos recibidos
 routerUsuario.post('/crear', jsonParser, (req: any, res: any) => {
   const { correo, password, nombre, es_encargado, es_supervisor, es_estudiante, es_admin, config } = req.body;
-  console.log("Request de creacion de usuario recibida");
   // hacer post a python backend
   usuario.create({
     correo: correo,
@@ -57,7 +55,6 @@ routerUsuario.post('/crear', jsonParser, (req: any, res: any) => {
 
   })
     .then((resultados: any) => {
-      console.log(resultados);
       res.send("Usuario creado");
     })
     .catch((err: any) => {
@@ -67,14 +64,12 @@ routerUsuario.post('/crear', jsonParser, (req: any, res: any) => {
 
 //[DELETE] Eliminar usuario con su ID
 routerUsuario.delete('/eliminar', (req: any, res: any) => {
-  console.log("Eliminando usuario con id: ", req.query.id)
   usuario.destroy({
     where: {
       id: req.query.id
     }
   })
     .then((resultados: any) => {
-      console.log(resultados);
       res.sendStatus(200);
     })
     .catch((err: any) => {
@@ -89,7 +84,6 @@ routerUsuario.put('/actualizar', jsonParser, async (req: any, res: any) => {
   if (Usuario) {
     Usuario.update(req.body)
       .then((resultados: any) => {
-        console.log(resultados);
         res.sendStatus(200);
       })
       .catch((err: any) => {
@@ -134,13 +128,11 @@ routerUsuario.post('/login', jsonParser, async (req: any, res: any) => {
       fecha: date,
       useragent: useragent
     })
-    console.log(2)
     //por comprobar si es valido hacer esto
     await token_usuarios.create({
       id_usuario: resultados.id_usuario,
       token: token
     })
-    console.log(3)
     return res.status(200).send({ message: 'Inicio de sesion correcto', userdata: resultados, token });
   } catch (err) {
     console.error(err)
@@ -151,11 +143,9 @@ routerUsuario.post('/login', jsonParser, async (req: any, res: any) => {
 
 routerUsuario.put('/estado_config', jsonParser, async (req: any, res: any) => {
   const Usuario = await usuario.findOne({ where: { id: req.body.id } })
-  console.log(req.body);
   if (Usuario) {
     const Usuario_Update = usuario.update({ config: req.body.estado }, { where: { id: req.body.id } })
       .then((resultados: any) => {
-        console.log(resultados);
         return res.status(200).send({ message: 'Estado cambiado con éxito', userdata: Usuario });
       })
       .catch((err: any) => {
@@ -178,9 +168,6 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
     id_carrera = extras.id_carrera;
     try {
       let dominios = await carrera.findAll();
-      dominios.forEach((element: any) => {
-        console.log(element.correos_admitidos)
-      });
       if (!checkMail(email, dominios)) {
         return res.status(400).json({ message: 'Dominio de correo no valido' });
       }
@@ -196,7 +183,6 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
   if (!cnfPwd || password != cnfPwd) {
     return res.status(400).send({ message: 'Contraseñas no coinciden' });
   }
-  console.log(email);
   // Verifico si correo ya se ocu
   const data = await usuario.findOne({ where: { correo: email } })
   if (data != null) {
@@ -217,20 +203,16 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
         es_admin: es_admin,
         config: null
       })
-      console.log(_usuario.es_encargado)
       if (_usuario.es_encargado) {
         try {
           let _encargado = await encargado.findOne({
             where: { id_usuario: _usuario.id }
           })
-          console.log(_encargado)
           if (_encargado != null) {
             return res.status(400).send({ message: 'Encargado ya existe' });
           }
           else {
-            console.log(1)
             await encargado.create({ id_usuario: _usuario.id, id_carrera: null, practica_pendiente: null });
-            console.log(2)
             return res.status(200).send({ message: 'Inicio de sesion exitoso', userdata: usuarioSend });
           }
         }
@@ -343,12 +325,9 @@ routerUsuario.post('/estudiantes_revisados', jsonParser, async (req: any, res: a
   let inicio = '';
   let fin = '';
   let lista = [];
-  console.log(id_usuario)
   try {
     let query = await supervisor.findOne({ where: { id_usuario: id_usuario } })
     let query2 = await practica.findAll({ where: { id_supervisor: query.id } })
-    console.log("query2")
-    console.log(query2)
     for (let i = 0; i < query2.length; i++) {
       let query3 = await estudiante.findAll({ where: { id: query2[i].id_estudiante } })
       for (let j = 0; j < query3.length; j++) {
