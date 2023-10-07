@@ -182,25 +182,6 @@ routerPractica.get('/todos', async (req: any, res: any) => {
   }
 });
 
-/*
-//[GET] mostrar todos con filtro
-routerPractica.get('/filtrar', async (req:any, res:any) => {
-  practica.findAll({
-    where: {
-      carrera: req.carrera
-    },
-    include: [{ model: estudiante, include: [usuario] }, config_practica, empresa, supervisor, { model: informe, include: [config_informe] },
-    { model: documento, include: [solicitud_documento] }, documento_extra, { model: respuesta_supervisor, include: [pregunta_supervisor] }, encargado]
-  })
-  .then((resultados: any) => {
-      res.send(resultados);
-  })
-    .catch((err: any) => {
-      console.log('Error al obtener practica', err);
-  })
-})
-*/
-
 routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
   try {
     const data = await practica.findAll({
@@ -343,7 +324,8 @@ routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
     key_repeticiones: key_repeticiones,
     key_fragmentos: key_fragmentos,
     calificacion_empresa: calificacion_empresa,
-    comentario_empresa: comentario_empresa
+    comentario_empresa: comentario_empresa,
+    ev_encargado: "-",
   })
     .then((resultados: any) => {
       res.status(200).json({ mensaje: "ok" });
@@ -471,8 +453,26 @@ routerPractica.post("/resumen", jsonParser, async (req: any, res: any) => {
     return res.status(500).json({ message: "Error interno" });
   }
 
-
+  
 });
 
+routerPractica.put("/ev_encargado", jsonParser, async (req: any, res: any) => {
+  try {
+    let { id_practica, evaluacion} = req.body;
+    const data = await practica.update({
+      ev_encargado: evaluacion
+    }, {
+      where: {
+        id_practica
+      }
+    }).then((resultados: any) => {
+      console.log(resultados);
+      res.status(200).json({ message: "Estado actualizado" });
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+  })
 
 module.exports = routerPractica;
