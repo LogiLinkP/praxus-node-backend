@@ -360,6 +360,34 @@ routerPractica.put('/actualizar', jsonParser, async (req: any, res: any) => {
   }
 })
 
+routerPractica.put('/eval_encargado', jsonParser, async (req: any, res: any) => {
+  try {
+    let { id_practica, ev_encargado} = req.body;
+    if(!id_practica || !ev_encargado){
+      return res.status(400).json({message: "Debe ingresar id_practica y evaluacion"});
+    }
+    console.log("1")
+    const data = await practica.findOne(
+      {where: {
+        id: id_practica
+      }}
+    )
+    console.log("2")
+    if(!data){
+      return res.status(400).json({message: "No se pudo encontrar la practica"});
+    }
+    console.log(data)
+    await data.update({
+      ev_encargado: ev_encargado
+    })
+    console.log(data);
+    res.status(200).json({ message: "Estado actualizado" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
 routerPractica.post("/resumen", jsonParser, async (req: any, res: any) => {
   const { id_practica } = req.query;
   if (!id_practica) {
@@ -455,24 +483,5 @@ routerPractica.post("/resumen", jsonParser, async (req: any, res: any) => {
 
   
 });
-
-routerPractica.put("/ev_encargado", jsonParser, async (req: any, res: any) => {
-  try {
-    let { id_practica, evaluacion} = req.body;
-    const data = await practica.update({
-      ev_encargado: evaluacion
-    }, {
-      where: {
-        id_practica
-      }
-    }).then((resultados: any) => {
-      console.log(resultados);
-      res.status(200).json({ message: "Estado actualizado" });
-    })
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Error interno" });
-  }
-  })
 
 module.exports = routerPractica;
