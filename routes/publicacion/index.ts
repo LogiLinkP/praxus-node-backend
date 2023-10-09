@@ -8,7 +8,7 @@ var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
 //[GET] Obtener todas las publicaciones de una carrera
-routerpublicacion.get("/todas",  (req:any, res:any) => {
+routerpublicacion.get('/todas',  (req:any, res:any) => {
     publicacion.findAll({
         where: {
             id_carrera: req.query.id_carrera
@@ -25,7 +25,7 @@ routerpublicacion.get("/todas",  (req:any, res:any) => {
 
 //[GET] Obtener las publicaciones de un encargado
 
-routerpublicacion.get("/encargado",  (req:any, res:any) => {
+routerpublicacion.get('/encargado',  (req:any, res:any) => {
   publicacion.findAll({
       where: {
           id_encargado: req.query.id_encargado
@@ -66,18 +66,36 @@ routerpublicacion.post('/crear', jsonParser, (req: any, res: any) => {
 //[PUT] Modificar el titulo y/o enunciado de una publicacion
 
 routerpublicacion.put('/editar', jsonParser, async (req: any, res: any) => {
-    const Publicacion = await publicacion.findOne({ where: { id: req.body.id } })
-    if (Publicacion) {
-      Publicacion.update({ titulo: req.body.titulo, enunciado: req.body.enunciado })
-        .then((resultados: any) => {
-          res.sendStatus(200);
-        })
-        .catch((err: any) => {
-          res.send(500)
-          console.log('Error al actualizar publicacion', err);
-        })
-    } else {
-      console.log("No existe publicacion con id: ", req.query.id)
-      res.sendStatus(404)
+  const Publicacion = await publicacion.findOne({ where: { id: req.body.id } })
+  if (Publicacion) {
+    Publicacion.update({ titulo: req.body.titulo, enunciado: req.body.enunciado })
+      .then((resultados: any) => {
+        res.sendStatus(200);
+      })
+      .catch((err: any) => {
+        res.send(500)
+        console.log('Error al actualizar publicacion', err);
+      })
+  } else {
+    console.log("No existe publicacion con id: ", req.query.id)
+    res.sendStatus(404)
+    }
+})
+
+//[DELETE] Borrar Publicación
+routerpublicacion.delete('/eliminar',(req:any, res:any) => {
+  console.log("Eliminando publicacion con id: ", req.query.id)
+  publicacion.destroy({
+    where: {
+      id: req.query.id
     }
   })
+  .then((resultados:any) => {
+    console.log(resultados);
+    res.sendStatus(200);
+  })
+  .catch((err:any) => {
+    res.send(500)
+    console.log('Error al eliminar publicacion', err);
+  })
+})
