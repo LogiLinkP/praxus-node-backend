@@ -76,6 +76,27 @@ routerConfigPracticas.get('/nombre', async (req: any, res: any) => {
   }
 });
 
+//[GET] obtener las config_practica por carrera SÓLO SI ESTÁN ACTIVADAS
+routerConfigPracticas.get('/carrera', async (req: any, res: any) => {
+  try {
+    const { id_carrera } = req.query;
+    if (!id_carrera) {
+      res.status(406).json({ message: "Se requiere ingresar id_carrera de config_practica" });
+      return;
+    }
+    const data = await config_practica.findAll({
+      where: {
+        activada: true,
+        id_carrera: id_carrera
+      },
+      include: [{ model: modalidad }]
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
 
 
 //[GET] mostrar todas las config_practicas
