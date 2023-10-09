@@ -14,17 +14,16 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   publicacion.init({
-    id: DataTypes.INTEGER,
     id_encargado: DataTypes.INTEGER,
     id_carrera: DataTypes.INTEGER,
     titulo: DataTypes.STRING,
     enunciado: DataTypes.STRING,
     fecha: DataTypes.DATE,
-    isfijo: DataTypes.BOOLEAN,
+    isfijo: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'publicacion',
-    timestamps: false
+    timestamps: false,
   });
   return publicacion;
 };
