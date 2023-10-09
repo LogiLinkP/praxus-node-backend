@@ -8,36 +8,54 @@ var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
 //[GET] Obtener todas las publicaciones de una carrera
-routerpublicacion.get('/todas',  (req:any, res:any) => {
-    publicacion.findAll({
+routerpublicacion.get('/todas', jsonParser, async (req:any, res:any) => {
+  try{
+    const id_carrera = req.query.id_carrera;
+    if(!id_carrera){
+      return res.status(400).json({message: "Debe ingresar id_carrera"});
+    }
+
+    const data = await publicacion.findAll({
         where: {
-            id_carrera: req.query.id_carrera
+            id_carrera: id_carrera
         }
     })
-    .then((resultados:any) => {
-      res.send(resultados)
-    })
-    .catch((err:any) => {
+
+    if(!data){
+      return res.status(400).json({message: "No se pudo encontrar la practica"});
+    }
+    console.log("Publicaciones Obtenidas")
+    res.send(data)
+  }catch(err) {
       console.log('Error al mostrar todas las publicaciones', err);
       res.send('Error al mostrar todas las publicaciones', err);
-    })
+    }
 })
 
 //[GET] Obtener las publicaciones de un encargado
 
-routerpublicacion.get('/encargado',  (req:any, res:any) => {
-  publicacion.findAll({
-      where: {
-          id_encargado: req.query.id_encargado
-      }
-  })
-  .then((resultados:any) => {
-    res.send(resultados)
-  })
-  .catch((err:any) => {
-    console.log('Error al mostrar las publicaciones', err);
-    res.send('Error al mostrar las publicaciones', err);
-  })
+routerpublicacion.get('/encargado', jsonParser, async (req:any, res:any) => {
+  try{
+    const id_encargado = req.query.id_encargado;
+    if(!id_encargado){
+      return res.status(400).json({message: "Debe ingresar id_encargado"});
+    }
+
+    const data = await publicacion.findAll({
+        where: {
+            id_encargado: id_encargado
+        }
+    })
+
+    if(!data){
+      return res.status(400).json({message: "No se pudo encontrar la practica"});
+    }
+    console.log("Publicaciones Obtenidas")
+    res.send(data)
+  }catch(err) {
+      console.log('Error al mostrar todas las publicaciones', err);
+      res.send('Error al mostrar todas las publicaciones', err);
+    }
 })
 
 //[POST] Agregar una nueva publicacion
@@ -99,3 +117,5 @@ routerpublicacion.delete('/eliminar',(req:any, res:any) => {
     console.log('Error al eliminar publicacion', err);
   })
 })
+
+module.exports = routerpublicacion;
