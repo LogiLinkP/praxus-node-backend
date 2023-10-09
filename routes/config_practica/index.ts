@@ -2,7 +2,7 @@ import { where } from "sequelize";
 
 export { };
 
-const { config_practica, modalidad } = require('../../models');
+const { config_practica, modalidad, pregunta_encuesta_final, config_informe, solicitud_documento, pregunta_supervisor, } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerConfigPracticas = new Router();
@@ -76,7 +76,21 @@ routerConfigPracticas.get('/nombre', async (req: any, res: any) => {
   }
 });
 
-
+//[GET] obtener todas las config_practicas activadas de una carrera
+routerConfigPracticas.get('/carrera', async (req: any, res: any) => {
+  try {
+    const data = await config_practica.findAll({
+      where: {
+        activada: true,
+        id_carrera: req.query.id
+      }
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log("error: ", error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
 
 //[GET] mostrar todas las config_practicas
 routerConfigPracticas.get('/todos', async (req: any, res: any) => {
