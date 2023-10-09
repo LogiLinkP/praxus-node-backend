@@ -2,7 +2,6 @@ export { };
 
 const { publicacion } = require('../../models');
 const { Router } = require('express');
-const sequelize = require('../../db');
 const routerpublicacion = new Router();
 
 var bodyParser = require('body-parser');
@@ -10,7 +9,6 @@ const jsonParser = bodyParser.json();
 
 //[GET] Obtener todas las publicaciones de una carrera
 routerpublicacion.get("/todas",  (req:any, res:any) => {
-    console.log("Obteniendo todas las preguntas de practica con id_config_practica: ", req.query.id)
     publicacion.findAll({
         where: {
             id_carrera: req.query.id_carrera
@@ -20,9 +18,26 @@ routerpublicacion.get("/todas",  (req:any, res:any) => {
       res.send(resultados)
     })
     .catch((err:any) => {
-      console.log('Error al mostrar todas las preguntas de practica', err);
-      res.send('Error al mostrar todas las preguntas de practica', err);
+      console.log('Error al mostrar todas las publicaciones', err);
+      res.send('Error al mostrar todas las publicaciones', err);
     })
+})
+
+//[GET] Obtener las publicaciones de un encargado
+
+routerpublicacion.get("/encargado",  (req:any, res:any) => {
+  publicacion.findAll({
+      where: {
+          id_encargado: req.query.id_encargado
+      }
+  })
+  .then((resultados:any) => {
+    res.send(resultados)
+  })
+  .catch((err:any) => {
+    console.log('Error al mostrar las publicaciones', err);
+    res.send('Error al mostrar las publicaciones', err);
+  })
 })
 
 //[POST] Agregar una nueva publicacion
@@ -47,6 +62,8 @@ routerpublicacion.post('/crear', jsonParser, (req: any, res: any) => {
         res.status(500).json({ message: "Error al crear publicacion", error: err});
     })
 })
+
+//[PUT] Modificar el titulo y/o enunciado de una publicacion
 
 routerpublicacion.put('/editar', jsonParser, async (req: any, res: any) => {
     const Publicacion = await publicacion.findOne({ where: { id: req.body.id } })
