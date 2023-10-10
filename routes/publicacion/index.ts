@@ -102,8 +102,13 @@ routerpublicacion.put('/editar', jsonParser, async (req: any, res: any) => {
 })
 
 //[DELETE] Borrar Publicación
-routerpublicacion.delete('/eliminar',(req:any, res:any) => {
-  console.log("Eliminando publicacion con id: ", req.query.id)
+routerpublicacion.delete('/eliminar', (req:any, res:any) => {
+  console.log(req.query)
+  console.log(req.body)
+  const Publicacion = publicacion.findOne({ where: { id: req.query.id } })
+  if(!Publicacion){
+    return res.status(400).json({message: "No hay publicacion"});
+  }
   publicacion.destroy({
     where: {
       id: req.query.id
