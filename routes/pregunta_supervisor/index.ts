@@ -1,6 +1,6 @@
 export { };
 
-const { pregunta_supervisor } = require('../../models');
+const { pregunta_supervisor, practica, config_practica, modalidad, carrera, aptitud } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerPregSupervisor = new Router();
@@ -125,6 +125,33 @@ routerPregSupervisor.post('/crear', jsonParser, (req: any, res: any) => {
         console.log('Error al crear preguntas de supervisor', err);
         res.status(500).json({ message: "Error al crear preguntas de supervisor", error: err});
     })
+})
+
+routerPregSupervisor.post('/aptitudes', jsonParser, async (req: any, res: any) => {
+  let { id_practica } =req.body;
+  console.log(1, id_practica, typeof id_practica, typeof parseInt(id_practica))
+  try{
+    console.log(2)
+    let _data = await practica.findOne({
+      where: {
+        id: id_practica
+      }
+      ,include: [{model: config_practica,
+         include: [{model: carrera, 
+          include: [{model: aptitud}]
+        }]
+      }]
+    })
+    if(_data){
+      return res.status(200).json({data: _data});
+    }
+    else{
+      return res.status(400).json({ message: "No se encontraron las aptitudes de la práctica"});
+    }
+  }
+  catch(err){
+    return res.status(500).json({ message: "Error al obtener la práctica", error: err});
+  }
 })
 
 module.exports = routerPregSupervisor;

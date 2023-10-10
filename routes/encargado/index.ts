@@ -227,7 +227,6 @@ routerEncargado.post('/eliminar-aptitud', jsonParser, async (req: any, res: any)
 
 routerEncargado.post('/todos-aptitudes', jsonParser, async (req: any, res: any) => {
   let {id_carrera} = req.body;
-  console.log("id carrera: ", id_carrera)
   try{
     let _data = await aptitud.findAll({where: {id_carrera: id_carrera}})
     if(_data){
