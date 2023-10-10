@@ -2,7 +2,7 @@ import { where } from "sequelize";
 
 export { };
 
-const { config_practica, modalidad, pregunta_encuesta_final, config_informe, solicitud_documento, pregunta_supervisor, } = require('../../models');
+const { config_practica, modalidad, pregunta_encuesta_final, config_informe, solicitud_documento, pregunta_supervisor, pregunta_informe } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerConfigPracticas = new Router();
@@ -83,7 +83,8 @@ routerConfigPracticas.get('/carrera', async (req: any, res: any) => {
       where: {
         activada: true,
         id_carrera: req.query.id
-      }
+      },
+      include: [modalidad, {model: config_informe, include: [pregunta_informe]}, solicitud_documento, pregunta_supervisor, pregunta_encuesta_final]
     });
     res.status(200).json(data);
   } catch (error) {
