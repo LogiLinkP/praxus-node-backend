@@ -6,6 +6,8 @@ const { Router, json, urlencoded } = require('express');
 const crypto = require('crypto');
 const routerPractica = new Router(); // /practica
 const axios = require('axios');
+const { gen_resumen } = require("../../middleware/resumen_utils");
+
 routerPractica.use(json());
 routerPractica.use(urlencoded({ extended: true }));
 
@@ -440,38 +442,26 @@ routerPractica.post("/resumen", jsonParser, async (req: any, res: any) => {
       let key = inf.key;
       if (!key) continue;
       for (let pregunta of inf.config_informe.pregunta_informes) {
-        texto_informe += pregunta.enunciado + " ";
-        texto_informe += (key[pregunta.id] || "") + " ";
+        texto_informe += "#Enunciado: " + pregunta.enunciado + "\n";
+        texto_informe += "#Respuesta: " + (key[pregunta.id] || "") + "\n\n";
       }
     }
     texto_informe = texto_informe.trim();
-    const inf_valido = texto_informe.length > 0;
+    const inf_valido = texto_informe.split(" ").length > 50;
 
     const RespuestaSupervisor = Practica.respuesta_supervisors;
     let texto_supervisor = "";
     for (let resp of RespuestaSupervisor) {
       if (!resp.pregunta_supervisor) continue;
-      texto_supervisor += resp.pregunta_supervisor.enunciado + " ";
-      texto_supervisor += (resp.respuesta || "") + " ";
+      texto_supervisor += "#Enunciado: " + resp.pregunta_supervisor.enunciado + "\n";
+      texto_supervisor += "#Respuesta: " + (resp.respuesta || "") + "\n\n";
     }
     texto_supervisor = texto_supervisor.trim();
-    const sup_valido = texto_supervisor.length > 0;
-
-    let textos = [];
-    if (inf_valido) textos.push(texto_informe);
-    if (sup_valido) textos.push(texto_supervisor);
-
-    let url = `${process.env.URL_PYTHON_BACKEND}/nlp/resumen?texto=${textos.join("|||")}`;
-    const resumenes = await axios.get(url);
+    const sup_valido = texto_supervisor.split(" ").length > 50;
 
     let resumen: any = {};
-    if (inf_valido && sup_valido) {
-      resumen.informe = resumenes.data[0];
-      resumen.supervisor = resumenes.data[1];
-    } else if (inf_valido)
-      resumen.informe = resumenes.data[0];
-    else if (sup_valido)
-      resumen.supervisor = resumenes.data[0];
+    resumen.informe = inf_valido ? await gen_resumen(texto_informe) : texto_informe;
+    resumen.supervisor = sup_valido ? await gen_resumen(texto_supervisor) : texto_supervisor;
 
     await Practica.update({ resumen });
 
@@ -480,8 +470,11 @@ routerPractica.post("/resumen", jsonParser, async (req: any, res: any) => {
     console.log(error);
     return res.status(500).json({ message: "Error interno" });
   }
+<<<<<<< HEAD
 
   
+=======
+>>>>>>> dev
 });
 
 module.exports = routerPractica;

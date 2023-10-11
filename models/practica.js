@@ -75,6 +75,7 @@ module.exports = (sequelize, DataTypes) => {
     calificacion_empresa: DataTypes.INTEGER,
     comentario_empresa: DataTypes.STRING,
     ev_encargado: DataTypes.INTEGER,
+    sueldo: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'practica',
