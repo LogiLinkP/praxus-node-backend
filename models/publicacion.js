@@ -19,7 +19,9 @@ module.exports = (sequelize, DataTypes) => {
     titulo: DataTypes.STRING,
     enunciado: DataTypes.STRING,
     fecha: DataTypes.DATE,
-    isfijo: DataTypes.BOOLEAN
+    isfijo: DataTypes.BOOLEAN,
+    fecha_programada: DataTypes.DATE,
+    enviable: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'publicacion',
