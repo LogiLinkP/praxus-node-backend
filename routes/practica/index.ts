@@ -470,11 +470,6 @@ routerPractica.post("/resumen", jsonParser, async (req: any, res: any) => {
     console.log(error);
     return res.status(500).json({ message: "Error interno" });
   }
-<<<<<<< HEAD
-
-  
-=======
->>>>>>> dev
 });
 
 module.exports = routerPractica;
