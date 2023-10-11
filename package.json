@@ -15,6 +15,7 @@
     "ngx-socket-io": "^4.5.1",
     "node-cron": "^3.0.2",
     "nodemailer": "^6.9.4",
+    "openai": "^4.11.1",
     "sequelize": "^6.32.0",
     "sequelize-cli": "^6.6.1"
   },
