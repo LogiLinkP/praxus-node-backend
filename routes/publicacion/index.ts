@@ -17,7 +17,8 @@ routerpublicacion.get('/todas', jsonParser, async (req:any, res:any) => {
 
     const data = await publicacion.findAll({
         where: {
-            id_carrera: id_carrera
+            id_carrera: id_carrera,
+            enviable: true
         }
     })
 
@@ -43,7 +44,8 @@ routerpublicacion.get('/encargado', jsonParser, async (req:any, res:any) => {
 
     const data = await publicacion.findAll({
         where: {
-            id_encargado: id_encargado
+            id_encargado: id_encargado,
+            enviable: true
         }
     })
 
@@ -62,8 +64,14 @@ routerpublicacion.get('/encargado', jsonParser, async (req:any, res:any) => {
 
 routerpublicacion.post('/crear', jsonParser, (req: any, res: any) => {
   console.log(req.body)
-  const {id_encargado, id_carrera, titulo, enunciado, fecha, isfijo} = req.body;
+  const {id_encargado, id_carrera, titulo, enunciado, fecha, isfijo, fecha_programada} = req.body;
   console.log("Request de creacion de publicacion recibida");
+
+  let publienviable:boolean;
+  if(fecha_programada != null){
+    publienviable = false
+  } else publienviable = true;
+  
   publicacion.create({
       id_encargado: id_encargado,
       id_carrera: id_carrera,
@@ -71,6 +79,8 @@ routerpublicacion.post('/crear', jsonParser, (req: any, res: any) => {
       enunciado: enunciado,
       fecha: fecha,
       isfijo: isfijo,
+      fecha_programada: fecha_programada,
+      enviable:publienviable,
   })
   .then((resultados:any) => {
       console.log(resultados);
