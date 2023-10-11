@@ -18,7 +18,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   respuesta_ramos.init({
     id_carrera: DataTypes.INTEGER,
-    respuesta: DataTypes.STRING
+    respuesta: DataTypes.STRING,
+    id_practica: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'respuesta_ramos',
