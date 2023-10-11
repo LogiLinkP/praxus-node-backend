@@ -325,7 +325,7 @@ routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
     key_fragmentos: key_fragmentos,
     calificacion_empresa: calificacion_empresa,
     comentario_empresa: comentario_empresa,
-    ev_encargado: "-",
+    ev_encargado: -1,
   })
     .then((resultados: any) => {
       res.status(200).json({ mensaje: "ok" });
