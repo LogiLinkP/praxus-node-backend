@@ -2,7 +2,7 @@ const cron = require('node-cron');
 const { crear_informes } = require('./informe');
 const { actualizar_ramos } = require('./carrera');
 const { actualizar_empresa } = require('./empresa');
-const { actualizar_encuesta_practica } = require('./config_practica');
+const { actualizar_encuesta_practica, actualizar_sueldo_promedio_config_practica } = require('./config_practica');
 const { save_linkedin_data } = require('./data_linkedin');
 
 
@@ -51,7 +51,12 @@ export class Scheduler {
         cron.schedule("0 0 1 1,7 *", () => {
             console.log('Scrapeando linkedins');
             save_linkedin_data();
-        })
+        });
+
+        cron.schedule('*/20 * * * * *', () => {
+            console.log('Actualizando sueldo_promedio config practica');
+            actualizar_sueldo_promedio_config_practica();
+          });
     }
 }
 
