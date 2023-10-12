@@ -101,8 +101,10 @@ export async function actualizar_sueldo_promedio_config_practica() {
                 }
             });
             for (let k = 0; k < practicas_modalidad.length; k++){
-                suma_sueldos += practicas_modalidad[k].sueldo;
-                cantidad_practicas += 1;
+                if (practicas_modalidad[k].sueldo){
+                    suma_sueldos += practicas_modalidad[k].sueldo;
+                    cantidad_practicas += 1;
+                }
             }
         }
         if (cantidad_practicas != 0){
@@ -110,7 +112,7 @@ export async function actualizar_sueldo_promedio_config_practica() {
             const Config_practica = await config_practica.findOne({ where: { id: lista_config_practicas[i].id } })
             Config_practica.update({
             sueldo_promedio: sueldo_promedio
-        })
+            })
         }
     }
 }

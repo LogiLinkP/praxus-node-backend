@@ -1,6 +1,8 @@
+import { actualizar_sueldo_promedio_empresa } from "./empresa";
+
 const cron = require('node-cron');
 const { crear_informes } = require('./informe');
-const { actualizar_ramos } = require('./carrera');
+const { actualizar_ramos, actualizar_sueldo_promedio_carrera, actualizar_sueldo_promedio_ramo } = require('./carrera');
 const { actualizar_empresa } = require('./empresa');
 const { actualizar_encuesta_practica, actualizar_sueldo_promedio_config_practica } = require('./config_practica');
 const { save_linkedin_data } = require('./data_linkedin');
@@ -53,10 +55,20 @@ export class Scheduler {
             save_linkedin_data();
         });
 
-        cron.schedule('*/20 * * * * *', () => {
-            console.log('Actualizando sueldo_promedio config practica');
-            actualizar_sueldo_promedio_config_practica();
-          });
+        //cron.schedule('*/20 * * * * *', () => {
+        //    console.log('Actualizando sueldo_promedio config practica');
+        //    actualizar_sueldo_promedio_config_practica();
+        //});
+
+        //cron.schedule('*/30 * * * * *', () => {
+        //   console.log('Actualizando sueldo_promedio carrera');
+        //    actualizar_sueldo_promedio_carrera();
+        //});
+
+        cron.schedule('*/55 * * * * *', () => {
+           console.log('Actualizando sueldo_promedio ramo');
+            actualizar_sueldo_promedio_ramo();
+        });
     }
 }
 
