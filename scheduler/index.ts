@@ -55,19 +55,24 @@ export class Scheduler {
             save_linkedin_data();
         });
 
-        //cron.schedule('*/20 * * * * *', () => {
-        //    console.log('Actualizando sueldo_promedio config practica');
-        //    actualizar_sueldo_promedio_config_practica();
-        //});
+        cron.schedule('0 0 * * *', () => {
+            console.log('Actualizando sueldo_promedio config practica');
+            actualizar_sueldo_promedio_config_practica();
+        });
 
-        //cron.schedule('*/30 * * * * *', () => {
-        //   console.log('Actualizando sueldo_promedio carrera');
-        //    actualizar_sueldo_promedio_carrera();
-        //});
+        cron.schedule('0 0 * * *', () => {
+           console.log('Actualizando sueldo_promedio carrera');
+            actualizar_sueldo_promedio_carrera();
+        });
 
-        cron.schedule('*/55 * * * * *', () => {
-           console.log('Actualizando sueldo_promedio ramo');
+        cron.schedule('0 0 * * *', () => {
+           console.log('Actualizando sueldo_promedio ramo ');
             actualizar_sueldo_promedio_ramo();
+        });
+
+        cron.schedule('0 0 * * *', () => {
+            console.log('Actualizando sueldo_promedio empresa');
+            actualizar_sueldo_promedio_empresa();
         });
     }
 }

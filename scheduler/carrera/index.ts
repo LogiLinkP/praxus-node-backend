@@ -117,8 +117,6 @@ export async function actualizar_sueldo_promedio_ramo(){
             console.log(practica_asociada);
             */
 
-            //----------------------------------------------- HASTA ACA FUNCIONA -----------------------------------------------
-
             if (practica_asociada.sueldo != null){
                 //console.log("sueldo no es null");
                 //console.log("lista_nombre_ramos");
@@ -165,10 +163,8 @@ export async function actualizar_sueldo_promedio_ramo(){
 
         let json_ramos_sueldo = { "array": arreglo_sueldo_ramos };
 
-        console.log("json_ramos_sueldo");
-        console.log(json_ramos_sueldo);
-
-
+        //console.log("json_ramos_sueldo");
+        //console.log(json_ramos_sueldo);
 
         const Carrera = await carrera.findOne({ where: { id: carreras[i].id } })
         Carrera.update({

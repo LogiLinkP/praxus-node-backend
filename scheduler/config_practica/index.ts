@@ -111,7 +111,7 @@ export async function actualizar_sueldo_promedio_config_practica() {
             let sueldo_promedio = suma_sueldos / cantidad_practicas;
             const Config_practica = await config_practica.findOne({ where: { id: lista_config_practicas[i].id } })
             Config_practica.update({
-            sueldo_promedio: sueldo_promedio
+                sueldo_promedio: sueldo_promedio
             })
         }
     }
