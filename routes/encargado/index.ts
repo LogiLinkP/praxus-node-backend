@@ -177,26 +177,40 @@ routerEncargado.post('/crear-encargado', jsonParser, async (req: any, res: any) 
 });
 
 routerEncargado.post('/crear-aptitud', jsonParser, async (req: any, res: any) => {
-  let { id_carrera, nombre, rango } = req.body;
+  let { id_carrera, lista } = req.body;
+  let lista_aptitudes = [];
+  let flag = false;
+  for(let i=0; i<lista.length; i++){
+    let json = {nombre: lista[i], id_carrera: id_carrera};
+    try{
+      const _query = aptitud.findOne({ where: json});
+      if(_query.length > 0){
+        flag = true;
+        continue;
+      }
+      else{
+        lista_aptitudes.push(json);
+      }
+    }catch(error){
+      return res.status(500).send({ message: "Error de conexion" });
+    }
+  }
   try {
-    await aptitud.create({
-      id_carrera: id_carrera,
-      nombre: nombre,
-      rango: rango
-    })
-    return res.status(200).json({ message: "Aptitud creada" });
-  } 
-  catch (err) { 
-    return res.status(500).json({ message: "Error interno" });
+    const _aptitudes = await aptitud.bulkCreate(lista_aptitudes);
+    return res.status(200).send({aptitudes: _aptitudes });
+  }
+  catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error de conexion" });
   }
 });
 
 routerEncargado.post('/editar-aptitud', jsonParser, async (req: any, res: any) => {
-  let { id, id_carrera, nombre, rango } = req.body;
+  let { id, id_carrera, nombre } = req.body;
   try {
     let _aptitud = await aptitud.findOne({where: {id: id}})
     if(_aptitud){
-      _aptitud.update({id_carrera: id_carrera, nombre: nombre, rango: rango})
+      _aptitud.update({id_carrera: id_carrera, nombre: nombre})
       return res.status(200).json({ message: "Aptitud editada" });
     }
     else{
@@ -234,6 +248,40 @@ routerEncargado.post('/todos-aptitudes', jsonParser, async (req: any, res: any) 
     }
     else{
       return res.status(500).json({ message: "No se encontraron aptitudes" });
+    }
+  }
+  catch(err){
+    return res.status(500).json({ message: "Error interno" });
+  }
+});
+
+routerEncargado.post('/rango', jsonParser, async (req: any, res: any) => {
+  let {id_carrera, rango} = req.body;
+  try{
+    let _aptitud = await aptitud.findAll({where: {id_carrera: id_carrera}})
+    if(_aptitud){
+      await aptitud.update({ rango: rango }, { where: { id_carrera: id_carrera } });
+      return res.status(200).json({ message: "Rango actualizado" });
+    }
+    else{
+      return res.status(500).json({ message: "No se han añadido aptitudes" });
+    }
+  }
+  catch(err){
+    return res.status(500).json({ message: "Error interno" });
+  }
+});
+
+routerEncargado.post('/get-rango', jsonParser, async (req: any, res: any) => {
+  let {id_carrera} = req.body;
+  console.log(0)
+  try{
+    let rango = await aptitud.findOne({where: {id_carrera: id_carrera}})
+    if(rango){
+      return res.status(200).json({data: rango.rango});
+    }
+    else{
+      return res.status(500).json({ message: "No se han añadido aptitudes" });
     }
   }
   catch(err){
