@@ -180,8 +180,16 @@ routerEncargado.post('/crear-aptitud', jsonParser, async (req: any, res: any) =>
   let { id_carrera, lista } = req.body;
   let lista_aptitudes = [];
   let flag = false;
+  let rango = 0;
+  try{
+    let qqq = await aptitud.findOne({where: {id_carrera: id_carrera}})
+    rango = qqq.rango;
+  }
+  catch(err){
+    return res.status(500).send({ message: "Error de conexion" });
+  }
   for(let i=0; i<lista.length; i++){
-    let json = {nombre: lista[i], id_carrera: id_carrera};
+    let json = {nombre: lista[i], id_carrera: id_carrera, rango: rango};
     try{
       const _query = aptitud.findOne({ where: json});
       if(_query.length > 0){
