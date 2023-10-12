@@ -97,7 +97,7 @@ routerpublicacion.post('/crear', jsonParser, (req: any, res: any) => {
 routerpublicacion.put('/editar', jsonParser, async (req: any, res: any) => {
   const Publicacion = await publicacion.findOne({ where: { id: req.body.id } })
   if (Publicacion) {
-    Publicacion.update({ titulo: req.body.titulo, enunciado: req.body.enunciado })
+    Publicacion.update({ titulo: req.body.titulo, enunciado: req.body.enunciado, isfijo: req.body.isfijo })
       .then((resultados: any) => {
         res.sendStatus(200);
       })
