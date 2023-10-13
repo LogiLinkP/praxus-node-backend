@@ -306,4 +306,20 @@ routerEncargado.post('/get-rango', jsonParser, async (req: any, res: any) => {
   }
 });
 
+routerEncargado.post('/if-aptitudes', jsonParser, async (req: any, res: any) => {
+  let { id_carrera } = req.body;
+  try{
+    let _aptitud = await aptitud.findAll({where: {id_carrera: id_carrera}})
+    if(_aptitud.length == 0){
+      return res.status(200).json({data: false});
+    }
+    else{
+      return res.status(200).json({data: true});
+    }
+  }
+  catch(err){
+    return res.status(500).json({ message: "Error interno" });
+  }
+});
+
 module.exports = routerEncargado;
