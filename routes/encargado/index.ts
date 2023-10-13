@@ -1,6 +1,6 @@
 export { };
 
-const { carrera, encargado, usuario, estudiante, practica } = require('../../models');
+const { aptitud, carrera, encargado, usuario, estudiante, practica } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerEncargado = new Router(); // /encargado
@@ -173,6 +173,152 @@ routerEncargado.post('/crear-encargado', jsonParser, async (req: any, res: any) 
   catch (err) { 
     console.log(err);
     return res.status(500).send({ message: "Error interno" });
+  }
+});
+
+routerEncargado.post('/crear-aptitud', jsonParser, async (req: any, res: any) => {
+  let { id_carrera, lista } = req.body;
+  let lista_aptitudes = [];
+  let flag = false;
+  let rango = 0;
+  try{
+    let qqq = await aptitud.findOne({where: {id_carrera: id_carrera}})
+    console.log(qqq)
+    if(qqq){
+      rango = qqq.rango;
+    }
+    else{
+      rango = 0;
+    }    
+  }
+  catch(err){
+    return res.status(500).send({ message: "Error de conexion" });
+  }
+  for(let i=0; i<lista.length; i++){
+    let json = {nombre: lista[i], id_carrera: id_carrera, rango: rango};
+    try{
+      const _query = aptitud.findOne({ where: json});
+      if(_query.length > 0){
+        flag = true;
+        continue;
+      }
+      else{
+        lista_aptitudes.push(json);
+      }
+    }catch(error){
+      return res.status(500).send({ message: "Error de conexion" });
+    }
+  }
+  try {
+    const _aptitudes = await aptitud.bulkCreate(lista_aptitudes);
+    return res.status(200).send({aptitudes: _aptitudes });
+  }
+  catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error de conexion" });
+  }
+});
+
+routerEncargado.post('/editar-aptitud', jsonParser, async (req: any, res: any) => {
+  let { id, id_carrera, nombre } = req.body;
+  try {
+    let _aptitud = await aptitud.findOne({where: {id: id}})
+    if(_aptitud){
+      _aptitud.update({id_carrera: id_carrera, nombre: nombre})
+      return res.status(200).json({ message: "Aptitud editada" });
+    }
+    else{
+      return res.status(500).json({ message: "Aptitud no encontrada" });
+    }
+  }
+  catch (err) { 
+    return res.status(500).json({ message: "Error interno" });
+  }
+});
+
+routerEncargado.post('/eliminar-aptitud', jsonParser, async (req: any, res: any) => {
+  let { id } = req.body;
+  try {
+    let _aptitud = await aptitud.findOne({where: {id: id}})
+    if(_aptitud){
+      aptitud.destroy({where: {id: id}})
+      return res.status(200).json({ message: "Aptitud eliminada" });
+    }
+    else{
+      return res.status(500).json({ message: "Aptitud no encontrada" });
+    }
+  }
+  catch (err) { 
+    return res.status(500).json({ message: "Error interno" });
+  }
+});
+
+routerEncargado.post('/todos-aptitudes', jsonParser, async (req: any, res: any) => {
+  let {id_carrera} = req.body;
+  try{
+    let _data = await aptitud.findAll({where: {id_carrera: id_carrera}})
+    if(_data){
+      return res.status(200).json({data: _data});
+    }
+    else{
+      return res.status(500).json({ message: "No se encontraron aptitudes" });
+    }
+  }
+  catch(err){
+    return res.status(500).json({ message: "Error interno" });
+  }
+});
+
+routerEncargado.post('/rango', jsonParser, async (req: any, res: any) => {
+  let {id_carrera, rango} = req.body;
+  try{
+    let _aptitud = await aptitud.findAll({where: {id_carrera: id_carrera}})
+    if(_aptitud){
+      await aptitud.update({ rango: rango }, { where: { id_carrera: id_carrera } });
+      return res.status(200).json({ message: "Rango actualizado" });
+    }
+    else{
+      return res.status(500).json({ message: "No se han añadido aptitudes" });
+    }
+  }
+  catch(err){
+    return res.status(500).json({ message: "Error interno" });
+  }
+});
+
+routerEncargado.post('/get-rango', jsonParser, async (req: any, res: any) => {
+  let {id_carrera} = req.body;
+  try{
+    let rango = await aptitud.findAll({where: {id_carrera: id_carrera}})
+    if(rango.length == 0){
+      return res.status(200).json({data: 0});
+    }else{
+      if(rango){
+        return res.status(200).json({data: rango[0].rango});
+      }
+      else{
+        return res.status(500).json({ message: "No se han añadido aptitudes" });
+      }
+    }
+  }
+  catch(err){
+    return res.status(500).json({ message: "Error de query" });
+  }
+});
+
+routerEncargado.post('/if-aptitudes', jsonParser, async (req: any, res: any) => {
+  let { id_carrera } = req.body;
+  try{
+    let _aptitud = await aptitud.findAll({where: {id_carrera: id_carrera}})
+    if(_aptitud.length == 0){
+      return res.status(200).json({data: false});
+    }
+    else{
+      return res.status(200).json({data: true});
+    }
+  }
+  catch(err){
+    return res.status(500).json({ message: "Error interno" });
   }
 });
 
