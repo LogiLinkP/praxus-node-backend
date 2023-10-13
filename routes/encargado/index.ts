@@ -183,7 +183,13 @@ routerEncargado.post('/crear-aptitud', jsonParser, async (req: any, res: any) =>
   let rango = 0;
   try{
     let qqq = await aptitud.findOne({where: {id_carrera: id_carrera}})
-    rango = qqq.rango;
+    console.log(qqq)
+    if(qqq){
+      rango = qqq.rango;
+    }
+    else{
+      rango = 0;
+    }    
   }
   catch(err){
     return res.status(500).send({ message: "Error de conexion" });
@@ -282,18 +288,21 @@ routerEncargado.post('/rango', jsonParser, async (req: any, res: any) => {
 
 routerEncargado.post('/get-rango', jsonParser, async (req: any, res: any) => {
   let {id_carrera} = req.body;
-  console.log(0)
   try{
-    let rango = await aptitud.findOne({where: {id_carrera: id_carrera}})
-    if(rango){
-      return res.status(200).json({data: rango.rango});
-    }
-    else{
-      return res.status(500).json({ message: "No se han añadido aptitudes" });
+    let rango = await aptitud.findAll({where: {id_carrera: id_carrera}})
+    if(rango.length == 0){
+      return res.status(200).json({data: 0});
+    }else{
+      if(rango){
+        return res.status(200).json({data: rango[0].rango});
+      }
+      else{
+        return res.status(500).json({ message: "No se han añadido aptitudes" });
+      }
     }
   }
   catch(err){
-    return res.status(500).json({ message: "Error interno" });
+    return res.status(500).json({ message: "Error de query" });
   }
 });
 
