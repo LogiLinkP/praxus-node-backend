@@ -10,7 +10,10 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+        pregunta_encuesta_final.belongsTo(models.config_practica, {
+          foreignKey: 'id_config_practica',
+          as: 'config_practica'
+        });
     }
   }
   pregunta_encuesta_final.init({
