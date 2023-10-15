@@ -1,3 +1,7 @@
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import dotenv from 'dotenv';
+dotenv.config();
+
 export { };
 
 const { documento_encargado } = require('../../models');
@@ -58,6 +62,19 @@ router_documento_encargado.get('/encargado', jsonParser, async (req:any, res:any
 })
 
 //[POST] Agregar un nuevo documento
+async function uploadFile(filePath:string) {
+  console.log(filePath);
+  const fileStream = fs.createReadStream(filePath)
+
+  return process.env.s3Client.send(
+      new PutObjectCommand({
+          Bucket: process.env.bucketName,
+          Key: "nombre_archivo.png",
+          Body: fileStream,
+      })
+  );
+}
+
 router_documento_encargado.post('/crear', jsonParser, (req: any, res: any) => {
   console.log(req.body)
   const {id_carrera, id_encargado, nombre, tipo, key} = req.body;
@@ -71,9 +88,16 @@ router_documento_encargado.post('/crear', jsonParser, (req: any, res: any) => {
       key:key,
   })
   .then((resultados:any) => {
-      console.log(resultados);
-      console.log("DOCUMENTO GUARDADO")
-      res.status(200).json(resultados);
+    console.log(resultados);
+    console.log("DOCUMENTO GUARDADO")
+
+    let acceslink = process.env.bucketAccessKey + "/" + key;
+    
+    uploadFile(acceslink).then((res:any) => {
+        console.log(res);
+    })
+    
+    res.status(200).json(resultados);
   })
   .catch((err:any) => {
       console.log('Error al crear documento', err);
