@@ -87,7 +87,7 @@ router_documento_encargado.delete('/eliminar', (req:any, res:any) => {
   if(!Docu){
     return res.status(400).json({message: "No hay documento"});
   }
-  Docu.destroy({
+  documento_encargado.destroy({
     where: {
       id: req.query.id
     }
@@ -101,5 +101,30 @@ router_documento_encargado.delete('/eliminar', (req:any, res:any) => {
     console.log('Error al eliminar documento', err);
   })
 })
+
+router_documento_encargado.get('/download', async (req: any, res: any) => {
+  try {
+    if (!("id" in req.query)) {
+      res.status(406).json({ message: "Se requiere ingresar id" });
+      return;
+    }
+    const data = await documento_encargado.findOne({
+      where: {
+        id: req.query.id
+      }
+    });
+    if (!data) {
+      res.status(404).json({ message: "No existe documento con id: " + req.query.id });
+      return;
+    }
+    else{
+      const file = `./tmp/${data.key}`;
+      res.download(file);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
 
 module.exports = router_documento_encargado;
