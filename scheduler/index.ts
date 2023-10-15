@@ -56,7 +56,7 @@ export class Scheduler {
         })
 
         //PUBLICACION CON FECHA PROGRAMADA
-        cron.schedule("* * * *", () => {
+        cron.schedule("0 * * * *", () => {
             console.log("Buscando publicaciones programadas");
             publicaciones_programadas();
         })
