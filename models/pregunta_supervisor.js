@@ -25,7 +25,8 @@ module.exports = (sequelize, DataTypes) => {
     enunciado: DataTypes.STRING,
     tipo_respuesta: DataTypes.STRING,
     opciones: DataTypes.STRING,
-    fija: DataTypes.BOOLEAN
+    fija: DataTypes.BOOLEAN,
+    rango: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'pregunta_supervisor',
