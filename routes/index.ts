@@ -32,6 +32,5 @@ router.use('/actualizacion_estadistica', require('./actualizacion_estadistica'))
 router.use('/carrera', require('./carrera'));
 router.use('/respuesta_ramos', require('./respuesta_ramos'));
 router.use('/publicacion', require('./publicacion'));
-router.use('/documento_encargado', require('./documento_encargado'))
 
 module.exports = router;
