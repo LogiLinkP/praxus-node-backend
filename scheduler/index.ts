@@ -53,7 +53,7 @@ export class Scheduler {
             save_linkedin_data();
         })
 
-        //lunes ("0 0 * * 1")
+        //validacion empresas
         cron.schedule("0 0 * * 1", () => {
             console.log("Realizando validacion de empresas");
             validador_empresa();
