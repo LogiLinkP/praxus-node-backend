@@ -92,7 +92,7 @@ routerRespuesta_supervisor.post('/responder_encuesta', jsonParser, async (req: a
       for (let j = 0; j < Object.keys(respuestas_informe).length; j++) {
         // find the pregunta_informe tha has the same id as the one in the informe
         let _pregunta_informe = _informes[i].config_informe.pregunta_informes.find((pregunta: any) => pregunta.id == Object.keys(respuestas_informe)[j]);
-        if (_pregunta_informe.tipo_respuesta == "abierta") {
+        if (_pregunta_informe?.tipo_respuesta == "abierta") {
           texto_informes += respuestas_informe[Object.keys(respuestas_informe)[j]] + ". ";
         }
       }
