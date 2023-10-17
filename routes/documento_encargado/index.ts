@@ -78,14 +78,11 @@ const s3Client = new S3Client({
 });
 
 async function uploadFile(filePath:any, key:string) {
-  console.log(filePath);
-  const fileStream = fs.createReadStream(filePath)
-
   return s3Client.send(
       new PutObjectCommand({
           Bucket: process.env.bucketName,
           Key: key,
-          Body: fileStream,
+          Body: filePath,
       })
   );
 }
@@ -104,11 +101,9 @@ router_documento_encargado.post('/crear', jsonParser, (req: any, res: any) => {
   })
   .then((resultados:any) => {
     console.log("DOCUMENTO GUARDADO")
-
-    
-    let acceslink = process.env.bucketAccessKey + "/" + key;
     
     console.log("ARCHIVO: ", archivo)
+    
     uploadFile(archivo, key).then((res:any) => {
         console.log(res);
     })
