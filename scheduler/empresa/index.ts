@@ -1,4 +1,5 @@
 const { empresa, practica, estudiante } = require('../../models');
+const { consulta_rutificador_co, consulta_boletaofactura_com } = require('../../routes/empresa/utilidades_empresa');
 
 export async function actualizar_empresa() {
     const empresas = await empresa.findAll();
@@ -55,5 +56,52 @@ export async function actualizar_empresa() {
             practicantes_destacados: porcentaje_destacados
         })
 
+    }
+}
+
+function shuffle(array: any){
+    for(let i = array.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i+1));
+        const temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+}
+
+export async function validador_empresa(){
+    const n = 5; //maximo peticiones
+    const empresas = await empresa.findAll({where: {empresa_verificada: false}});
+    const empresas_aux = shuffle(empresas);
+    if(n > empresas_aux.length){
+        for(let i = 0; i < empresas_aux.length; i++){
+            let rut = empresas_aux[i].rut_empresa;
+            let rutificador = await consulta_rutificador_co(rut);
+            if(rutificador === false){
+                let boletaofactura = await consulta_boletaofactura_com(rut);
+                if(boletaofactura === false){
+                    continue;
+                }else{
+                    empresa.update({empresa_verificada: true}, {where: {rut_empresa: rut}})
+                }
+            }else{
+                empresa.update({empresa_verificada: true}, {where: {rut_empresa: rut}})
+            }
+        }
+    }else{
+        for(let i = 0; i < n; i++){
+            let rut = empresas_aux[i].rut_empresa;
+            let rutificador = await consulta_rutificador_co(rut);
+            if(rutificador === false){
+                let boletaofactura = await consulta_boletaofactura_com(rut);
+                if(boletaofactura === false){
+                    continue;
+                }else{
+                    empresa.update({empresa_verificada: true}, {where: {rut_empresa: rut}})
+                }
+            }else{
+                empresa.update({empresa_verificada: true}, {where: {rut_empresa: rut}})
+            }
+        }
     }
 }
