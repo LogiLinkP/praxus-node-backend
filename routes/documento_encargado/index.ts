@@ -1,6 +1,13 @@
-import { PutObjectCommand } from "@aws-sdk/client-s3";
 import dotenv from 'dotenv';
 dotenv.config();
+
+const {
+  S3Client,
+  PutObjectCommand,
+  // DeleteObjectCommand,
+  // GetObjectCommand,
+} = require("@aws-sdk/client-s3");
+const fs = require("fs")
 
 export { };
 
@@ -62,22 +69,30 @@ router_documento_encargado.get('/encargado', jsonParser, async (req:any, res:any
 })
 
 //[POST] Agregar un nuevo documento
-async function uploadFile(filePath:string) {
+const s3Client = new S3Client({
+  region: process.env.bucketRegion,
+  credentials: {
+      accessKeyId: process.env.bucketUserAccessKey,
+      secretAccessKey: process.env.bucketUserSecretAccessKey,
+  }
+});
+
+async function uploadFile(filePath:any, key:string) {
   console.log(filePath);
   const fileStream = fs.createReadStream(filePath)
 
-  return process.env.s3Client.send(
+  return s3Client.send(
       new PutObjectCommand({
           Bucket: process.env.bucketName,
-          Key: "nombre_archivo.png",
+          Key: key,
           Body: fileStream,
       })
   );
 }
 
 router_documento_encargado.post('/crear', jsonParser, (req: any, res: any) => {
-  console.log(req.body)
-  const {id_carrera, id_encargado, nombre, tipo, key} = req.body;
+  console.log("BODY: ", req.body)
+  const {archivo, id_encargado, id_carrera, tipo, nombre, key} = req.body;
   console.log("Request de creacion de documento recibida");
 
   documento_encargado.create({
@@ -88,15 +103,16 @@ router_documento_encargado.post('/crear', jsonParser, (req: any, res: any) => {
       key:key,
   })
   .then((resultados:any) => {
-    console.log(resultados);
     console.log("DOCUMENTO GUARDADO")
 
+    
     let acceslink = process.env.bucketAccessKey + "/" + key;
     
-    uploadFile(acceslink).then((res:any) => {
+    console.log("ARCHIVO: ", archivo)
+    uploadFile(archivo, key).then((res:any) => {
         console.log(res);
     })
-    
+
     res.status(200).json(resultados);
   })
   .catch((err:any) => {
@@ -126,6 +142,7 @@ router_documento_encargado.delete('/eliminar', (req:any, res:any) => {
   })
 })
 
+/*
 router_documento_encargado.get('/download', async (req: any, res: any) => {
   try {
     if (!("id" in req.query)) {
@@ -150,5 +167,6 @@ router_documento_encargado.get('/download', async (req: any, res: any) => {
     res.status(500).json({ message: "Error interno" });
   }
 });
+*/
 
 module.exports = router_documento_encargado;
