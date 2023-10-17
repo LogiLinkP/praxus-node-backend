@@ -7,6 +7,12 @@ const { filetypename } = require('magic-bytes.js');
 const path = "./tmp";
 const MAX_FILE_SIZE = 10 * 1000 * 1000; // 10MB porque MiB es de perdedores
 
+const memorystorage = multer.memoryStorage({
+    filename:(req:Request, file:any, cb:CallableFunction) => {
+        cb(null, "file")
+    }
+})
+
 const storage = multer.diskStorage({
     destination: (req: Request, file: any, cb: CallableFunction) => {
         cb(null, path);
@@ -53,5 +59,10 @@ export const uploadFile = multer({
     limits: {
         fileSize: MAX_FILE_SIZE,
     }
+});
+
+export const memoryFile = multer({
+    storage: memorystorage,
+    limits: { fileSize: MAX_FILE_SIZE }
 });
 

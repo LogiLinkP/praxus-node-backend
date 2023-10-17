@@ -1,13 +1,22 @@
 import dotenv from 'dotenv';
+const { memoryFile } = require('../../middleware/file_utils');
 dotenv.config();
 
 const {
   S3Client,
   PutObjectCommand,
-  // DeleteObjectCommand,
+  DeleteObjectCommand,
   // GetObjectCommand,
 } = require("@aws-sdk/client-s3");
 const fs = require("fs")
+
+const s3Client = new S3Client({
+  region: process.env.bucketRegion,
+  credentials: {
+    accessKeyId: process.env.bucketUserAccessKey,
+    secretAccessKey: process.env.bucketUserSecretAccessKey,
+  }
+});
 
 export { };
 
@@ -69,15 +78,9 @@ router_documento_encargado.get('/encargado', jsonParser, async (req:any, res:any
 })
 
 //[POST] Agregar un nuevo documento
-const s3Client = new S3Client({
-  region: process.env.bucketRegion,
-  credentials: {
-      accessKeyId: process.env.bucketUserAccessKey,
-      secretAccessKey: process.env.bucketUserSecretAccessKey,
-  }
-});
 
 async function uploadFile(filePath:any, key:string) {
+  
   return s3Client.send(
       new PutObjectCommand({
           Bucket: process.env.bucketName,
@@ -87,81 +90,54 @@ async function uploadFile(filePath:any, key:string) {
   );
 }
 
-router_documento_encargado.post('/crear', jsonParser, (req: any, res: any) => {
-  console.log("BODY: ", req.body)
-  const {archivo, id_encargado, id_carrera, tipo, nombre, key} = req.body;
-  console.log("Request de creacion de documento recibida");
+router_documento_encargado.post('/crear', memoryFile.single("file"), async (req: any, res: any) => {
+  try{
+    const archivo = req.file.buffer
+    const {id_encargado, id_carrera, tipo, nombre, key} = req.body;
+    console.log("Request de creacion de documento recibida");
 
-  documento_encargado.create({
-      id_encargado: id_encargado,
-      id_carrera: id_carrera,
+    uploadFile(archivo, key)
+    await documento_encargado.create({
+      id_encargado:+ id_encargado,
+      id_carrera:+ id_carrera,
       nombre:nombre,
       tipo:tipo,
       key:key,
-  })
-  .then((resultados:any) => {
-    console.log("DOCUMENTO GUARDADO")
-    
-    console.log("ARCHIVO: ", archivo)
-    
-    uploadFile(archivo, key).then((res:any) => {
-        console.log(res);
     })
-
-    res.status(200).json(resultados);
-  })
-  .catch((err:any) => {
-      console.log('Error al crear documento', err);
-      res.status(500).json({ message: "Error al crear documento", error: err});
-  })
+    console.log("Documento Guardado")
+    res.status(200).json({message: "Documento Guardado"});
+  } catch (error:any) {
+    console.log('Error al crear documento', error);
+    res.status(500).json({ message: "Error al crear documento"});
+  }
 })
 
 //[DELETE] Borrar Publicación
-router_documento_encargado.delete('/eliminar', (req:any, res:any) => {
-  const Docu = documento_encargado.findOne({ where: { id: req.query.id } })
-  if(!Docu){
-    return res.status(400).json({message: "No hay documento"});
-  }
-  documento_encargado.destroy({
-    where: {
-      id: req.query.id
+router_documento_encargado.delete('/eliminar', async (req:any, res:any) => {
+  try{   
+    const Docu = await documento_encargado.findOne({ where: { id: req.query.id } })
+    if(!Docu){
+      return res.status(400).json({message: "No hay documento"});
     }
-  })
-  .then((resultados:any) => {
-    console.log(resultados);
-    res.sendStatus(200);
-  })
-  .catch((err:any) => {
-    res.send(500)
-    console.log('Error al eliminar documento', err);
-  })
-})
+    console.log("Documento: ", Docu)
 
-/*
-router_documento_encargado.get('/download', async (req: any, res: any) => {
-  try {
-    if (!("id" in req.query)) {
-      res.status(406).json({ message: "Se requiere ingresar id" });
-      return;
-    }
-    const data = await documento_encargado.findOne({
+    const input = {
+      "Bucket": process.env.bucketName,
+      "Key": Docu.key
+    };
+    const command = new DeleteObjectCommand(input);
+    await s3Client.send(command);
+
+    await documento_encargado.destroy({
       where: {
         id: req.query.id
       }
-    });
-    if (!data) {
-      res.status(404).json({ message: "No existe documento con id: " + req.query.id });
-      return;
-    }
-    else{
-      const file = `./tmp/${data.key}`;
-      res.download(file);
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Error interno" });
+    })
+    console.log("Documento Eliminado")
+    res.status(200).json({message: "Documento Eliminado"});
+   }catch(err:any) {
+    res.status(500).json({message: "Error al eliminar documento"})
+    console.log('Error al eliminar documento', err);
   }
-});
-*/
-
+})
 module.exports = router_documento_encargado;
