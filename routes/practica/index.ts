@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const routerPractica = new Router(); // /practica
 const axios = require('axios');
 const { gen_resumen } = require("../../middleware/resumen_utils");
+const { detectar_plagio } = require("../../utils/plagio");
 
 routerPractica.use(json());
 routerPractica.use(urlencoded({ extended: true }));
@@ -224,7 +225,6 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
       }
     });
 
-    console.log("\n\n\n\nLOS DATOS SON\n\n\n", data, req.body);
 
     // Envio de correo al supervisor
 
@@ -248,6 +248,9 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
       // send the email with the encrypted id_practica
       sendMail(correo, `Revisión de práctica de ${nom_estudiante}`, "Para evaluar al practicante debe acceder a " + process.env.URL_FRONTEND + "/supervisor/evaluacion?token=" + encrypted_str.content + "&iv=" + encrypted_str.iv, "Revisión de práctica de " + nom_estudiante);
       //console.log("correo enviado correctamente");
+
+      const res_plagio = await detectar_plagio(+id_practica);
+
       res.status(200).json({ message: "Correo enviado y estado actualizado" });
     } else {
       res.status(406).json({ message: "Se requiere ingresar correo, el nombre del supervisor y nombre del estudiante" });
@@ -364,19 +367,21 @@ routerPractica.put('/actualizar', jsonParser, async (req: any, res: any) => {
 
 routerPractica.put('/eval_encargado', jsonParser, async (req: any, res: any) => {
   try {
-    let { id_practica, ev_encargado} = req.body;
-    if(!id_practica || !ev_encargado){
-      return res.status(400).json({message: "Debe ingresar id_practica y evaluacion"});
+    let { id_practica, ev_encargado } = req.body;
+    if (!id_practica || !ev_encargado) {
+      return res.status(400).json({ message: "Debe ingresar id_practica y evaluacion" });
     }
     console.log("1")
     const data = await practica.findOne(
-      {where: {
-        id: id_practica
-      }}
+      {
+        where: {
+          id: id_practica
+        }
+      }
     )
     console.log("2")
-    if(!data){
-      return res.status(400).json({message: "No se pudo encontrar la practica"});
+    if (!data) {
+      return res.status(400).json({ message: "No se pudo encontrar la practica" });
     }
     console.log(data)
     await data.update({
