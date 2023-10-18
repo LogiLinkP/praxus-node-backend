@@ -11,19 +11,23 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.belongsTo(models.practica, {
-        foreignKey: 'id_practica'
+        foreignKey: 'id_practica',
       });
       this.belongsTo(models.informe, {
-        foreignKey: 'id_informe_origen'
+        foreignKey: 'id_informe_origen',
+        as: 'informe_origen'
       });
       this.belongsTo(models.pregunta_informe, {
-        foreignKey: 'id_pregunta_informe_origen'
+        foreignKey: 'id_pregunta_informe_origen',
+        as: 'pregunta_informe_origen'
       });
       this.belongsTo(models.informe, {
-        foreignKey: 'id_informe_plagio'
+        foreignKey: 'id_informe_plagio',
+        as: 'informe_plagio'
       });
       this.belongsTo(models.pregunta_informe, {
-        foreignKey: 'id_pregunta_informe_plagio'
+        foreignKey: 'id_pregunta_informe_plagio',
+        as: 'pregunta_informe_plagio'
       });
     }
   }

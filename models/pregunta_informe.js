@@ -11,6 +11,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.hasOne(models.plagio, {
+        foreignKey: 'id_pregunta_informe_origen',
+        as: 'pregunta_informe_origen'
+      });
+      this.hasOne(models.plagio, {
+        foreignKey: 'id_pregunta_informe_plagio',
+        as: 'pregunta_informe_plagio'
+      });
+
       this.belongsTo(models.config_informe, {
         foreignKey: 'id_config_informe'
       })
