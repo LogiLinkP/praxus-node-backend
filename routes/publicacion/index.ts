@@ -29,13 +29,14 @@ routerpublicacion.get('/todas', jsonParser, async (req:any, res:any) => {
     res.send(data)
   }catch(err) {
       console.log('Error al mostrar todas las publicaciones', err);
-      res.send('Error al mostrar todas las publicaciones', err);
+      res.status(500).json({message: "Error al mostrar todas las publicaciones"});
     }
 })
 
 //[GET] Obtener las publicaciones de un encargado
 
 routerpublicacion.get('/encargado', jsonParser, async (req:any, res:any) => {
+  console.log(req.query)
   try{
     const id_encargado = req.query.id_encargado;
     if(!id_encargado){
@@ -56,21 +57,26 @@ routerpublicacion.get('/encargado', jsonParser, async (req:any, res:any) => {
     res.send(data)
   }catch(err) {
       console.log('Error al mostrar todas las publicaciones', err);
-      res.send('Error al mostrar todas las publicaciones', err);
+      res.status(200).json({message: "Error al mostrar todas las publicaciones"});
     }
 })
 
 //[POST] Agregar una nueva publicacion
 
 routerpublicacion.post('/crear', jsonParser, (req: any, res: any) => {
-  console.log(req.body)
   const {id_encargado, id_carrera, titulo, enunciado, fecha, isfijo, fecha_programada} = req.body;
   console.log("Request de creacion de publicacion recibida");
 
   let publienviable:boolean;
-  if(fecha_programada != null){
+  let fecha_progra:Date;
+
+  if(fecha_programada.length != 0){
     publienviable = false
-  } else publienviable = true;
+    fecha_progra = fecha_programada
+  } else {
+    publienviable = true;
+    fecha_progra = fecha
+  }
   
   publicacion.create({
       id_encargado: id_encargado,
@@ -79,7 +85,7 @@ routerpublicacion.post('/crear', jsonParser, (req: any, res: any) => {
       enunciado: enunciado,
       fecha: fecha,
       isfijo: isfijo,
-      fecha_programada: fecha_programada,
+      fecha_programada: fecha_progra,
       enviable:publienviable,
   })
   .then((resultados:any) => {
@@ -102,12 +108,12 @@ routerpublicacion.put('/editar', jsonParser, async (req: any, res: any) => {
         res.sendStatus(200);
       })
       .catch((err: any) => {
-        res.send(500)
         console.log('Error al actualizar publicacion', err);
+        res.status(500).json({message: "Error al actualizar publicación"});
       })
   } else {
     console.log("No existe publicacion con id: ", req.query.id)
-    res.sendStatus(404)
+    res.status(404).json({message: "No existe publicación con tal id"});
     }
 })
 
@@ -126,10 +132,10 @@ routerpublicacion.delete('/eliminar', (req:any, res:any) => {
   })
   .then((resultados:any) => {
     console.log(resultados);
-    res.sendStatus(200);
+    res.status(200).json({message: resultados});
   })
   .catch((err:any) => {
-    res.send(500)
+    res.status(500).json({message: "Error al eliminar publicación"});
     console.log('Error al eliminar publicacion', err);
   })
 })
