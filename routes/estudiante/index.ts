@@ -1,6 +1,6 @@
 export { };
 
-const { estudiante, usuario, practica, encargado, carrera } = require('../../models');
+const { estudiante, usuario, practica, encargado, carrera, pregunta_supervisor, respuesta_supervisor } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerEstudiante = new Router();
@@ -202,6 +202,34 @@ routerEstudiante.put('/carrera', jsonParser, async (req: any, res: any) => {
   } else {
     console.log("No existe estudiante con id: ", req.body.id)
     res.sendStatus(404)
+  }
+})
+
+routerEstudiante.post('/get-comentarios', jsonParser, async (req: any, res: any) => {
+  let {id_practica} = req.body;
+  console.log(0)
+  try{
+    let _data = await practica.findOne({
+      where: {
+        id: id_practica
+      },
+      include: [{
+        model : respuesta_supervisor, include: {model: pregunta_supervisor}
+      }]
+    })
+    console.log(1)
+    if(_data){
+      console.log(2)
+      return res.status(200).json({message: "Comentarios obtenidos", data: _data});
+    }
+    else{
+      console.log(3)
+      return res.status(500).json({message: "No se encontraron comentarios"});
+    }
+  }
+  catch(error){
+    console.log(4);
+    res.status(500).json({ message: "Error interno" });
   }
 })
 
