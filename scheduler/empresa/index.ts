@@ -97,10 +97,10 @@ export async function validador_empresa(){
                 if(boletaofactura === false){
                     continue;
                 }else{
-                    empresa.update({empresa_verificada: true}, {where: {rut_empresa: rut}})
+                    empresa.update({nombre_empresa: boletaofactura, empresa_verificada: true}, {where: {rut_empresa: rut}})
                 }
             }else{
-                empresa.update({empresa_verificada: true}, {where: {rut_empresa: rut}})
+                empresa.update({nombre_empresa: rutificador, empresa_verificada: true}, {where: {rut_empresa: rut}})
             }
         }
     }
