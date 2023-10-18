@@ -57,10 +57,10 @@ export async function actualizar_promedio_aptitudes_carrera(){
         });
         //console.log("Configuraciones de Practica: ", lista_config_practica_carrera);
         let aux_nombre_aptitudes_carrera: string[] = [];
-        let aux_eval_aptitudes_carrera: any[] = [];
+        let aux_eval_aptitudes_carrera: number[][] = [];
         //recorriendo config_practica de la carrera
         for(let j=0; j<lista_config_practica_carrera.length;j++){
-            console.log("Config_practica");
+            //console.log("Config_practica");
             if (lista_config_practica_carrera[j] != null) {
                 let pregunta_evaluacion = await pregunta_supervisor.findOne({
                     where: {
@@ -71,6 +71,7 @@ export async function actualizar_promedio_aptitudes_carrera(){
 
                 if(pregunta_evaluacion != null){
                     let aptitudes_pregunta_evaluacion = pregunta_evaluacion.opciones.split(";;");
+                    
                     let lista_modalidades = await modalidad.findAll({
                         where: {
                             id_config_practica: lista_config_practica_carrera[j].id
@@ -83,11 +84,11 @@ export async function actualizar_promedio_aptitudes_carrera(){
                                 id_modalidad: lista_modalidades[k].id
                             }
                         });
-                        console.log("Modalidad");
+                        //console.log("Modalidad");
                         //recorriendo practicas de la modalidad
                         for(let l=0;l<lista_practicas.length;l++){
 
-                            console.log("Practica");
+                            //console.log("Practica");
         
                             let eval_aptitudes = await respuesta_supervisor.findOne({
                                 where: {
@@ -98,17 +99,64 @@ export async function actualizar_promedio_aptitudes_carrera(){
                             //console.log("Evaluacion Aptitudes: ", eval_aptitudes);
                             if(eval_aptitudes != null){
                                 let notas_pregunta_evaluacion = eval_aptitudes.respuesta.split(",");
-                                console.log("Aptitudes Evaluadas: ", aptitudes_pregunta_evaluacion);
-                                console.log("Nota Aptitudes: ", notas_pregunta_evaluacion);
+                                //console.log("Aptitudes Evaluadas: ", aux_eval_aptitudes_carrera);
+                                //console.log("Nota Aptitudes: ", notas_pregunta_evaluacion);
+
+                                //recorriendo notas aptitudes
+                                for(let m=0;m<notas_pregunta_evaluacion.length;m++){
+                                    let pos_aptitud = aux_nombre_aptitudes_carrera.indexOf(aptitudes_pregunta_evaluacion[m]);
+                                    if(pos_aptitud== -1){
+                                        //aptitud no esta en aux_nombre_aptitudes_carrera
+                                        aux_nombre_aptitudes_carrera.push(aptitudes_pregunta_evaluacion[m]);
+                                        aux_eval_aptitudes_carrera.push([notas_pregunta_evaluacion[m]]);
+                                    }
+                                    else{
+                                        //aptitud esta en aux_nombre_aptitudes_carrera
+                                        aux_eval_aptitudes_carrera[pos_aptitud].push(notas_pregunta_evaluacion[m]);
+                                    }
+                                }
                             }
                         }
                     }
                 }
 
             }
-            else{
-                continue
+        }
+        //console.log("Carrera: ", lista_carreras[i].nombre);
+        //console.log("Aptitudes: ", aux_nombre_aptitudes_carrera);
+        //console.log("Notas: ", aux_eval_aptitudes_carrera);
+        let promedio_aptitudes_carrera: any[] = [];
+
+        if(aux_nombre_aptitudes_carrera.length != 0){
+            let promedio_aptitudes=0;
+            for (let j=0;j<aux_eval_aptitudes_carrera.length;j++){
+                let suma_notas = 0;
+                for(let k=0;k<aux_eval_aptitudes_carrera[j].length;k++){
+                    suma_notas += Number(aux_eval_aptitudes_carrera[j][k]);
+                }
+                promedio_aptitudes_carrera.push((suma_notas/aux_eval_aptitudes_carrera[j].length).toFixed(1));
+                //dejar promedio con un decimal
+                //promedio_aptitudes_carrera[j] = promedio_aptitudes_carrera[j].toFixed(1);
+                promedio_aptitudes += Number((suma_notas/aux_eval_aptitudes_carrera[j].length).toFixed(1));
             }
+            promedio_aptitudes = Number((promedio_aptitudes/aux_nombre_aptitudes_carrera.length).toFixed(1));
+            //console.log("Promedio Aptitudes: ", promedio_aptitudes_carrera);
+            //console.log("Promedio General: ", promedio_aptitudes);
+
+            let arreglo_aptitudes: any[] = [];
+            arreglo_aptitudes.push(promedio_aptitudes);
+            for (let j=0;j<aux_nombre_aptitudes_carrera.length;j++){
+                arreglo_aptitudes.push(aux_nombre_aptitudes_carrera[j]);
+                arreglo_aptitudes.push(Number(promedio_aptitudes_carrera[j]));
+            }
+            //console.log("Arreglo Aptitudes: ", arreglo_aptitudes);
+
+            let json_promedio_aptitudes = {"array": arreglo_aptitudes};
+
+            const Carrera = await carrera.findOne({ where: { id: lista_carreras[i].id } })
+            Carrera.update({
+                promedio_aptitudes: json_promedio_aptitudes
+            })
         }
     }
 }

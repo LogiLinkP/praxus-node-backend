@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 const { crear_informes } = require('./informe');
 const { actualizar_ramos, actualizar_promedio_aptitudes_carrera } = require('./carrera');
-const { actualizar_empresa } = require('./empresa');
+const { actualizar_empresa, actualizar_aptitudes_empresa } = require('./empresa');
 const { actualizar_encuesta_practica } = require('./config_practica');
 const { save_linkedin_data } = require('./data_linkedin');
 
@@ -58,6 +58,12 @@ export class Scheduler {
             console.log('actualizando aptitudes carrera');
             actualizar_promedio_aptitudes_carrera()
           });
+
+        //aptitudes empresa
+        cron.schedule('* * * * *', () => {
+            console.log('actualizando aptitudes empresa');
+            actualizar_aptitudes_empresa()
+        });
     }
 }
 
