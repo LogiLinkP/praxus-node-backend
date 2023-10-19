@@ -2,7 +2,7 @@ import { where } from "sequelize";
 
 export { };
 
-const { config_practica, modalidad, pregunta_encuesta_final, config_informe, solicitud_documento, pregunta_supervisor, pregunta_informe } = require('../../models');
+const { config_practica, modalidad, pregunta_encuesta_final, config_informe, solicitud_documento, pregunta_supervisor, pregunta_informe, aptitud } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerConfigPracticas = new Router();
@@ -149,9 +149,53 @@ routerConfigPracticas.delete('/eliminar', (req: any, res: any) => {
 })
 
 //[POST] Crear una config_practica con los datos recibidos
-routerConfigPracticas.post('/crear', jsonParser, (req: any, res: any) => {
+routerConfigPracticas.post('/crear', jsonParser, async (req: any, res: any) => {
   const { nombre, frecuencia_informes, informe_final, id_carrera, activada } = req.body;
   console.log("Request de creacion de config_practica recibida");
+  try{
+    console.log("Creando config_practica");
+    const config_practica_creada = await config_practica.create({
+      nombre: nombre,
+      frecuencia_informes: frecuencia_informes,
+      informe_final: informe_final,
+      id_carrera: id_carrera,
+      activada: activada
+    });
+
+    const Aptitudes = await aptitud.findAll({
+      where: {
+        id_carrera: id_carrera
+      }
+    });
+
+    let rango = Aptitudes[0].rango;
+    let opciones = "";
+    for (let i = 0; i < Aptitudes.length; i++) {
+      opciones = opciones + ";;"+ Aptitudes[i].nombre;
+    }
+    opciones = opciones.substring(2, opciones.length);
+    const Pregunta_supervisor = await pregunta_supervisor.create({
+      id_config_practica: config_practica_creada.id,
+      tipo_respuesta: "evaluacion",
+      opciones: opciones,
+      enunciado: "Evalúe las siguientes aptitudes del alumno: (considere 1 como la menor calificación y " + String(rango) + " la mayor)",
+      fija: true,
+      rango: rango
+    });
+
+    res.status(200).json({ message: "config_practica creada", id: config_practica_creada.id });
+  } catch (err) {
+    console.log("Error al crear config_practica", err);
+    res.status(500).json({ message: "Error al crear config_practica", error: err });
+  }
+
+});
+
+/*
+
+  const config_practica_creada = await config_practica.c
+
+
   config_practica.create({
     nombre: nombre,
     frecuencia_informes: frecuencia_informes,
@@ -162,12 +206,18 @@ routerConfigPracticas.post('/crear', jsonParser, (req: any, res: any) => {
     .then((resultados: any) => {
       console.log(resultados);
       res.status(200).json({ message: "config_practica creada", id: resultados.id });
+
+      //crecion de pregunta evaluacion supervisor considerando aptitudes
+          
+      const Carrera = await carrera.findOne({where: {id: id_carrera}})
+
     })
     .catch((err: any) => {
       console.log('Error al crear config_practica', err);
       res.status(500).json({ message: "Error al crear config_practica", error: err });
     })
 })
+*/
 
 //[PUT]
 routerConfigPracticas.put('/actualizar', jsonParser, async (req: any, res: any) => {
