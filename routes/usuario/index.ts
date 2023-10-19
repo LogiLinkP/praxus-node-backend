@@ -111,11 +111,11 @@ routerUsuario.post('/login', jsonParser, async (req: any, res: any) => {
     ]
   })
   if (!resultados) {
-    return res.status(400).send({ message: 'Error en usuario y contraseña' });
+    return res.status(400).send({ message: 'Credenciales incorrectas. Usuario o contraseña inválidos.' });
   }
   let checkout = await bcrypt.compare(password, resultados.password)
   if (checkout === false) {
-    return res.status(400).send({ message: 'Error en usuario y contraseña' });
+    return res.status(400).send({ message: 'Credenciales incorrectas. Usuario o contraseña inválidos.' });
   }
   const token = jwt.sign({ id: resultados.id.toString() }, process.env.SECRET_KEY, { expiresIn: '1h' })
   let date = new Date();
@@ -183,10 +183,10 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
   if (!cnfPwd || password != cnfPwd) {
     return res.status(400).send({ message: 'Contraseñas no coinciden' });
   }
-  // Verifico si correo ya se ocu
+  // Verificar si correo ya existe
   const data = await usuario.findOne({ where: { correo: email } })
   if (data != null) {
-    return res.status(400).send({ message: 'Email ya ocupado' });
+    return res.status(400).send({ message: 'Correo ya ocupado, intente con otro correo.' });
   }
   else {
     let hash = await bcrypt.hash(password, 8)
@@ -224,7 +224,7 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
       if (_usuario.es_supervisor) {
         let trabajador = await supervisor.findAll({ where: { correo: email } })
         if (trabajador != null && trabajador.correo == email) {
-          return res.status(400).send({ message: 'Email ya ocupado' });
+          return res.status(400).send({ message: 'Correo ya ocupado, intente con otro correo.' });
         }
         else {
           supervisor.update({ id_usuario: _usuario.id }, { where: { correo: email } })
@@ -284,7 +284,7 @@ routerUsuario.post('/crear_supervisor', jsonParser, async (req: any, res: any) =
   try {
     let query = await usuario.findOne({ where: { correo: email } })
     if (query != null) {
-      return res.status(400).send({ message: 'Email ya ocupado' });
+      return res.status(400).send({ message: 'Correo ya ocupado, intente con otro correo.' });
     }
     else {
       let hash = await bcrypt.hash(password, 8)
@@ -303,7 +303,7 @@ routerUsuario.post('/crear_supervisor', jsonParser, async (req: any, res: any) =
 
       let trabajador = await supervisor.findAll({ where: { correo: email } })
       if (trabajador != null && trabajador.correo == email) {
-        return res.status(400).send({ message: 'Email ya ocupado' });
+        return res.status(400).send({ message: 'Correo ya ocupado, intente con otro correo.' });
       }
       else {
         supervisor.update({ id_usuario: _usuario.id }, { where: { correo: email } })
