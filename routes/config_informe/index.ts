@@ -1,3 +1,23 @@
+import dotenv from 'dotenv';
+const { memoryFile } = require('../../middleware/file_utils');
+dotenv.config();
+
+const {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  // GetObjectCommand,
+} = require("@aws-sdk/client-s3");
+const fs = require("fs")
+
+const s3Client = new S3Client({
+  region: process.env.bucketRegion,
+  credentials: {
+    accessKeyId: process.env.bucketUserAccessKey,
+    secretAccessKey: process.env.bucketUserSecretAccessKey,
+  }
+});
+
 export { };
 
 const { config_informe, pregunta_informe } = require('../../models');
@@ -7,6 +27,17 @@ const routerConfigInforme = new Router();
 
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
+
+async function uploadFile(filePath:any, key:string) {
+  
+  return s3Client.send(
+      new PutObjectCommand({
+          Bucket: process.env.bucketName,
+          Key: key,
+          Body: filePath,
+      })
+  );
+}
 
 
 //[GET] para obtener uno
@@ -97,11 +128,14 @@ routerConfigInforme.delete('/eliminar_config', (req: any, res: any) => {
 
 //[POST] Crear uno
 routerConfigInforme.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_config_practica, tipo_informe} = req.body;
+  const {id_config_practica, tipo_informe, archivo_o_encuesta, tipo_archivo, plantilla} = req.body;
   console.log("Request de config_informe");
   config_informe.create({
     id_config_practica: id_config_practica,
     tipo_informe: tipo_informe,
+    archivo_o_encuesta: archivo_o_encuesta,
+    tipo_archivo: tipo_archivo,
+    plantilla: plantilla
   })
   .then((resultados:any) => {
       res.status(200).json({ message: "config_informe creado" , id: resultados.id});
@@ -110,6 +144,30 @@ routerConfigInforme.post('/crear', jsonParser, (req: any, res: any) => {
       console.log('Error al crear config_informe', err);
       res.status(500).json({ message: "Error al crear config_informe", error: err });
   })
+})
+
+//[POST] Crear uno
+routerConfigInforme.post('/crearConArchivo', memoryFile.single("file_plantilla"), jsonParser, async (req: any, res: any) => {
+  try{
+    const file_plantilla = req.file.buffer
+    const {id_config_practica, tipo_informe, archivo_o_encuesta, tipo_archivo, plantilla} = req.body;
+
+    console.log("Request de crear config_informe con archivo recibida");
+
+    uploadFile(file_plantilla, plantilla)
+    await config_informe.create({
+      id_config_practica: id_config_practica,
+      tipo_informe: tipo_informe,
+      archivo_o_encuesta: archivo_o_encuesta,
+      tipo_archivo: tipo_archivo,
+      plantilla: plantilla
+    })
+    console.log("Documento Guardado")
+    res.status(200).json({message: "Documento Guardado"});
+  } catch (error:any) {
+    console.log('Error al crear documento', error);
+    res.status(500).json({ message: "Error al crear documento"});
+  }
 })
 
 
