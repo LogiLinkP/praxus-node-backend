@@ -192,8 +192,6 @@ routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
       include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: [config_practica] }],
 
     });
-
-    console.log("\n\n\n\n HOLA");
     console.log("Carrera: ", req);
     res.status(200).json(data);
   } catch (error) {
@@ -305,42 +303,62 @@ routerPractica.delete('/eliminar', (req: any, res: any) => {
 })
 
 //[POST] Crear uno
-routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
-  const { id_estudiante, id_config_practica, id_supervisor, id_empresa, id_encargado, id_modalidad, estado,
-    fecha_inicio, fecha_termino, nota_evaluacion,
-    consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos
-    , calificacion_empresa, comentario_empresa } = req.body;
-  console.log("Request de creacion de practica recibida");
-  practica.create({
-    id_estudiante: id_estudiante,
-    id_config_practica: id_config_practica,
-    id_supervisor: id_supervisor,
-    id_empresa: id_empresa,
-    id_encargado: id_encargado,
-    id_modalidad: id_modalidad,
-    estado: estado,
-    fecha_inicio: fecha_inicio,
-    fecha_termino: fecha_termino,
-    nota_eval: nota_evaluacion,
-    consistencia_informe: consistencia_informe,
-    consistencia_nota: consistencia_nota,
-    resumen: resumen,
-    indice_repeticion: indice_repeticion,
-    key_repeticiones: key_repeticiones,
-    key_fragmentos: key_fragmentos,
-    calificacion_empresa: calificacion_empresa,
-    comentario_empresa: comentario_empresa,
-    ev_encargado: -1,
-  })
-    .then((resultados: any) => {
-      res.status(200).json({ mensaje: "ok" });
-      console.log("practica creada");
+routerPractica.post('/crear', jsonParser, async (req: any, res: any) => {
+  try{
+    const { id_estudiante, id_config_practica, id_supervisor, id_empresa, id_encargado, id_modalidad, estado,
+      fecha_inicio, fecha_termino, nota_evaluacion,
+      consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos
+      , calificacion_empresa, comentario_empresa } = req.body;
+    console.log("Request de creacion de practica recibida");
+    const _pratica = await practica.create({
+      id_estudiante: id_estudiante,
+      id_config_practica: id_config_practica,
+      id_supervisor: id_supervisor,
+      id_empresa: id_empresa,
+      id_encargado: id_encargado,
+      id_modalidad: id_modalidad,
+      estado: estado,
+      fecha_inicio: fecha_inicio,
+      fecha_termino: fecha_termino,
+      nota_eval: nota_evaluacion,
+      consistencia_informe: consistencia_informe,
+      consistencia_nota: consistencia_nota,
+      resumen: resumen,
+      indice_repeticion: indice_repeticion,
+      key_repeticiones: key_repeticiones,
+      key_fragmentos: key_fragmentos,
+      calificacion_empresa: calificacion_empresa,
+      comentario_empresa: comentario_empresa,
+      ev_encargado: -1,
+    })
 
-    })
-    .catch((err: any) => {
-      res.status(500).json({ mensaje: "error" });
-      console.log('Error al crear practica', err.message, fecha_inicio);
-    })
+    // Chequear obtener la modalidad asociada a la practica, luego la config practica asociada a la modalidad
+    // y luego chequear si el campo informe_final en ella dice "si". De ser así, se debe crear un informe final,
+    // para lo cual se debe buscar todas las config_informe asociadas a esta config_practica y encontrar el id de
+    // la que tenga el campo tipo_informe (llevado a minúsculas) con valor "informe final".
+
+    // Crear informe final
+    const _modalidad = await modalidad.findOne({ where: { id: id_modalidad } });
+    const _config_practica = await config_practica.findOne({ where: { id: _modalidad.id_config_practica } });
+    const _config_informes = await config_informe.findAll({ where: { id_config_practica: _config_practica.id } });
+
+    if ( _config_informes.length > 0 ) {
+      const _config_informe = _config_informes.find( (config_informe: any) => config_informe.tipo_informe.toLowerCase() === "informe final" );
+      if ( _config_informe ) {
+        await informe.create({
+          id_practica: _pratica.id,
+          id_config_informe: _config_informe.id,
+          horas_trabajadas: 0,
+          fecha: new Date()
+        })
+      }
+    }
+
+    res.status(200).json({message: "Practica creada"});
+  } catch (error:any) {
+    console.log('Error al crear practica', error);
+    res.status(500).json({ message: "Error al crear practica"});
+  }
 })
 
 

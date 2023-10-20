@@ -85,13 +85,23 @@ routerInforme.delete('/eliminar', (req: any, res: any) => {
 //[POST] Crear uno
 routerInforme.post('/crear', jsonParser, (req: any, res: any) => {
   const { id_practica, id_config_informe, horas_trabajadas, key } = req.body;
+  // if key is not a json object, convert it
+  let key_json = key;
+  if (typeof key === 'string') {
+    try {
+      key_json = JSON.parse(key);
+    } catch (error) {
+      console.log(error);
+      return res.sendStatus(400);
+    }
+  }
   console.log("Request de creacion de informe");
   informe.create({
     id_practica: id_practica,
     id_config_informe: id_config_informe,
     horas_trabajadas: horas_trabajadas,
     fecha: Date.now(),
-    key: key
+    key: key_json
   })
     .then((resultados: any) => {
       console.log(resultados);

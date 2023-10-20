@@ -162,11 +162,12 @@ routerConfigInforme.post('/crearConArchivo', memoryFile.single("file_plantilla")
       tipo_archivo: tipo_archivo,
       plantilla: plantilla
     })
-    console.log("Documento Guardado")
-    res.status(200).json({message: "Documento Guardado"});
+    console.log("Config_informe con plantilla creado")
+
+    res.status(200).json({message: "Config_informe con plantilla creado"});
   } catch (error:any) {
-    console.log('Error al crear documento', error);
-    res.status(500).json({ message: "Error al crear documento"});
+    console.log('Error al crear config_informe con plantilla', error);
+    res.status(500).json({ message: "Error al crear config_informe con plantilla"});
   }
 })
 
