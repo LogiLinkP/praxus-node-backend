@@ -21,7 +21,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   config_informe.init({
     id_config_practica: DataTypes.INTEGER,
-    tipo_informe: DataTypes.STRING
+    tipo_informe: DataTypes.STRING,
+    archivo_o_encuesta: DataTypes.STRING,
+    tipo_archivo: DataTypes.STRING,
+    plantilla: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'config_informe',
