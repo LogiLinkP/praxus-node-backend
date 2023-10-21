@@ -70,43 +70,26 @@ function shuffle(array: any){
 }
 
 export async function validador_empresa(){
-    const n = 5 //maximo peticiones
+    //const n = 5 //maximo peticiones
     const empresas = await empresa.findAll({where: {empresa_verificada: false}});
+    const n = Math.min(empresas.length, 5);
     const empresas_aux = shuffle(empresas);
-    console.log(empresas_aux)
-    if(n > empresas_aux.length){
-        for(let i = 0; i < empresas_aux.length; i++){
-            let rut = empresas_aux[i].rut_empresa;
-            let rutificador = await consulta_rutificador_co(rut);
-            //console.log(1)
-            if(rutificador === false){
-                let boletaofactura = await consulta_boletaofactura_com(rut);
-                if(boletaofactura === false){
-                    continue;
-                }else{
-                    //console.log(2)
-                    empresa.update({nombre_empresa: boletaofactura, empresa_verificada: true}, {where: {rut_empresa: rut}})
-                }
+    //console.log(empresas_aux)
+    for(let i = 0; i < n; i++){
+        let rut = empresas_aux[i].rut_empresa;
+        let rutificador = await consulta_rutificador_co(rut);
+        //console.log(1)
+        if(rutificador === false){
+            let boletaofactura = await consulta_boletaofactura_com(rut);
+            if(boletaofactura === false){
+                continue;
             }else{
-                empresa.update({nombre_empresa: rutificador, empresa_verificada: true}, {where: {rut_empresa: rut}})
+                //console.log(2)
+                empresa.update({nombre_empresa: boletaofactura, empresa_verificada: true}, {where: {rut_empresa: rut}})
             }
-        }
-    }else{
-        for(let i = 0; i < n; i++){
-            let rut = empresas_aux[i].rut_empresa;
-            let rutificador = await consulta_rutificador_co(rut);
-            if(rutificador === false){
-                //console.log(rutificador)
-                let boletaofactura = await consulta_boletaofactura_com(rut);
-                if(boletaofactura === false){
-                    continue;
-                }else{
-                    //console.log(boletaofactura, rutificador)
-                    empresa.update({nombre_empresa: boletaofactura, empresa_verificada: true}, {where: {rut_empresa: rut}})
-                }
-            }else{
-                empresa.update({nombre_empresa: rutificador, empresa_verificada: true}, {where: {rut_empresa: rut}})
-            }
+        }else{
+            empresa.update({nombre_empresa: rutificador, empresa_verificada: true}, {where: {rut_empresa: rut}})
         }
     }
+    
 }
