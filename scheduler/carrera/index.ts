@@ -117,26 +117,28 @@ export async function actualizar_sueldo_promedio_ramo(){
             console.log(practica_asociada);
             */
 
-            if (practica_asociada.sueldo != null){
-                //console.log("sueldo no es null");
-                //console.log("lista_nombre_ramos");
-                //console.log(respuesta_ramos);
-                for (let k = 0; k < respuesta_ramos.length; k++){
-                    //console.log("k: ",k);
-
-                    //if (respuesta_ramos[k] in lista_nombre_ramos){
-                    if (lista_nombre_ramos.indexOf(respuesta_ramos[k]) > -1){ //si el ramo ya existe en la lista
-                        //console.log("RAMO YA EXISTE");
-                        let pos_ramo = lista_nombre_ramos.indexOf(respuesta_ramos[k]);
-                        //obteniendo sueldo
-                        
-                        lista_sueldo_ramos[pos_ramo].push(practica_asociada.sueldo);
-                    }
-                    else{
-                        //console.log("RAMO NO EXISTE");
-                        lista_nombre_ramos.push(respuesta_ramos[k]);
-                        let lista_sueldo_ramo_aux = [respuesta_ramos[k], practica_asociada.sueldo];
-                        lista_sueldo_ramos.push(lista_sueldo_ramo_aux);
+            if (practica_asociada != null){
+                if (practica_asociada.sueldo != null){
+                    //console.log("sueldo no es null");
+                    //console.log("lista_nombre_ramos");
+                    //console.log(respuesta_ramos);
+                    for (let k = 0; k < respuesta_ramos.length; k++){
+                        //console.log("k: ",k);
+    
+                        //if (respuesta_ramos[k] in lista_nombre_ramos){
+                        if (lista_nombre_ramos.indexOf(respuesta_ramos[k]) > -1){ //si el ramo ya existe en la lista
+                            //console.log("RAMO YA EXISTE");
+                            let pos_ramo = lista_nombre_ramos.indexOf(respuesta_ramos[k]);
+                            //obteniendo sueldo
+                            
+                            lista_sueldo_ramos[pos_ramo].push(practica_asociada.sueldo);
+                        }
+                        else{
+                            //console.log("RAMO NO EXISTE");
+                            lista_nombre_ramos.push(respuesta_ramos[k]);
+                            let lista_sueldo_ramo_aux = [respuesta_ramos[k], practica_asociada.sueldo];
+                            lista_sueldo_ramos.push(lista_sueldo_ramo_aux);
+                        }
                     }
                 }
             }
