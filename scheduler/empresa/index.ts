@@ -1,4 +1,4 @@
-const { empresa, practica, estudiante } = require('../../models');
+const { empresa, practica, estudiante, respuesta_ramos } = require('../../models');
 
 export async function actualizar_empresa() {
     const empresas = await empresa.findAll();
@@ -56,4 +56,34 @@ export async function actualizar_empresa() {
         })
 
     }
+}
+
+export async function actualizacion_ramos_empresa() {
+    const lista_empresas = await empresa.findAll();
+    for (let i=0;i<lista_empresas.legth;i++){
+        let json_aux_empresa = {}
+        let practicas_empresa = await practica.findAll({
+            where: {
+                id_empresa: lista_empresas[i].id
+            }
+        })
+        for (let j=0;j<practicas_empresa.length;j++){
+            if(practicas_empresa[j] != null){
+                let respuesta_ramos_practica = await respuesta_ramos.findOne({
+                    where: {
+                        id_practica: practicas_empresa[j].id
+                    }
+                })
+                if (respuesta_ramos_practica != null){
+                    let arreglo_respuesta_ramos = respuesta_ramos_practica.respuesta.split(";;")
+                    let id_carrera = respuesta_ramos_practica.id_carrera
+
+                    console.log(arreglo_respuesta_ramos)
+                    console.log(id_carrera)
+                }
+
+            }
+        }
+    }
+    
 }
