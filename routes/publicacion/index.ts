@@ -103,9 +103,11 @@ routerpublicacion.post('/crear', jsonParser, (req: any, res: any) => {
 routerpublicacion.put('/editar', jsonParser, async (req: any, res: any) => {
   const Publicacion = await publicacion.findOne({ where: { id: req.body.id } })
   if (Publicacion) {
+    console.log("BODY: ", req.body)
     Publicacion.update({ titulo: req.body.titulo, enunciado: req.body.enunciado, isfijo: req.body.isfijo })
       .then((resultados: any) => {
-        res.sendStatus(200);
+        console.log("EDITADO")
+        res.status(200).json({message: "Publicación Editada"});
       })
       .catch((err: any) => {
         console.log('Error al actualizar publicacion', err);
