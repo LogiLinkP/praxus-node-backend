@@ -23,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     palabras_clave: DataTypes.STRING,
     sueldo_promedio: DataTypes.INTEGER,
     ramos_utiles: DataTypes.JSON
+    promedio_aptitudes: DataTypes.JSON
   }, {
     sequelize,
     modelName: 'empresa',
