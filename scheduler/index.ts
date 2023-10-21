@@ -1,9 +1,11 @@
+
 const cron = require('node-cron');
 const { crear_informes } = require('./informe');
 const { actualizar_ramos, actualizar_promedio_aptitudes_carrera } = require('./carrera');
 const { actualizar_empresa, actualizar_aptitudes_empresa } = require('./empresa');
 const { actualizar_encuesta_practica } = require('./config_practica');
 const { save_linkedin_data } = require('./data_linkedin');
+const { publicaciones_programadas } = require("./publicacion");
 
 
 // cron basics:
@@ -64,6 +66,12 @@ export class Scheduler {
             console.log('actualizando aptitudes empresa');
             actualizar_aptitudes_empresa()
         });
+
+        //PUBLICACION CON FECHA PROGRAMADA
+        cron.schedule("* * * * *", () => {
+            console.log("Buscando publicaciones programadas");
+            publicaciones_programadas();
+        })
     }
 }
 
