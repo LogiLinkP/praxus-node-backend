@@ -1,4 +1,6 @@
-const { empresa, practica, estudiante } = require('../../models');
+import e from "cors";
+const { empresa, practica, estudiante, carrera, modalidad, config_practica, pregunta_supervisor, respuesta_supervisor } = require('../../models');
+const { consulta_rutificador_co, consulta_boletaofactura_com } = require('../../routes/empresa/utilidades_empresa');
 
 export async function actualizar_empresa() {
     const empresas = await empresa.findAll();
@@ -55,5 +57,201 @@ export async function actualizar_empresa() {
             practicantes_destacados: porcentaje_destacados
         })
 
+    }
+}
+
+export async function actualizar_sueldo_promedio_empresa(){
+    const empresas = await empresa.findAll();
+    for (let i = 0; i < empresas.length; i++) {
+        let array_practicas = await practica.findAll({
+            where: {
+                id_empresa: empresas[i].id
+            }
+        });
+        let suma_sueldos = 0;
+        let cantidad_practicas = 0;
+
+        for (let k = 0; k < array_practicas.length; k++) {
+            if (array_practicas[k].sueldo) {
+                suma_sueldos += array_practicas[k].sueldo;
+                cantidad_practicas += 1;
+            }
+        }
+
+        //let sueldo_promedio = 0
+
+        if (cantidad_practicas != 0) {
+             let sueldo_promedio = suma_sueldos / cantidad_practicas;
+             //console.log(empresas[i].nombre_empresa)
+            //console.log(sueldo_promedio)
+
+            const Empresa = await empresa.findOne({ where: { id: empresas[i].id } })
+
+            Empresa.update({
+                sueldo_promedio: sueldo_promedio
+            })
+        }
+    }
+}
+
+export async function actualizar_aptitudes_empresa(){
+    const lista_empresas = await empresa.findAll();
+    //recorriendo empresas
+    for(let i=0; i<lista_empresas.length;i++){
+        //console.log("Recorriendo empresa-------------------------------------------------------------------");
+        //console.log("Recorriendo empresas");
+        var json_aux_empresa: any = {};
+        //recorriendo todas practicas
+        let lista_practicas = await practica.findAll({
+            where: {
+                id_empresa: lista_empresas[i].id
+            }
+        });
+        for(let j=0;j<lista_practicas.length;j++){
+            //console.log("Recorriendo practicas");
+            if (lista_practicas[j] != null){
+                //console.log("Recorriendo practicas no nulas");
+                let Estudiante = await estudiante.findOne({
+                    where: {
+                        id: lista_practicas[j].id_estudiante
+                    }
+                });
+                let Carrera = await carrera.findOne({
+                    where: {
+                        id: Estudiante.id_carrera
+                    }
+                });
+                //obtener evaluacion de aptitudes
+    
+                let Modalidad = await modalidad.findOne({
+                    where: {
+                        id: lista_practicas[j].id_modalidad
+                    }
+                });
+    
+                let Config_practica = await config_practica.findOne({
+                    where: {
+                        id: Modalidad.id_config_practica
+                    }
+                });
+    
+                let pregunta_evaluacion_supervisor = await pregunta_supervisor.findOne({
+                    where: {
+                        id_config_practica: Config_practica.id,
+                        tipo_respuesta: "evaluacion"
+                    }
+                });
+    
+                let respuesta_evaluacion_supervisor = await respuesta_supervisor.findOne({
+                    where: {
+                        id_pregunta_supervisor: pregunta_evaluacion_supervisor.id,
+                        id_practica: lista_practicas[j].id
+                    }
+                });
+
+                //console.log("Pregunta evaluacion supervisor: ", pregunta_evaluacion_supervisor);
+                //console.log("Respuesta evaluacion supervisor: ",respuesta_evaluacion_supervisor);
+
+                if(respuesta_evaluacion_supervisor != null && pregunta_evaluacion_supervisor != null){
+                    if (respuesta_evaluacion_supervisor.respuesta != null && pregunta_evaluacion_supervisor.opciones != null){
+                        let aptitudes_pregunta_supervisor = pregunta_evaluacion_supervisor.opciones.split(";;");
+                        let notas_evaluacion_apitudes = respuesta_evaluacion_supervisor.respuesta.split(",");
+            
+                        //console.log("Pregunta evaluacion supervisor: ",aptitudes_pregunta_supervisor);
+                        //console.log("Respuesta evaluacion supervisor: ",notas_evaluacion_apitudes);
+                        //console.log("Carrera:",Carrera.nombre);
+            
+                        //verificacion si carrera existe en json_aux_empresa
+                        if (json_aux_empresa.hasOwnProperty(Carrera.nombre)){
+                            //console.log("Carrera ya existe");
+                        }
+                        else{
+                            //console.log("Carrera no existe");
+                            json_aux_empresa[String(Carrera.nombre)] = {};  
+                        }
+
+                        //recorriendo aptitudes
+                        for(let k=0; k<aptitudes_pregunta_supervisor.length;k++){
+                            if (json_aux_empresa[String(Carrera.nombre)].hasOwnProperty(String(aptitudes_pregunta_supervisor[k]))){
+                                //aptitud ya existe en la carrera
+                                json_aux_empresa[String(Carrera.nombre)][String(aptitudes_pregunta_supervisor[k])].push(notas_evaluacion_apitudes[k]);
+                            }
+                            else{
+                                //aptitud no existe en la carrera
+                                json_aux_empresa[String(Carrera.nombre)][String(aptitudes_pregunta_supervisor[k])] = [notas_evaluacion_apitudes[k]];
+                            }
+                        }
+                    }
+                }            
+            }
+        }
+        //console.log("Nombre empresa: ", lista_empresas[i].nombre_empresa);
+        //console.log("Json aux empresa: ",json_aux_empresa);
+
+        let json_promedio_aptitudes_empresa:any = {};
+        let carreras = Object.keys(json_aux_empresa);
+        for(let k=0; k<carreras.length;k++){
+            let carrera_aux = await carrera.findOne({
+                where: {
+                    nombre: carreras[k]
+                }
+            });
+            json_promedio_aptitudes_empresa[carrera_aux.id] = [];
+
+            let json_aptitudes = json_aux_empresa[carreras[k]];
+            let aptitudes = Object.keys(json_aptitudes);
+            for(let l=0; l<aptitudes.length;l++){
+                json_promedio_aptitudes_empresa[carrera_aux.id].push(aptitudes[l]);
+                let promedio_aux = 0;
+                for (let m=0; m<json_aux_empresa[carreras[k]][aptitudes[l]].length;m++){
+                    promedio_aux += Number(json_aux_empresa[carreras[k]][aptitudes[l]][m]);
+                }
+                promedio_aux = Number((promedio_aux / json_aux_empresa[carreras[k]][aptitudes[l]].length).toFixed(1));
+                json_promedio_aptitudes_empresa[carrera_aux.id].push(promedio_aux);
+            }
+        }
+        //console.log("Json promedio aptitudes empresa: ",json_promedio_aptitudes_empresa);
+        let Empresa = await empresa.findOne({
+            where: {
+                id: lista_empresas[i].id
+            }
+        });
+        Empresa.update({
+            promedio_aptitudes: json_promedio_aptitudes_empresa
+        });
+    }
+}
+
+function shuffle(array: any){
+    for(let i = array.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i+1));
+        const temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+}
+
+export async function validador_empresa(){
+    //const n = 5 //maximo peticiones
+    const empresas = await empresa.findAll({where: {empresa_verificada: false}});
+    const n = Math.min(empresas.length, 5);
+    const empresas_aux = shuffle(empresas);
+    //console.log(empresas_aux)
+    for(let i = 0; i < n; i++){
+        let rut = empresas_aux[i].rut_empresa;
+        let rutificador = await consulta_rutificador_co(rut);
+        //console.log(1)
+        if(rutificador === false){
+            let boletaofactura = await consulta_boletaofactura_com(rut);
+            if(boletaofactura === false){
+                continue;
+            }else{
+                //console.log(2)
+                empresa.update({nombre_empresa: boletaofactura, empresa_verificada: true}, {where: {rut_empresa: rut}})
+            }
+        }else{
+            empresa.update({nombre_empresa: rutificador, empresa_verificada: true}, {where: {rut_empresa: rut}})
+        }
     }
 }
