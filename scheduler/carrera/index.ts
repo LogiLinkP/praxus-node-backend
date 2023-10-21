@@ -1,4 +1,4 @@
-const { carrera, respuesta_ramos, config_practica, modalidad, pregunta_supervisor, practica, respuesta_supervisor } = require('../../models');
+const { carrera, respuesta_ramos, config_practica, modalidad, practica, pregunta_supervisor, respuesta_supervisor } = require('../../models');
 
 export async function actualizar_ramos() {
     const carreras = await carrera.findAll();

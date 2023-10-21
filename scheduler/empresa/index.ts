@@ -1,5 +1,3 @@
-import e from "cors";
-
 const { empresa, practica, estudiante, carrera, modalidad, config_practica, pregunta_supervisor, respuesta_supervisor } = require('../../models');
 
 export async function actualizar_empresa() {

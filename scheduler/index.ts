@@ -1,13 +1,11 @@
 import { actualizar_sueldo_promedio_empresa } from "./empresa";
 
-
 const cron = require('node-cron');
 const { crear_informes } = require('./informe');
-const { actualizar_ramos, actualizar_promedio_aptitudes_carrera, actualizar_sueldo_promedio_carrera, actualizar_sueldo_promedio_ramo } = require('./carrera');
+const { actualizar_ramos, actualizar_sueldo_promedio_carrera, actualizar_sueldo_promedio_ramo, actualizar_promedio_aptitudes_carrera } = require('./carrera');
 const { actualizar_empresa, actualizar_aptitudes_empresa } = require('./empresa');
 const { actualizar_encuesta_practica, actualizar_sueldo_promedio_config_practica } = require('./config_practica');
 const { save_linkedin_data } = require('./data_linkedin');
-const { publicaciones_programadas } = require("./publicacion");
 
 
 // cron basics:
@@ -57,22 +55,22 @@ export class Scheduler {
             save_linkedin_data();
         });
 
-        cron.schedule('0 0 * * *', () => {
+        cron.schedule('* * * * *', () => {
             console.log('Actualizando sueldo_promedio config practica');
             actualizar_sueldo_promedio_config_practica();
         });
 
-        cron.schedule('0 0 * * *', () => {
+        cron.schedule('* * * * *', () => {
            console.log('Actualizando sueldo_promedio carrera');
             actualizar_sueldo_promedio_carrera();
         });
 
-        cron.schedule('0 0 * * *', () => {
+        cron.schedule('* * * * *', () => {
            console.log('Actualizando sueldo_promedio ramo ');
             actualizar_sueldo_promedio_ramo();
         });
 
-        cron.schedule('0 0 * * *', () => {
+        cron.schedule('* * * * *', () => {
             console.log('Actualizando sueldo_promedio empresa');
             actualizar_sueldo_promedio_empresa();
         });
@@ -89,12 +87,6 @@ export class Scheduler {
             console.log('actualizando aptitudes empresa');
             actualizar_aptitudes_empresa()
         });
-
-        //PUBLICACION CON FECHA PROGRAMADA
-        cron.schedule("* * * * *", () => {
-            console.log("Buscando publicaciones programadas");
-            publicaciones_programadas();
-        })
     }
 }
 
