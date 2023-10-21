@@ -1,3 +1,4 @@
+
 const cron = require('node-cron');
 const { crear_informes } = require('./informe');
 const { actualizar_ramos } = require('./carrera');
