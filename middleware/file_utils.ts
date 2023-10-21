@@ -65,4 +65,3 @@ export const memoryFile = multer({
     storage: memorystorage,
     limits: { fileSize: MAX_FILE_SIZE }
 });
-
