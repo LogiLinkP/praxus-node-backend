@@ -1,11 +1,13 @@
 import { actualizar_sueldo_promedio_empresa } from "./empresa";
 
+
 const cron = require('node-cron');
 const { crear_informes } = require('./informe');
 const { actualizar_ramos, actualizar_sueldo_promedio_carrera, actualizar_sueldo_promedio_ramo } = require('./carrera');
 const { actualizar_empresa } = require('./empresa');
 const { actualizar_encuesta_practica, actualizar_sueldo_promedio_config_practica } = require('./config_practica');
 const { save_linkedin_data } = require('./data_linkedin');
+const { publicaciones_programadas } = require("./publicacion");
 
 
 // cron basics:
@@ -74,6 +76,12 @@ export class Scheduler {
             console.log('Actualizando sueldo_promedio empresa');
             actualizar_sueldo_promedio_empresa();
         });
+
+        //PUBLICACION CON FECHA PROGRAMADA
+        cron.schedule("* * * * *", () => {
+            console.log("Buscando publicaciones programadas");
+            publicaciones_programadas();
+        })
     }
 }
 

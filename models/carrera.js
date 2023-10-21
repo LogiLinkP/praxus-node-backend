@@ -23,6 +23,9 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.estudiante, {
         foreignKey: 'id_carrera'
         });
+      this.hasMany(models.aptitud, {
+        foreignKey: 'id_carrera'
+      });
     }
   }
   carrera.init({
@@ -31,7 +34,8 @@ module.exports = (sequelize, DataTypes) => {
     correos_admitidos: DataTypes.STRING,
     estadistica_ramos: DataTypes.JSON,
     sueldo_promedio: DataTypes.INTEGER,
-    sueldo_ramos: DataTypes.JSON
+    sueldo_ramos: DataTypes.JSON,
+    promedio_aptitudes: DataTypes.JSON
   }, {
     sequelize,
     modelName: 'carrera',
