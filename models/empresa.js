@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     calificacion_promedio: DataTypes.FLOAT,
     palabras_clave: DataTypes.STRING,
     sueldo_promedio: DataTypes.INTEGER,
+    promedio_aptitudes: DataTypes.JSON
   }, {
     sequelize,
     modelName: 'empresa',
