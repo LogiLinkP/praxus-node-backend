@@ -56,13 +56,13 @@ export class Scheduler {
         });
 
         //aptitudes carrera
-        cron.schedule('* * * * *', () => {
+        cron.schedule('0 0 * * *', () => {
             console.log('actualizando aptitudes carrera');
             actualizar_promedio_aptitudes_carrera()
-          });
+        });
 
         //aptitudes empresa
-        cron.schedule('* * * * *', () => {
+        cron.schedule('0 0 * * *', () => {
             console.log('actualizando aptitudes empresa');
             actualizar_aptitudes_empresa()
         });
