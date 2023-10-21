@@ -61,12 +61,12 @@ export class Scheduler {
         });
 
         cron.schedule('0 0 * * *', () => {
-           console.log('Actualizando sueldo_promedio carrera');
+            console.log('Actualizando sueldo_promedio carrera');
             actualizar_sueldo_promedio_carrera();
         });
 
         cron.schedule('0 0 * * *', () => {
-           console.log('Actualizando sueldo_promedio ramo ');
+            console.log('Actualizando sueldo_promedio ramo ');
             actualizar_sueldo_promedio_ramo();
         });
 
@@ -74,7 +74,7 @@ export class Scheduler {
             console.log('Actualizando sueldo_promedio empresa');
             actualizar_sueldo_promedio_empresa();
         });
-        
+
         //aptitudes carrera
         cron.schedule('0 0 * * *', () => {
             console.log('actualizando aptitudes carrera');
@@ -92,10 +92,10 @@ export class Scheduler {
             console.log("Buscando publicaciones programadas");
             publicaciones_programadas();
         })
-      
+
         //validacion empresas
         cron.schedule("0 0 * * 1", () => {
-        //cron.schedule("10 * * * *", () => {
+            //cron.schedule("10 * * * *", () => {
             console.log("Realizando validacion de empresas");
             validador_empresa();
         })
