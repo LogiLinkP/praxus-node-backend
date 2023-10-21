@@ -1,5 +1,3 @@
-const { validador_empresa } = require("../scheduler/empresa");
-
 let { Router } = require('express');
 
 const router = new Router();
@@ -35,6 +33,5 @@ router.use('/carrera', require('./carrera'));
 router.use('/respuesta_ramos', require('./respuesta_ramos'));
 router.use('/plagio', require('./plagio'));
 
-//validador_empresa();
 
 module.exports = router;
