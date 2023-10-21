@@ -34,7 +34,8 @@ module.exports = (sequelize, DataTypes) => {
     correos_admitidos: DataTypes.STRING,
     estadistica_ramos: DataTypes.JSON,
     sueldo_promedio: DataTypes.INTEGER,
-    sueldo_ramos: DataTypes.JSON
+    sueldo_ramos: DataTypes.JSON,
+    promedio_aptitudes: DataTypes.JSON
   }, {
     sequelize,
     modelName: 'carrera',
