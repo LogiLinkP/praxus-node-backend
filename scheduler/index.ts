@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 const { crear_informes } = require('./informe');
 const { actualizar_ramos } = require('./carrera');
-const { actualizar_empresa } = require('./empresa');
+const { actualizar_empresa, validador_empresa } = require('./empresa');
 const { actualizar_encuesta_practica } = require('./config_practica');
 const { save_linkedin_data } = require('./data_linkedin');
 const { publicaciones_programadas } = require("./publicacion");
@@ -58,6 +58,13 @@ export class Scheduler {
         cron.schedule("0 * * * *", () => {
             console.log("Buscando publicaciones programadas");
             publicaciones_programadas();
+        })
+      
+        //validacion empresas
+        cron.schedule("0 0 * * 1", () => {
+        //cron.schedule("10 * * * *", () => {
+            console.log("Realizando validacion de empresas");
+            validador_empresa();
         })
     }
 }
