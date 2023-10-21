@@ -70,20 +70,21 @@ function shuffle(array: any){
 }
 
 export async function validador_empresa(){
-    const n = 2 //maximo peticiones
+    const n = 5 //maximo peticiones
     const empresas = await empresa.findAll({where: {empresa_verificada: false}});
     const empresas_aux = shuffle(empresas);
+    console.log(empresas_aux)
     if(n > empresas_aux.length){
         for(let i = 0; i < empresas_aux.length; i++){
             let rut = empresas_aux[i].rut_empresa;
             let rutificador = await consulta_rutificador_co(rut);
-            console.log(1)
+            //console.log(1)
             if(rutificador === false){
                 let boletaofactura = await consulta_boletaofactura_com(rut);
                 if(boletaofactura === false){
                     continue;
                 }else{
-                    console.log(2)
+                    //console.log(2)
                     empresa.update({nombre_empresa: boletaofactura, empresa_verificada: true}, {where: {rut_empresa: rut}})
                 }
             }else{

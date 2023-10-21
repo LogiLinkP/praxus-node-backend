@@ -55,7 +55,7 @@ export class Scheduler {
 
         //validacion empresas
         cron.schedule("0 0 * * 1", () => {
-        //cron.schedule("* * * * *", () => {
+        //cron.schedule("10 * * * *", () => {
             console.log("Realizando validacion de empresas");
             validador_empresa();
         })
