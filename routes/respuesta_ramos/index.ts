@@ -58,11 +58,12 @@ routerRespuestaRamos.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] Crear uno
 routerRespuestaRamos.post('/crear', jsonParser, (req: any, res: any) => {
-  const { id_carrera, respuesta } = req.body;
+  const { id_carrera, respuesta, id_practica } = req.body;
   console.log("Request de respuesta_ramos");
   respuesta_ramos.create({
     id_carrera: id_carrera,
-    respuesta: respuesta
+    respuesta: respuesta,
+    id_practica: id_practica
   })
     .then((resultados: any) => {
       res.status(200).json({ message: "respuesta_ramos creada", id: resultados.id });

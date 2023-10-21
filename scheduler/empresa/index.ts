@@ -2,7 +2,6 @@ import e from "cors";
 const { empresa, practica, estudiante, carrera, modalidad, config_practica, pregunta_supervisor, respuesta_supervisor } = require('../../models');
 const { consulta_rutificador_co, consulta_boletaofactura_com } = require('../../routes/empresa/utilidades_empresa');
 
-
 export async function actualizar_empresa() {
     const empresas = await empresa.findAll();
     for (let i = 0; i < empresas.length; i++) {
@@ -58,6 +57,40 @@ export async function actualizar_empresa() {
             practicantes_destacados: porcentaje_destacados
         })
 
+    }
+}
+
+export async function actualizar_sueldo_promedio_empresa(){
+    const empresas = await empresa.findAll();
+    for (let i = 0; i < empresas.length; i++) {
+        let array_practicas = await practica.findAll({
+            where: {
+                id_empresa: empresas[i].id
+            }
+        });
+        let suma_sueldos = 0;
+        let cantidad_practicas = 0;
+
+        for (let k = 0; k < array_practicas.length; k++) {
+            if (array_practicas[k].sueldo) {
+                suma_sueldos += array_practicas[k].sueldo;
+                cantidad_practicas += 1;
+            }
+        }
+
+        //let sueldo_promedio = 0
+
+        if (cantidad_practicas != 0) {
+             let sueldo_promedio = suma_sueldos / cantidad_practicas;
+             //console.log(empresas[i].nombre_empresa)
+            //console.log(sueldo_promedio)
+
+            const Empresa = await empresa.findOne({ where: { id: empresas[i].id } })
+
+            Empresa.update({
+                sueldo_promedio: sueldo_promedio
+            })
+        }
     }
 }
 
