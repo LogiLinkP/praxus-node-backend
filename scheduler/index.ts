@@ -55,22 +55,22 @@ export class Scheduler {
             save_linkedin_data();
         });
 
-        cron.schedule('* * * * *', () => {
+        cron.schedule('0 0 * * *', () => {
             console.log('Actualizando sueldo_promedio config practica');
             actualizar_sueldo_promedio_config_practica();
         });
 
-        cron.schedule('* * * * *', () => {
+        cron.schedule('0 0 * * *', () => {
            console.log('Actualizando sueldo_promedio carrera');
             actualizar_sueldo_promedio_carrera();
         });
 
-        cron.schedule('* * * * *', () => {
+        cron.schedule('0 0 * * *', () => {
            console.log('Actualizando sueldo_promedio ramo ');
             actualizar_sueldo_promedio_ramo();
         });
 
-        cron.schedule('* * * * *', () => {
+        cron.schedule('0 0 * * *', () => {
             console.log('Actualizando sueldo_promedio empresa');
             actualizar_sueldo_promedio_empresa();
         });
