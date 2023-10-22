@@ -1,4 +1,4 @@
-const { config_practica, pregunta_encuesta_final, estadistica, respuesta_encuesta_final } = require('../../models');
+const { config_practica, pregunta_encuesta_final, estadistica, respuesta_encuesta_final, modalidad, practica } = require('../../models');
 
 export async function actualizar_encuesta_practica() {
     const lista_config_practicas = await config_practica.findAll();
@@ -78,6 +78,40 @@ export async function actualizar_encuesta_practica() {
             estadistica.create({
                 id_config_practica: estadistica_pregunta_aux[0],
                 pregunta_respuestas: { "array": estadistica_pregunta_aux }
+            })
+        }
+    }
+}
+
+export async function actualizar_sueldo_promedio_config_practica() {
+    const lista_config_practicas = await config_practica.findAll();
+    //console.log(lista_config_practicas);
+    for (let i = 0; i < lista_config_practicas.length; i++){
+        let suma_sueldos = 0;
+        let cantidad_practicas = 0;
+        let lista_modalidades = await modalidad.findAll({
+            where: {
+                id_config_practica: lista_config_practicas[i].id
+            }
+        });
+        for (let j = 0; j < lista_modalidades.length; j++){
+            let practicas_modalidad = await practica.findAll({
+                where: {
+                    id_modalidad: lista_modalidades[j].id
+                }
+            });
+            for (let k = 0; k < practicas_modalidad.length; k++){
+                if (practicas_modalidad[k].sueldo){
+                    suma_sueldos += practicas_modalidad[k].sueldo;
+                    cantidad_practicas += 1;
+                }
+            }
+        }
+        if (cantidad_practicas != 0){
+            let sueldo_promedio = suma_sueldos / cantidad_practicas;
+            const Config_practica = await config_practica.findOne({ where: { id: lista_config_practicas[i].id } })
+            Config_practica.update({
+                sueldo_promedio: sueldo_promedio
             })
         }
     }
