@@ -154,15 +154,15 @@ routerInforme.put('/actualizar', jsonParser, async (req: any, res: any) => {
     Informe.update(req.body)
       .then((resultados: any) => {
         console.log(resultados);
-        res.sendStatus(200);
+        res.status(200).json({ message: "Informe actualizado con éxito" })
       })
       .catch((err: any) => {
-        res.send(500)
+        res.send(500).json({ message: "Error al actualizar informe" })
         console.log('Error al actualizar de informe', err);
       })
   } else {
     console.log("No existe informe con id: ", req.query.id)
-    res.sendStatus(404)
+    res.status(404).json({ message: "No existe informe con id: " + req.query.id })
   }
 })
 
