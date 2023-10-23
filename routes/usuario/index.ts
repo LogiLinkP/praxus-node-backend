@@ -232,6 +232,7 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
           }
           else {
             await encargado.create({ id_usuario: _usuario.id, id_carrera: null, practica_pendiente: null });
+            await usuario.update({ activado: true }, { where: { id: _usuario.id } })
             return res.status(200).send({ message: 'Creacion de usuario correcta', userdata: usuarioSend });
           }
         }
