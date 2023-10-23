@@ -49,11 +49,11 @@ export class Scheduler {
             actualizar_encuesta_practica();
         });
 
-        //scrape linkedins
-        cron.schedule("0 0 1 1,7 *", () => {
-            console.log('Scrapeando linkedins');
-            save_linkedin_data();
-        })
+        //scrape linkedins // está fallando
+        // cron.schedule("0 0 1 1,7 *", () => {
+        //     console.log('Scrapeando linkedins');
+        //     save_linkedin_data();
+        // })
 
         cron.schedule("0 0 * * *", () => {
             console.log('Actualizando ramos empresa');
