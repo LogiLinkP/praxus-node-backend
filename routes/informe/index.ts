@@ -1,3 +1,24 @@
+import dotenv from 'dotenv';
+import { parse } from 'path';
+const { memoryFile } = require('../../middleware/file_utils');
+dotenv.config();
+
+const {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  // GetObjectCommand,
+} = require("@aws-sdk/client-s3");
+const fs = require("fs")
+
+const s3Client = new S3Client({
+  region: process.env.bucketRegion,
+  credentials: {
+    accessKeyId: process.env.bucketUserAccessKey,
+    secretAccessKey: process.env.bucketUserSecretAccessKey,
+  }
+});
+
 export { };
 
 const { informe, config_informe, pregunta_informe } = require('../../models');
@@ -7,6 +28,18 @@ const routerInforme = new Router(); // /informe
 
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
+
+
+async function uploadFile(filePath:any, key:string) {
+  
+  return s3Client.send(
+      new PutObjectCommand({
+          Bucket: process.env.bucketName,
+          Key: key,
+          Body: filePath,
+      })
+  );
+}
 
 
 //[GET] para obtener uno
@@ -85,13 +118,23 @@ routerInforme.delete('/eliminar', (req: any, res: any) => {
 //[POST] Crear uno
 routerInforme.post('/crear', jsonParser, (req: any, res: any) => {
   const { id_practica, id_config_informe, horas_trabajadas, key } = req.body;
+  // if key is not a json object, convert it
+  let key_json = key;
+  if (typeof key === 'string') {
+    try {
+      key_json = JSON.parse(key);
+    } catch (error) {
+      console.log(error);
+      return res.sendStatus(400);
+    }
+  }
   console.log("Request de creacion de informe");
   informe.create({
     id_practica: id_practica,
     id_config_informe: id_config_informe,
     horas_trabajadas: horas_trabajadas,
     fecha: Date.now(),
-    key: key
+    key: key_json
   })
     .then((resultados: any) => {
       console.log(resultados);
@@ -111,15 +154,32 @@ routerInforme.put('/actualizar', jsonParser, async (req: any, res: any) => {
     Informe.update(req.body)
       .then((resultados: any) => {
         console.log(resultados);
-        res.sendStatus(200);
+        res.status(200).json({ message: "Informe actualizado con éxito" })
       })
       .catch((err: any) => {
-        res.send(500)
+        res.send(500).json({ message: "Error al actualizar informe" })
         console.log('Error al actualizar de informe', err);
       })
   } else {
     console.log("No existe informe con id: ", req.query.id)
-    res.sendStatus(404)
+    res.status(404).json({ message: "No existe informe con id: " + req.query.id })
+  }
+})
+
+// [PUT] modificar la key de un informe, subir archivo a s3
+routerInforme.put('/subirInforme', memoryFile.single("file_informe"), jsonParser, async (req: any, res: any) => {
+  try{    
+    const file_informe = req.file.buffer
+    const {id, key} = req.body;
+    console.log("ID", id);
+    console.log("KEY", key);
+    uploadFile(file_informe,  JSON.parse(key).filename)
+    const Informe = await informe.findOne({ where: { id: id } })   
+    await Informe.update({key: JSON.parse(key)})
+    res.status(200).json({ message: "Informe subido con éxito"});
+  }catch (error:any) {
+    console.log('Error al actualizar informe', error);
+    res.status(500).json({ message: "Error al actualizar informe"});
   }
 })
 
@@ -139,6 +199,8 @@ routerInforme.get('/todos_practica', (req: any, res: any) => {
       res.send('Error al mostrar informe', err)
     })
 })
+
+
 
 
 module.exports = routerInforme;

@@ -3,9 +3,14 @@ export { };
 const { practica, estudiante, config_practica, usuario, empresa, supervisor, informe, documento, solicitud_documento,
   documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe, encargado, modalidad, pregunta_informe } = require('../../models');
 const { Router, json, urlencoded } = require('express');
+
+const {encrypt} = require('../../utils/encriptar');
 const crypto = require('crypto');
 const routerPractica = new Router(); // /practica
 const axios = require('axios');
+const { gen_resumen } = require("../../middleware/resumen_utils");
+const { detectar_plagio } = require("../../utils/plagio");
+
 routerPractica.use(json());
 routerPractica.use(urlencoded({ extended: true }));
 
@@ -83,7 +88,8 @@ routerPractica.get('/encrypted', async (req: any, res: any) => {
       res.status(406).json({ message: "Se requiere ingresar token e iv" });
       return;
     }
-
+    console.log("token: ", req.query.token);
+    console.log("iv: ", req.query.iv);
     //decrypt the encripted id in req.query.id with the algorith and key in the .env file
     const decrypt = (hash: any) => {
       const algorithm = process.env.ENCRYPT_ALGORITHM;
@@ -102,9 +108,9 @@ routerPractica.get('/encrypted', async (req: any, res: any) => {
         id: decrypted_id
       },
       include: [{ model: estudiante, include: [usuario] }, {
-        model: modalidad, include: [
-          { model: config_practica, include: [pregunta_supervisor] }]
-      }]
+            model: modalidad, include: [{ model: config_practica, include: [pregunta_supervisor] }]},
+            empresa, supervisor
+          ]
     });
     res.status(200).json(data);
   } catch (error) {
@@ -182,25 +188,6 @@ routerPractica.get('/todos', async (req: any, res: any) => {
   }
 });
 
-/*
-//[GET] mostrar todos con filtro
-routerPractica.get('/filtrar', async (req:any, res:any) => {
-  practica.findAll({
-    where: {
-      carrera: req.carrera
-    },
-    include: [{ model: estudiante, include: [usuario] }, config_practica, empresa, supervisor, { model: informe, include: [config_informe] },
-    { model: documento, include: [solicitud_documento] }, documento_extra, { model: respuesta_supervisor, include: [pregunta_supervisor] }, encargado]
-  })
-  .then((resultados: any) => {
-      res.send(resultados);
-  })
-    .catch((err: any) => {
-      console.log('Error al obtener practica', err);
-  })
-})
-*/
-
 routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
   try {
     const data = await practica.findAll({
@@ -208,8 +195,6 @@ routerPractica.get("/estudiantes_practicas", async (req: any, res: any) => {
       include: [{ model: estudiante, include: [usuario] }, { model: modalidad, include: [config_practica] }],
 
     });
-
-    console.log("\n\n\n\n HOLA");
     console.log("Carrera: ", req);
     res.status(200).json(data);
   } catch (error) {
@@ -241,30 +226,20 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
       }
     });
 
-    console.log("\n\n\n\nLOS DATOS SON\n\n\n", data, req.body);
 
     // Envio de correo al supervisor
 
     if ("correo" in req.body && "nom_estudiante" in req.body) {
-      const { correo, nom_estudiante } = req.body;
-
-      const encrypt = (text: any) => {
-        const algorithm = process.env.ENCRYPT_ALGORITHM;
-        const key = process.env.ENCRYPT_SECRET_KEY;
-        const iv = crypto.randomBytes(16)
-        const cipher = crypto.createCipheriv(algorithm, key, iv)
-        const encrypted = Buffer.concat([cipher.update(text), cipher.final()])
-        return {
-          iv: iv.toString('hex'),
-          content: encrypted.toString('hex')
-        }
-      }
+      const { correo, nom_estudiante } = req.body;     
 
       let encrypted_str = encrypt(req.body.id_practica.toString());
 
       // send the email with the encrypted id_practica
       sendMail(correo, `Revisión de práctica de ${nom_estudiante}`, "Para evaluar al practicante debe acceder a " + process.env.URL_FRONTEND + "/supervisor/evaluacion?token=" + encrypted_str.content + "&iv=" + encrypted_str.iv, "Revisión de práctica de " + nom_estudiante);
       //console.log("correo enviado correctamente");
+
+      const res_plagio = await detectar_plagio(+id_practica);
+
       res.status(200).json({ message: "Correo enviado y estado actualizado" });
     } else {
       res.status(406).json({ message: "Se requiere ingresar correo, el nombre del supervisor y nombre del estudiante" });
@@ -319,42 +294,125 @@ routerPractica.delete('/eliminar', (req: any, res: any) => {
 })
 
 //[POST] Crear uno
-routerPractica.post('/crear', jsonParser, (req: any, res: any) => {
-  const { id_estudiante, id_config_practica, id_supervisor, id_empresa, id_encargado, id_modalidad, estado,
-    fecha_inicio, fecha_termino, nota_evaluacion,
-    consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos
-    , calificacion_empresa, comentario_empresa } = req.body;
-  console.log("Request de creacion de practica recibida");
-  practica.create({
-    id_estudiante: id_estudiante,
-    id_config_practica: id_config_practica,
-    id_supervisor: id_supervisor,
-    id_empresa: id_empresa,
-    id_encargado: id_encargado,
-    id_modalidad: id_modalidad,
-    estado: estado,
-    fecha_inicio: fecha_inicio,
-    fecha_termino: fecha_termino,
-    nota_eval: nota_evaluacion,
-    consistencia_informe: consistencia_informe,
-    consistencia_nota: consistencia_nota,
-    resumen: resumen,
-    indice_repeticion: indice_repeticion,
-    key_repeticiones: key_repeticiones,
-    key_fragmentos: key_fragmentos,
-    calificacion_empresa: calificacion_empresa,
-    comentario_empresa: comentario_empresa
-  })
-    .then((resultados: any) => {
-      res.status(200).json({ mensaje: "ok" });
-      console.log("practica creada");
+routerPractica.post('/crear', jsonParser, async (req: any, res: any) => {
+  try{
+    const { id_estudiante, id_config_practica, id_supervisor, id_empresa, id_encargado, id_modalidad, estado,
+      fecha_inicio, fecha_termino, nota_evaluacion,
+      consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos
+      , calificacion_empresa, comentario_empresa } = req.body;
+    console.log("Request de creacion de practica recibida");
+    const _pratica = await practica.create({
+      id_estudiante: id_estudiante,
+      id_config_practica: id_config_practica,
+      id_supervisor: id_supervisor,
+      id_empresa: id_empresa,
+      id_encargado: id_encargado,
+      id_modalidad: id_modalidad,
+      estado: estado,
+      fecha_inicio: fecha_inicio,
+      fecha_termino: fecha_termino,
+      nota_eval: nota_evaluacion,
+      consistencia_informe: consistencia_informe,
+      consistencia_nota: consistencia_nota,
+      resumen: resumen,
+      indice_repeticion: indice_repeticion,
+      key_repeticiones: key_repeticiones,
+      key_fragmentos: key_fragmentos,
+      calificacion_empresa: calificacion_empresa,
+      comentario_empresa: comentario_empresa,
+      ev_encargado: -1,
+    })
 
-    })
-    .catch((err: any) => {
-      res.status(500).json({ mensaje: "error" });
-      console.log('Error al crear practica', err.message, fecha_inicio);
-    })
+    // Chequear obtener la modalidad asociada a la practica, luego la config practica asociada a la modalidad
+    // y luego chequear si el campo informe_final en ella dice "si". De ser así, se debe crear un informe final,
+    // para lo cual se debe buscar todas las config_informe asociadas a esta config_practica y encontrar el id de
+    // la que tenga el campo tipo_informe (llevado a minúsculas) con valor "informe final".
+
+    // Crear informe final
+    const _modalidad = await modalidad.findOne({ where: { id: id_modalidad } });
+    const _config_practica = await config_practica.findOne({ where: { id: _modalidad.id_config_practica } });
+    const _config_informes = await config_informe.findAll({ where: { id_config_practica: _config_practica.id } });
+
+    if ( _config_informes.length > 0 ) {
+      const _config_informe = _config_informes.find( (config_informe: any) => config_informe.tipo_informe.toLowerCase() === "informe final" );
+      if ( _config_informe ) {
+        await informe.create({
+          id_practica: _pratica.id,
+          id_config_informe: _config_informe.id,
+          horas_trabajadas: 0,
+          fecha: new Date()
+        })
+      }
+    }
+
+    res.status(200).json({message: "Practica creada"});
+  } catch (error:any) {
+    console.log('Error al crear practica', error);
+    res.status(500).json({ message: "Error al crear practica"});
+  }
 })
+
+//[POST] Crear uno mandando correo a supervisor para confirmar
+routerPractica.post('/crear_verifica_supervisor', jsonParser, async (req: any, res: any) => {
+  try{
+    const { id_estudiante, id_config_practica, id_supervisor, id_empresa, id_encargado, id_modalidad, estado,
+      fecha_inicio, fecha_termino, nota_evaluacion,
+      consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos
+      , calificacion_empresa, comentario_empresa } = req.body;
+    console.log("Request de creacion de practica recibida");
+    const _practica = await practica.create({
+      id_estudiante: id_estudiante,
+      id_config_practica: id_config_practica,
+      id_supervisor: id_supervisor,
+      id_empresa: id_empresa,
+      id_encargado: id_encargado,
+      id_modalidad: id_modalidad,
+      estado: estado,
+      fecha_inicio: fecha_inicio,
+      fecha_termino: fecha_termino,
+      nota_eval: nota_evaluacion,
+      consistencia_informe: consistencia_informe,
+      consistencia_nota: consistencia_nota,
+      resumen: resumen,
+      indice_repeticion: indice_repeticion,
+      key_repeticiones: key_repeticiones,
+      key_fragmentos: key_fragmentos,
+      calificacion_empresa: calificacion_empresa,
+      comentario_empresa: comentario_empresa,
+      ev_encargado: -1
+    })
+    if(_practica){
+      let encrypted_str = encrypt(_practica.id.toString());
+
+      const _supervisor = await supervisor.findOne({ where: { id: id_supervisor } });
+
+      if (!_supervisor || _supervisor.correo == "" || !_supervisor.correo) {
+        return res.status(404).json({ mensaje: "Error: El correo del supervisor no ha podido registrarse, inténtelo nuevamente" });
+      }
+
+      const _estudiante = await estudiante.findOne({ where: { id: id_estudiante }, include: [usuario] });
+
+      if (!_estudiante || !_estudiante.usuario || _estudiante.usuario.nombre == "" || !_estudiante.usuario.nombre) {
+        return res.status(404).json({ mensaje: "Error: Usuario del estudiante no encontrado, inténtelo nuevamente" });
+      }
+
+      sendMail(_supervisor.correo, `Confirmar práctica de ${_estudiante.usuario.nombre}`, 
+              `El estudiante ${_estudiante.usuario.nombre} desea su confirmación para iniciar su práctica. Por favor, ingrese al siguiente sitio para verificar los datos asociados:\n\n` 
+              + process.env.URL_FRONTEND + "/confirmar-inicio-practica?token=" + encrypted_str.content + "&iv=" + encrypted_str.iv,
+              "Confirmar práctica de " + _estudiante.usuario.nombre);
+
+      return res.status(200).json({ mensaje: "Práctica creada correctamente." });
+    }
+    else{
+      return res.status(500).json({ mensaje: "1 - error en la creación de la práctica" });
+      
+    }
+  } catch(err){
+    console.log(err);
+    res.status(500).json({ mensaje: "2 - error en la creación de la práctica" });
+  }
+})
+
 
 
 //[PUT]
@@ -377,6 +435,36 @@ routerPractica.put('/actualizar', jsonParser, async (req: any, res: any) => {
     res.status(404).json({ message: "No existe practica con el id ingresado" });
   }
 })
+
+routerPractica.put('/eval_encargado', jsonParser, async (req: any, res: any) => {
+  try {
+    let { id_practica, ev_encargado } = req.body;
+    if (!id_practica || !ev_encargado) {
+      return res.status(400).json({ message: "Debe ingresar id_practica y evaluacion" });
+    }
+    console.log("1")
+    const data = await practica.findOne(
+      {
+        where: {
+          id: id_practica
+        }
+      }
+    )
+    console.log("2")
+    if (!data) {
+      return res.status(400).json({ message: "No se pudo encontrar la practica" });
+    }
+    console.log(data)
+    await data.update({
+      ev_encargado: ev_encargado
+    })
+    console.log(data);
+    res.status(200).json({ message: "Estado actualizado" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
 
 routerPractica.post("/resumen", jsonParser, async (req: any, res: any) => {
   const { id_practica } = req.query;
@@ -430,38 +518,26 @@ routerPractica.post("/resumen", jsonParser, async (req: any, res: any) => {
       let key = inf.key;
       if (!key) continue;
       for (let pregunta of inf.config_informe.pregunta_informes) {
-        texto_informe += pregunta.enunciado + " ";
-        texto_informe += (key[pregunta.id] || "") + " ";
+        texto_informe += "#Enunciado: " + pregunta.enunciado + "\n";
+        texto_informe += "#Respuesta: " + (key[pregunta.id] || "") + "\n\n";
       }
     }
     texto_informe = texto_informe.trim();
-    const inf_valido = texto_informe.length > 0;
+    const inf_valido = texto_informe.split(" ").length > 50;
 
     const RespuestaSupervisor = Practica.respuesta_supervisors;
     let texto_supervisor = "";
     for (let resp of RespuestaSupervisor) {
       if (!resp.pregunta_supervisor) continue;
-      texto_supervisor += resp.pregunta_supervisor.enunciado + " ";
-      texto_supervisor += (resp.respuesta || "") + " ";
+      texto_supervisor += "#Enunciado: " + resp.pregunta_supervisor.enunciado + "\n";
+      texto_supervisor += "#Respuesta: " + (resp.respuesta || "") + "\n\n";
     }
     texto_supervisor = texto_supervisor.trim();
-    const sup_valido = texto_supervisor.length > 0;
-
-    let textos = [];
-    if (inf_valido) textos.push(texto_informe);
-    if (sup_valido) textos.push(texto_supervisor);
-
-    let url = `${process.env.URL_PYTHON_BACKEND}/nlp/resumen?texto=${textos.join("|||")}`;
-    const resumenes = await axios.get(url);
+    const sup_valido = texto_supervisor.split(" ").length > 50;
 
     let resumen: any = {};
-    if (inf_valido && sup_valido) {
-      resumen.informe = resumenes.data[0];
-      resumen.supervisor = resumenes.data[1];
-    } else if (inf_valido)
-      resumen.informe = resumenes.data[0];
-    else if (sup_valido)
-      resumen.supervisor = resumenes.data[0];
+    resumen.informe = inf_valido ? await gen_resumen(texto_informe) : texto_informe;
+    resumen.supervisor = sup_valido ? await gen_resumen(texto_supervisor) : texto_supervisor;
 
     await Practica.update({ resumen });
 
@@ -470,9 +546,6 @@ routerPractica.post("/resumen", jsonParser, async (req: any, res: any) => {
     console.log(error);
     return res.status(500).json({ message: "Error interno" });
   }
-
-
 });
-
 
 module.exports = routerPractica;

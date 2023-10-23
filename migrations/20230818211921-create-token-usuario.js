@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       token: {
-        type: Sequelize.STRING(141)
+        type: Sequelize.STRING(200)
       }
     });
   },

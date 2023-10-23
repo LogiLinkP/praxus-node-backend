@@ -31,5 +31,10 @@ router.use('/estadistica', require('./estadistica'));
 router.use('/actualizacion_estadistica', require('./actualizacion_estadistica'));
 router.use('/carrera', require('./carrera'));
 router.use('/respuesta_ramos', require('./respuesta_ramos'));
+router.use('/documento_encargado', require('./documento_encargado'))
+router.use('/publicacion', require('./publicacion'));
+router.use('/plagio', require('./plagio'));
+router.use("/doc_ent_ext", require("./doc_ent_ext"));
+
 
 module.exports = router;

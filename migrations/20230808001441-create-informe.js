@@ -19,7 +19,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       key: {
-        type: Sequelize.STRING
+        type: Sequelize.JSON
       }
     });
   },

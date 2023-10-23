@@ -2,7 +2,7 @@ import { where } from "sequelize";
 
 export { };
 
-const { config_practica, modalidad } = require('../../models');
+const { config_practica, modalidad, pregunta_encuesta_final, config_informe, solicitud_documento, pregunta_supervisor, pregunta_informe, aptitud, practica } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerConfigPracticas = new Router();
@@ -76,6 +76,60 @@ routerConfigPracticas.get('/nombre', async (req: any, res: any) => {
   }
 });
 
+//[GET] obtener las config_practica por carrera SÓLO SI ESTÁN ACTIVADAS
+routerConfigPracticas.get('/carrera', async (req: any, res: any) => {
+  try {
+    const { id_carrera } = req.query;
+    if (!id_carrera) {
+      res.status(406).json({ message: "Se requiere ingresar id_carrera de config_practica" });
+      return;
+    }
+    const data = await config_practica.findAll({
+      where: {
+        activada: true,
+        id_carrera: id_carrera
+      },
+      include: [{ model: modalidad }]
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
+//[GET] obtener todas las config_practicas activadas de una carrera VERSION ORIGINAL 
+routerConfigPracticas.get('/all/carrera', async (req: any, res: any) => {
+  try {
+    const data = await config_practica.findAll({
+      where: {
+        activada: true,
+        id_carrera: req.query.id
+      },
+      include: [modalidad, { model: config_informe, include: [pregunta_informe] }, solicitud_documento, pregunta_supervisor, pregunta_encuesta_final]
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log("error: ", error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
+//[GET] obtener todas las config_practicas que tengan una practica vinculada
+routerConfigPracticas.get('/configConPractica', async (req: any, res: any) => {
+  try {
+    const data = await config_practica.findOne({
+      where: {
+        id: req.query.id
+      },
+      include: [practica]
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log("error: ", error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
 
 
 //[GET] mostrar todas las config_practicas
@@ -111,9 +165,54 @@ routerConfigPracticas.delete('/eliminar', (req: any, res: any) => {
 })
 
 //[POST] Crear una config_practica con los datos recibidos
-routerConfigPracticas.post('/crear', jsonParser, (req: any, res: any) => {
-  const { nombre, frecuencia_informes, informe_final, id_carrera, activada } = req.body;
+routerConfigPracticas.post('/crear', jsonParser, async (req: any, res: any) => {
+  const { nombre, frecuencia_informes, informe_final, id_carrera, activada, doc_direst } = req.body;
   console.log("Request de creacion de config_practica recibida");
+  try {
+    console.log("Creando config_practica");
+    const config_practica_creada = await config_practica.create({
+      nombre: nombre,
+      frecuencia_informes: frecuencia_informes,
+      informe_final: informe_final,
+      id_carrera: id_carrera,
+      activada: activada,
+      doc_direst: doc_direst
+    });
+
+    const Aptitudes = await aptitud.findAll({
+      where: {
+        id_carrera: id_carrera
+      }
+    });
+
+    let rango = Aptitudes[0].rango;
+    let opciones = "";
+    for (let i = 0; i < Aptitudes.length; i++) {
+      opciones = opciones + ";;" + Aptitudes[i].nombre;
+    }
+    opciones = opciones.substring(2, opciones.length);
+    const Pregunta_supervisor = await pregunta_supervisor.create({
+      id_config_practica: config_practica_creada.id,
+      tipo_respuesta: "evaluacion",
+      opciones: opciones,
+      enunciado: "Evalúe las siguientes aptitudes del alumno: (considere 1 como la menor calificación y " + String(rango) + " la mayor)",
+      fija: true,
+      rango: rango
+    });
+
+    res.status(200).json({ message: "config_practica creada", id: config_practica_creada.id });
+  } catch (err) {
+    console.log("Error al crear config_practica", err);
+    res.status(500).json({ message: "Error al crear config_practica", error: err });
+  }
+
+});
+
+/*
+
+  const config_practica_creada = await config_practica.c
+
+
   config_practica.create({
     nombre: nombre,
     frecuencia_informes: frecuencia_informes,
@@ -124,12 +223,18 @@ routerConfigPracticas.post('/crear', jsonParser, (req: any, res: any) => {
     .then((resultados: any) => {
       console.log(resultados);
       res.status(200).json({ message: "config_practica creada", id: resultados.id });
+
+      //crecion de pregunta evaluacion supervisor considerando aptitudes
+          
+      const Carrera = await carrera.findOne({where: {id: id_carrera}})
+
     })
     .catch((err: any) => {
       console.log('Error al crear config_practica', err);
       res.status(500).json({ message: "Error al crear config_practica", error: err });
     })
 })
+*/
 
 //[PUT]
 routerConfigPracticas.put('/actualizar', jsonParser, async (req: any, res: any) => {
