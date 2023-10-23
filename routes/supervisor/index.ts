@@ -59,8 +59,16 @@ routerSupervisor.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] Crear un supervisor con los datos recibidos
 routerSupervisor.post('/crear', jsonParser, (req: any, res: any) => {
-  const {id_usuario, nombre, correo, carnet_rostro, es_correo_institucional} = req.body;
+  const {id_usuario, nombre, correo, carnet_rostro} = req.body;
+  const correos_ilegales = ["gmail", "yahoo", "yop", "outlook", "hotmail"]
+  let es_correo_institucional = true;
+
   console.log("Request de creacion de supervisor recibida");
+  
+  if (correos_ilegales.includes(correo.split("@")[1].split(".")[0])) {
+    es_correo_institucional = false;
+  }
+  
   supervisor.create({
       id_usuario: id_usuario,
       nombre: nombre,
