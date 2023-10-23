@@ -25,7 +25,8 @@ module.exports = (sequelize, DataTypes) => {
     es_supervisor: DataTypes.BOOLEAN,
     es_estudiante: DataTypes.BOOLEAN,
     es_admin: DataTypes.BOOLEAN,
-    config: DataTypes.JSON
+    config: DataTypes.JSON,
+    activado: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'usuario',
