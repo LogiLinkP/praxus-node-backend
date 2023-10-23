@@ -2,7 +2,7 @@ import { actualizar_sueldo_promedio_empresa } from "./empresa";
 const cron = require('node-cron');
 const { crear_informes } = require('./informe');
 const { actualizar_ramos, actualizar_sueldo_promedio_carrera, actualizar_sueldo_promedio_ramo, actualizar_promedio_aptitudes_carrera } = require('./carrera');
-const { actualizar_empresa, actualizar_aptitudes_empresa, validador_empresa } = require('./empresa');
+const { actualizar_empresa, actualizar_aptitudes_empresa, validador_empresa, actualizacion_ramos_empresa } = require('./empresa');
 const { actualizar_encuesta_practica, actualizar_sueldo_promedio_config_practica } = require('./config_practica');
 const { save_linkedin_data } = require('./data_linkedin');
 const { publicaciones_programadas } = require("./publicacion");
@@ -53,7 +53,12 @@ export class Scheduler {
         cron.schedule("0 0 1 1,7 *", () => {
             console.log('Scrapeando linkedins');
             save_linkedin_data();
-        });
+        })
+
+        cron.schedule("0 0 * * *", () => {
+            console.log('Actualizando ramos empresa');
+            actualizacion_ramos_empresa();
+        })
 
         cron.schedule('0 0 * * *', () => {
             console.log('Actualizando sueldo_promedio config practica');
@@ -99,6 +104,7 @@ export class Scheduler {
             console.log("Realizando validacion de empresas");
             validador_empresa();
         })
+
     }
 }
 
