@@ -2,7 +2,7 @@ import { where } from "sequelize";
 
 export { };
 
-const { config_practica, modalidad, pregunta_encuesta_final, config_informe, solicitud_documento, pregunta_supervisor, pregunta_informe, aptitud } = require('../../models');
+const { config_practica, modalidad, pregunta_encuesta_final, config_informe, solicitud_documento, pregunta_supervisor, pregunta_informe, aptitud, practica } = require('../../models');
 const { Router } = require('express');
 const sequelize = require('../../db');
 const routerConfigPracticas = new Router();
@@ -107,6 +107,22 @@ routerConfigPracticas.get('/all/carrera', async (req: any, res: any) => {
         id_carrera: req.query.id
       },
       include: [modalidad, {model: config_informe, include: [pregunta_informe]}, solicitud_documento, pregunta_supervisor, pregunta_encuesta_final]
+    });
+    res.status(200).json(data);
+  } catch (error) {
+    console.log("error: ", error);
+    res.status(500).json({ message: "Error interno" });
+  }
+});
+
+//[GET] obtener todas las config_practicas que tengan una practica vinculada
+routerConfigPracticas.get('/configConPractica', async (req: any, res: any) => {
+  try {
+    const data = await config_practica.findOne({
+      where: {
+        id: req.query.id
+      },
+      include: [practica]
     });
     res.status(200).json(data);
   } catch (error) {
