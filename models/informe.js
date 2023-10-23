@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
     id_practica: DataTypes.INTEGER,
     id_config_informe: DataTypes.INTEGER,
     horas_trabajadas: DataTypes.INTEGER,
-    key: DataTypes.STRING,
+    key: DataTypes.JSON,
     fecha: DataTypes.DATE
   }, {
     sequelize,
