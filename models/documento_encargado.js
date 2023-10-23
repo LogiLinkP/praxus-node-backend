@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     tipo: DataTypes.STRING,
     nombre: DataTypes.STRING,
     key: DataTypes.STRING,
+    descripcion: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'documento_encargado',

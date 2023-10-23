@@ -93,9 +93,10 @@ async function uploadFile(filePath:any, key:string) {
 router_documento_encargado.post('/crear', memoryFile.single("file"), async (req: any, res: any) => {
   try{
     const archivo = req.file.buffer
-    const {id_encargado, id_carrera, tipo, nombre, key} = req.body;
+    console.log("BODY: ", req.body)
+    const {id_encargado, id_carrera, tipo, nombre, key, descripcion} = req.body;
     console.log("Request de creacion de documento recibida");
-
+    console.log(descripcion)
     uploadFile(archivo, key)
     await documento_encargado.create({
       id_encargado:+ id_encargado,
@@ -103,6 +104,7 @@ router_documento_encargado.post('/crear', memoryFile.single("file"), async (req:
       nombre:nombre,
       tipo:tipo,
       key:key,
+      descripcion:descripcion
     })
     console.log("Documento Guardado")
     res.status(200).json({message: "Documento Guardado"});
