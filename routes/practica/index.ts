@@ -3,6 +3,8 @@ export { };
 const { practica, estudiante, config_practica, usuario, empresa, supervisor, informe, documento, solicitud_documento,
   documento_extra, respuesta_supervisor, pregunta_supervisor, config_informe, encargado, modalidad, pregunta_informe } = require('../../models');
 const { Router, json, urlencoded } = require('express');
+
+const {encrypt} = require('../../utils/encriptar');
 const crypto = require('crypto');
 const routerPractica = new Router(); // /practica
 const axios = require('axios');
@@ -86,7 +88,8 @@ routerPractica.get('/encrypted', async (req: any, res: any) => {
       res.status(406).json({ message: "Se requiere ingresar token e iv" });
       return;
     }
-
+    console.log("token: ", req.query.token);
+    console.log("iv: ", req.query.iv);
     //decrypt the encripted id in req.query.id with the algorith and key in the .env file
     const decrypt = (hash: any) => {
       const algorithm = process.env.ENCRYPT_ALGORITHM;
@@ -105,9 +108,9 @@ routerPractica.get('/encrypted', async (req: any, res: any) => {
         id: decrypted_id
       },
       include: [{ model: estudiante, include: [usuario] }, {
-        model: modalidad, include: [
-          { model: config_practica, include: [pregunta_supervisor] }]
-      }]
+            model: modalidad, include: [{ model: config_practica, include: [pregunta_supervisor] }]},
+            empresa, supervisor
+          ]
     });
     res.status(200).json(data);
   } catch (error) {
@@ -227,19 +230,7 @@ routerPractica.put("/finalizar", async (req: any, res: any) => {
     // Envio de correo al supervisor
 
     if ("correo" in req.body && "nom_estudiante" in req.body) {
-      const { correo, nom_estudiante } = req.body;
-
-      const encrypt = (text: any) => {
-        const algorithm = process.env.ENCRYPT_ALGORITHM;
-        const key = process.env.ENCRYPT_SECRET_KEY;
-        const iv = crypto.randomBytes(16)
-        const cipher = crypto.createCipheriv(algorithm, key, iv)
-        const encrypted = Buffer.concat([cipher.update(text), cipher.final()])
-        return {
-          iv: iv.toString('hex'),
-          content: encrypted.toString('hex')
-        }
-      }
+      const { correo, nom_estudiante } = req.body;     
 
       let encrypted_str = encrypt(req.body.id_practica.toString());
 
@@ -360,6 +351,68 @@ routerPractica.post('/crear', jsonParser, async (req: any, res: any) => {
     res.status(500).json({ message: "Error al crear practica"});
   }
 })
+
+//[POST] Crear uno mandando correo a supervisor para confirmar
+routerPractica.post('/crear_verifica_supervisor', jsonParser, async (req: any, res: any) => {
+  try{
+    const { id_estudiante, id_config_practica, id_supervisor, id_empresa, id_encargado, id_modalidad, estado,
+      fecha_inicio, fecha_termino, nota_evaluacion,
+      consistencia_informe, consistencia_nota, resumen, indice_repeticion, key_repeticiones, key_fragmentos
+      , calificacion_empresa, comentario_empresa } = req.body;
+    console.log("Request de creacion de practica recibida");
+    const _practica = await practica.create({
+      id_estudiante: id_estudiante,
+      id_config_practica: id_config_practica,
+      id_supervisor: id_supervisor,
+      id_empresa: id_empresa,
+      id_encargado: id_encargado,
+      id_modalidad: id_modalidad,
+      estado: estado,
+      fecha_inicio: fecha_inicio,
+      fecha_termino: fecha_termino,
+      nota_eval: nota_evaluacion,
+      consistencia_informe: consistencia_informe,
+      consistencia_nota: consistencia_nota,
+      resumen: resumen,
+      indice_repeticion: indice_repeticion,
+      key_repeticiones: key_repeticiones,
+      key_fragmentos: key_fragmentos,
+      calificacion_empresa: calificacion_empresa,
+      comentario_empresa: comentario_empresa,
+      ev_encargado: -1
+    })
+    if(_practica){
+      let encrypted_str = encrypt(_practica.id.toString());
+
+      const _supervisor = await supervisor.findOne({ where: { id: id_supervisor } });
+
+      if (!_supervisor || _supervisor.correo == "" || !_supervisor.correo) {
+        return res.status(404).json({ mensaje: "Error: El correo del supervisor no ha podido registrarse, inténtelo nuevamente" });
+      }
+
+      const _estudiante = await estudiante.findOne({ where: { id: id_estudiante }, include: [usuario] });
+
+      if (!_estudiante || !_estudiante.usuario || _estudiante.usuario.nombre == "" || !_estudiante.usuario.nombre) {
+        return res.status(404).json({ mensaje: "Error: Usuario del estudiante no encontrado, inténtelo nuevamente" });
+      }
+
+      sendMail(_supervisor.correo, `Confirmar práctica de ${_estudiante.usuario.nombre}`, 
+              `El estudiante ${_estudiante.usuario.nombre} desea su confirmación para iniciar su práctica. Por favor, ingrese al siguiente sitio para verificar los datos asociados:\n\n` 
+              + process.env.URL_FRONTEND + "/confirmar-inicio-practica?token=" + encrypted_str.content + "&iv=" + encrypted_str.iv,
+              "Confirmar práctica de " + _estudiante.usuario.nombre);
+
+      return res.status(200).json({ mensaje: "Práctica creada correctamente." });
+    }
+    else{
+      return res.status(500).json({ mensaje: "1 - error en la creación de la práctica" });
+      
+    }
+  } catch(err){
+    console.log(err);
+    res.status(500).json({ mensaje: "2 - error en la creación de la práctica" });
+  }
+})
+
 
 
 //[PUT]
