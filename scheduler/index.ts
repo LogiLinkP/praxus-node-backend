@@ -55,7 +55,7 @@ export class Scheduler {
             save_linkedin_data();
         })
 
-        cron.schedule("* * * * *", () => {
+        cron.schedule("0 0 * * *", () => {
             console.log('Actualizando ramos empresa');
             actualizacion_ramos_empresa();
         })
