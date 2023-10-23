@@ -106,7 +106,7 @@ routerConfigPracticas.get('/all/carrera', async (req: any, res: any) => {
         activada: true,
         id_carrera: req.query.id
       },
-      include: [modalidad, {model: config_informe, include: [pregunta_informe]}, solicitud_documento, pregunta_supervisor, pregunta_encuesta_final]
+      include: [modalidad, { model: config_informe, include: [pregunta_informe] }, solicitud_documento, pregunta_supervisor, pregunta_encuesta_final]
     });
     res.status(200).json(data);
   } catch (error) {
@@ -166,16 +166,17 @@ routerConfigPracticas.delete('/eliminar', (req: any, res: any) => {
 
 //[POST] Crear una config_practica con los datos recibidos
 routerConfigPracticas.post('/crear', jsonParser, async (req: any, res: any) => {
-  const { nombre, frecuencia_informes, informe_final, id_carrera, activada } = req.body;
+  const { nombre, frecuencia_informes, informe_final, id_carrera, activada, doc_direst } = req.body;
   console.log("Request de creacion de config_practica recibida");
-  try{
+  try {
     console.log("Creando config_practica");
     const config_practica_creada = await config_practica.create({
       nombre: nombre,
       frecuencia_informes: frecuencia_informes,
       informe_final: informe_final,
       id_carrera: id_carrera,
-      activada: activada
+      activada: activada,
+      doc_direst: doc_direst
     });
 
     const Aptitudes = await aptitud.findAll({
@@ -187,7 +188,7 @@ routerConfigPracticas.post('/crear', jsonParser, async (req: any, res: any) => {
     let rango = Aptitudes[0].rango;
     let opciones = "";
     for (let i = 0; i < Aptitudes.length; i++) {
-      opciones = opciones + ";;"+ Aptitudes[i].nombre;
+      opciones = opciones + ";;" + Aptitudes[i].nombre;
     }
     opciones = opciones.substring(2, opciones.length);
     const Pregunta_supervisor = await pregunta_supervisor.create({
