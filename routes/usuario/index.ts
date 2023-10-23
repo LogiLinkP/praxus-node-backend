@@ -8,6 +8,7 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const { checkMail } = require("../../utils/pattern");
+const {sendMail} = require("../../utils/email");
 
 var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
@@ -39,6 +40,33 @@ routerUsuario.get('', (req: any, res: any) => {
     })
 })
 
+//[GET] para obtener un usuario con su encryted ID
+routerUsuario.get('/confirmar_correo', async (req: any, res: any) => {
+  try{
+    const { token, iv } = req.query
+    const algorithm = process.env.ENCRYPT_ALGORITHM;
+    const key = process.env.ENCRYPT_SECRET_KEY;
+    const decipher = crypto.createDecipheriv(algorithm, key, Buffer.from(iv, 'hex'))
+    const decrypted = Buffer.concat([decipher.update(Buffer.from(token, 'hex')), decipher.final()])
+    const decrypted_str = decrypted.toString()
+    const _usuario = await usuario.findOne({
+      where: {
+        id: decrypted_str
+      }
+    })
+    if(_usuario){
+      await usuario.update({ activado: true }, { where: { id: decrypted_str } })
+      return res.status(200).send({ message: 'Usuario encontrado', userdata: _usuario });
+    }
+    else{
+      return res.status(400).send({ message: 'Usuario no encontrado' });
+    }
+  } catch (err) {
+    console.log('Error al obtener usuario', err);
+    return res.status(400).send({ message: 'Error al obtener usuario' });
+  }
+})
+
 //[POST] Crear un usuario con los datos recibidos
 routerUsuario.post('/crear', jsonParser, (req: any, res: any) => {
   const { correo, password, nombre, es_encargado, es_supervisor, es_estudiante, es_admin, config } = req.body;
@@ -51,8 +79,8 @@ routerUsuario.post('/crear', jsonParser, (req: any, res: any) => {
     es_supervisor: es_supervisor,
     es_estudiante: es_estudiante,
     es_admin: es_admin,
-    config: config
-
+    config: config,
+    activado: false
   })
     .then((resultados: any) => {
       res.send("Usuario creado");
@@ -104,7 +132,7 @@ routerUsuario.post('/login', jsonParser, async (req: any, res: any) => {
 
   }
   const resultados = await usuario.findOne({
-    where: { correo: email },
+    where: { correo: email, activado: true },
     include: [
       { model: estudiante },
       { model: encargado }
@@ -164,17 +192,7 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
   let id_carrera;
 
   if (es_estudiante) {
-    RUT = extras.RUT;
-    id_carrera = extras.id_carrera;
-    try {
-      let dominios = await carrera.findAll();
-      if (!checkMail(email, dominios)) {
-        return res.status(400).json({ message: 'Dominio de correo no valido' });
-      }
-    }
-    catch (err) {
-      return res.status(400).json({ message: 'Error al consultar carreras' });
-    }
+    
 
   }
   const usuarioSend = { email, password, nombre, es_encargado, es_supervisor, es_estudiante, es_admin };
@@ -184,7 +202,7 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
     return res.status(400).send({ message: 'Contraseñas no coinciden' });
   }
   // Verificar si correo ya existe
-  const data = await usuario.findOne({ where: { correo: email } })
+  const data = await usuario.findOne({ where: { correo: email, activado: true} })
   if (data != null) {
     return res.status(400).send({ message: 'Correo ya ocupado, intente con otro correo.' });
   }
@@ -201,7 +219,8 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
         es_supervisor: es_supervisor,
         es_estudiante: es_estudiante,
         es_admin: es_admin,
-        config: null
+        config: null,
+        activado: false
       })
       if (_usuario.es_encargado) {
         try {
@@ -213,11 +232,11 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
           }
           else {
             await encargado.create({ id_usuario: _usuario.id, id_carrera: null, practica_pendiente: null });
-            return res.status(200).send({ message: 'Inicio de sesion exitoso', userdata: usuarioSend });
+            return res.status(200).send({ message: 'Creacion de usuario correcta', userdata: usuarioSend });
           }
         }
         catch (err) {
-          return res.status(400).send({ message: 'Error al crear encargado' });
+          return res.status(400).send({ message: 'Error al crear usuario' });
         }
 
       }
@@ -228,11 +247,23 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
         }
         else {
           supervisor.update({ id_usuario: _usuario.id }, { where: { correo: email } })
-          return res.status(200).send({ message: 'Creacion de usuario', userdata: usuarioSend });
+          return res.status(200).send({ message: 'Creacion de usuario correcta', userdata: usuarioSend });
         }
       }
       if (_usuario.es_estudiante) {
+        RUT = extras.RUT;
+        id_carrera = extras.id_carrera;
         try {
+          let dominios = await carrera.findAll();
+          if (!checkMail(email, dominios)) {
+            return res.status(400).json({ message: 'Dominio de correo no valido' });
+          }
+        }
+        catch (err) {
+          return res.status(400).json({ message: 'Error al consultar carreras' });
+        }
+        try {
+          
           await estudiante.create({
             id_usuario: _usuario.id,
             nombre_id_org: null,
@@ -241,10 +272,30 @@ routerUsuario.post('/register', jsonParser, async (req: any, res: any) => {
             id_carrera: id_carrera
 
           })
-          return res.status(200).send({ message: 'Inicio de sesion exitoso', userdata: usuarioSend });
+
+          // enviar correo de confirmacion, con un link que contiene el id del usuario recién creado encriptado en la url
+          const encrypt = (text: any) => {
+            const algorithm = process.env.ENCRYPT_ALGORITHM;
+            const key = process.env.ENCRYPT_SECRET_KEY;
+            const iv = crypto.randomBytes(16)
+            const cipher = crypto.createCipheriv(algorithm, key, iv)
+            const encrypted = Buffer.concat([cipher.update(text), cipher.final()])
+            return {
+              iv: iv.toString('hex'),
+              content: encrypted.toString('hex')
+            }
+          }
+    
+          let encrypted_str = encrypt(_usuario.id.toString())
+
+          sendMail(email, `Registro de usario en plataforma Praxus`, 
+                  "Para confirmar su registro en Praxus debe ingresar al siguiente link " + process.env.URL_FRONTEND + "/usuario/confirmacion?token=" + encrypted_str.content + "&iv=" + encrypted_str.iv, 
+                  `Registro de usario en plataforma Praxus`);
+
+          return res.status(200).send({ message: 'Registro exitoso', userdata: usuarioSend });
         }
         catch (err) {
-          return res.status(400).send({ message: 'Error al crear est' });
+          return res.status(400).send({ message: 'Error al crear usuario' });
         }
       }
 
@@ -282,7 +333,7 @@ routerUsuario.post('/crear_supervisor', jsonParser, async (req: any, res: any) =
     return res.status(400).send({ message: 'Contraseñas no coinciden' });
   }
   try {
-    let query = await usuario.findOne({ where: { correo: email } })
+    let query = await usuario.findOne({ where: { correo: email, activado: true } })
     if (query != null) {
       return res.status(400).send({ message: 'Correo ya ocupado, intente con otro correo.' });
     }
@@ -298,7 +349,8 @@ routerUsuario.post('/crear_supervisor', jsonParser, async (req: any, res: any) =
         es_supervisor: true,
         es_estudiante: false,
         es_admin: false,
-        config: null
+        config: null,
+        activado: true
       })
 
       let trabajador = await supervisor.findAll({ where: { correo: email } })
