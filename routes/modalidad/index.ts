@@ -59,7 +59,8 @@ routerModalidad.get('/id_config_practica', async (req: any, res: any) => {
       const data = await modalidad.findAll({
         where: {
           id_config_practica: req.query.id
-        }
+        },
+        order: [['cantidad_tiempo', 'ASC']]
       });
       res.status(200).json(data);
     } catch (error) {
@@ -71,7 +72,9 @@ routerModalidad.get('/id_config_practica', async (req: any, res: any) => {
 //[GET] mostrar todos
 routerModalidad.get('/todos', async (req: any, res: any) => {
   try {
-    const data = await modalidad.findAll();
+    const data = await modalidad.findAll({
+      order: [['cantidad_tiempo', 'ASC']]
+    });
     res.status(200).json(data);
   } catch (error) {
     console.log(error);
@@ -82,7 +85,7 @@ routerModalidad.get('/todos', async (req: any, res: any) => {
 //[DELETE] Eliminar
 routerModalidad.delete('/eliminar', (req: any, res: any) => {
   console.log("Eliminando modalidad con id: ", req.query.id)
- modalidad.destroy({
+  modalidad.destroy({
     where: {
       id: req.query.id
     }
@@ -100,7 +103,7 @@ routerModalidad.delete('/eliminar', (req: any, res: any) => {
 //[DELETE] Eliminar por config_practica
 routerModalidad.delete('/eliminar_config', (req: any, res: any) => {
     console.log("Eliminando modalidad con id: ", req.query.id)
-   modalidad.destroy({
+    modalidad.destroy({
       where: {
         id_config_practica: req.query.id
       }
