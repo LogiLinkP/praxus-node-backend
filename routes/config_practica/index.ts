@@ -67,7 +67,8 @@ routerConfigPracticas.get('/nombre', async (req: any, res: any) => {
         activada: true,
         id_carrera: id_carrera
       },
-      include: [{ model: modalidad }]
+      include: [{ model: modalidad }],
+      order: [[modalidad, 'cantidad_tiempo', 'ASC']]
     });
     res.status(200).json(data);
   } catch (error) {
@@ -89,7 +90,8 @@ routerConfigPracticas.get('/carrera', async (req: any, res: any) => {
         activada: true,
         id_carrera: id_carrera
       },
-      include: [{ model: modalidad }]
+      include: [{ model: modalidad }],
+      
     });
     res.status(200).json(data);
   } catch (error) {
