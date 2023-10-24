@@ -7,7 +7,7 @@ const routerEncargado = new Router(); // /encargado
 
 //Librerias para creacion de encargado
 
-const {sendMail} = require("../../utils/email");
+const { sendMail } = require("../../utils/email");
 const crypto = require("crypto");
 
 var bodyParser = require('body-parser');
@@ -58,8 +58,8 @@ routerEncargado.get('/usuario', async (req: any, res: any) => {
 //[GET] mostrar todos
 routerEncargado.get('/todos', async (req: any, res: any) => {
   try {
-    let data = await encargado.findAll({include: [{model: usuario},{model: carrera}]});
-    return res.status(200).json({data}); 
+    let data = await encargado.findAll({ include: [{ model: usuario }, { model: carrera }] });
+    return res.status(200).json({ data });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Error interno" });
@@ -70,13 +70,13 @@ routerEncargado.get('/todos', async (req: any, res: any) => {
 routerEncargado.delete('/eliminar', async (req: any, res: any) => {
   console.log("Eliminando encargado con id: ", req.query.id)
   try {
-    let data = await encargado.findOne({where: {id: req.query.id}})
+    let data = await encargado.findOne({ where: { id: req.query.id } })
     if (data) {
       console.log("Encargado existe")
-      let user = await usuario.findOne({where: {id: data.id_usuario}})
+      let user = await usuario.findOne({ where: { id: data.id_usuario } })
       if (user) {
         console.log("Usuario existe")
-        usuario.destroy({where: {id: data.id_usuario}})
+        usuario.destroy({ where: { id: data.id_usuario } })
         encargado.destroy({
           where: {
             id: req.query.id
@@ -147,7 +147,7 @@ routerEncargado.get('/estudiantes', async (req: any, res: any) => {
         id: req.query.id_encargado
       },
       include: [{
-        model: carrera, include:{ model: estudiante, include: { model: usuario } } 
+        model: carrera, include: { model: estudiante, include: { model: usuario } }
       }]
     });
     return res.status(200).json(data);
@@ -170,7 +170,7 @@ routerEncargado.post('/crear-encargado', jsonParser, async (req: any, res: any) 
     console.log(4)
     return res.status(200).send({ message: "Correo enviado" });
   }
-  catch (err) { 
+  catch (err) {
     console.log(err);
     return res.status(500).send({ message: "Error interno" });
   }
@@ -180,38 +180,34 @@ routerEncargado.post('/crear-aptitud', jsonParser, async (req: any, res: any) =>
   let { id_carrera, lista } = req.body;
   let lista_aptitudes = [];
   let flag = false;
-  let rango = 0;
-  try{
-    let qqq = await aptitud.findOne({where: {id_carrera: id_carrera}})
-    console.log(qqq)
-    if(qqq){
-      rango = qqq.rango;
+  let rango = 10;
+  try {
+    let Aptitud = await aptitud.findOne({ where: { id_carrera: id_carrera } })
+    if (Aptitud && Aptitud.rango) {
+      rango = Aptitud.rango;
     }
-    else{
-      rango = 0;
-    }    
   }
-  catch(err){
+  catch (err) {
     return res.status(500).send({ message: "Error de conexion" });
   }
-  for(let i=0; i<lista.length; i++){
-    let json = {nombre: lista[i], id_carrera: id_carrera, rango: rango};
-    try{
-      const _query = aptitud.findOne({ where: json});
-      if(_query.length > 0){
+  for (let i = 0; i < lista.length; i++) {
+    let json = { nombre: lista[i], id_carrera: id_carrera, rango: rango };
+    try {
+      const _query = aptitud.findOne({ where: json });
+      if (_query.length > 0) {
         flag = true;
         continue;
       }
-      else{
+      else {
         lista_aptitudes.push(json);
       }
-    }catch(error){
+    } catch (error) {
       return res.status(500).send({ message: "Error de conexion" });
     }
   }
   try {
     const _aptitudes = await aptitud.bulkCreate(lista_aptitudes);
-    return res.status(200).send({aptitudes: _aptitudes });
+    return res.status(200).send({ aptitudes: _aptitudes });
   }
   catch (error) {
     console.log(error);
@@ -222,16 +218,16 @@ routerEncargado.post('/crear-aptitud', jsonParser, async (req: any, res: any) =>
 routerEncargado.post('/editar-aptitud', jsonParser, async (req: any, res: any) => {
   let { id, id_carrera, nombre } = req.body;
   try {
-    let _aptitud = await aptitud.findOne({where: {id: id}})
-    if(_aptitud){
-      _aptitud.update({id_carrera: id_carrera, nombre: nombre})
+    let _aptitud = await aptitud.findOne({ where: { id: id } })
+    if (_aptitud) {
+      _aptitud.update({ id_carrera: id_carrera, nombre: nombre })
       return res.status(200).json({ message: "Aptitud editada" });
     }
-    else{
+    else {
       return res.status(500).json({ message: "Aptitud no encontrada" });
     }
   }
-  catch (err) { 
+  catch (err) {
     return res.status(500).json({ message: "Error interno" });
   }
 });
@@ -239,85 +235,85 @@ routerEncargado.post('/editar-aptitud', jsonParser, async (req: any, res: any) =
 routerEncargado.post('/eliminar-aptitud', jsonParser, async (req: any, res: any) => {
   let { id } = req.body;
   try {
-    let _aptitud = await aptitud.findOne({where: {id: id}})
-    if(_aptitud){
-      aptitud.destroy({where: {id: id}})
+    let _aptitud = await aptitud.findOne({ where: { id: id } })
+    if (_aptitud) {
+      aptitud.destroy({ where: { id: id } })
       return res.status(200).json({ message: "Aptitud eliminada" });
     }
-    else{
+    else {
       return res.status(500).json({ message: "Aptitud no encontrada" });
     }
   }
-  catch (err) { 
+  catch (err) {
     return res.status(500).json({ message: "Error interno" });
   }
 });
 
 routerEncargado.post('/todos-aptitudes', jsonParser, async (req: any, res: any) => {
-  let {id_carrera} = req.body;
-  try{
-    let _data = await aptitud.findAll({where: {id_carrera: id_carrera}})
-    if(_data){
-      return res.status(200).json({data: _data});
+  let { id_carrera } = req.body;
+  try {
+    let _data = await aptitud.findAll({ where: { id_carrera: id_carrera } })
+    if (_data) {
+      return res.status(200).json({ data: _data });
     }
-    else{
+    else {
       return res.status(500).json({ message: "No se encontraron aptitudes" });
     }
   }
-  catch(err){
+  catch (err) {
     return res.status(500).json({ message: "Error interno" });
   }
 });
 
 routerEncargado.post('/rango', jsonParser, async (req: any, res: any) => {
-  let {id_carrera, rango} = req.body;
-  try{
-    let _aptitud = await aptitud.findAll({where: {id_carrera: id_carrera}})
-    if(_aptitud){
+  let { id_carrera, rango } = req.body;
+  try {
+    let _aptitud = await aptitud.findAll({ where: { id_carrera: id_carrera } })
+    if (_aptitud) {
       await aptitud.update({ rango: rango }, { where: { id_carrera: id_carrera } });
       return res.status(200).json({ message: "Rango actualizado" });
     }
-    else{
+    else {
       return res.status(500).json({ message: "No se han añadido aptitudes" });
     }
   }
-  catch(err){
+  catch (err) {
     return res.status(500).json({ message: "Error interno" });
   }
 });
 
 routerEncargado.post('/get-rango', jsonParser, async (req: any, res: any) => {
-  let {id_carrera} = req.body;
-  try{
-    let rango = await aptitud.findAll({where: {id_carrera: id_carrera}})
-    if(rango.length == 0){
-      return res.status(200).json({data: 0});
-    }else{
-      if(rango){
-        return res.status(200).json({data: rango[0].rango});
+  let { id_carrera } = req.body;
+  try {
+    let rango = await aptitud.findAll({ where: { id_carrera: id_carrera } })
+    if (rango.length == 0) {
+      return res.status(200).json({ data: 0 });
+    } else {
+      if (rango) {
+        return res.status(200).json({ data: rango[0].rango });
       }
-      else{
+      else {
         return res.status(500).json({ message: "No se han añadido aptitudes" });
       }
     }
   }
-  catch(err){
+  catch (err) {
     return res.status(500).json({ message: "Error de query" });
   }
 });
 
 routerEncargado.post('/if-aptitudes', jsonParser, async (req: any, res: any) => {
   let { id_carrera } = req.body;
-  try{
-    let _aptitud = await aptitud.findAll({where: {id_carrera: id_carrera}})
-    if(_aptitud.length == 0){
-      return res.status(200).json({data: false});
+  try {
+    let _aptitud = await aptitud.findAll({ where: { id_carrera: id_carrera } })
+    if (_aptitud.length == 0) {
+      return res.status(200).json({ data: false });
     }
-    else{
-      return res.status(200).json({data: true});
+    else {
+      return res.status(200).json({ data: true });
     }
   }
-  catch(err){
+  catch (err) {
     return res.status(500).json({ message: "Error interno" });
   }
 });
