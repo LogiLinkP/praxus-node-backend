@@ -382,6 +382,29 @@ routerPractica.post('/crear_verifica_supervisor', jsonParser, async (req: any, r
       ev_encargado: -1
     })
     if(_practica){
+
+      // buscar la config practica asociada a la modalidad, y ver si tiene informe final. si lo tiene, se debe crear un informe final
+      const _modalidad = await modalidad.findOne({ where: { id: id_modalidad }, include: [{model: config_practica, include:[{model:config_informe, where:{tipo_informe:"informe final"}}]}] });
+
+      if (!_modalidad || !_modalidad.config_practica) {
+        return res.status(404).json({ mensaje: "Error: No se ha encontrado la modalidad, configuración de práctica o configuración de informe asociada a la práctica, inténtelo nuevamente" });
+      }
+
+      if ( _modalidad.config_practica.informe_final == "si") {
+        // crear informe final (se asume que solo habrá un config informe con tipo_informe = "informe final")
+        const _informe = await informe.create({
+          id_practica: _practica.id,
+          id_config_informe: _modalidad.config_practica.config_informes[0].id,
+          horas_trabajadas: 0,
+          fecha: new Date()
+        });
+        
+
+        if (!_informe) {
+          return res.status(404).json({ mensaje: "Error: No se ha podido crear el informe final, inténtelo nuevamente" });
+        }
+      }       
+
       let encrypted_str = encrypt(_practica.id.toString());
 
       const _supervisor = await supervisor.findOne({ where: { id: id_supervisor } });
