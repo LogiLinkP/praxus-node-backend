@@ -198,7 +198,7 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
       }
       );
 
-      res.status(404).json({
+      res.status(200).json({
         "informes": {},
         "supervisor": {}
       });
