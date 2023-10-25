@@ -15,10 +15,8 @@ routerPlagio.get('', async (req: any, res: any) => {
             return req.status(400).json({ message: "Debe especificar id de práctica o id de plagio, no ambas juntas ni ninguno" });
         let Data: any;
         if (id_practica) {
-            console.log("id_practica plagio")
             Data = await plagio.findAll({ where: { id_practica: +id_practica } });
         } else {
-            console.log("id_plagio plagio")
             Data = await plagio.findAll({ where: { id_plagio: +id_plagio } });
         }
 
