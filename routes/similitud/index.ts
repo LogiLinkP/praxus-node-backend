@@ -185,15 +185,18 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
       ]
     });
     if (!_practica) {
-      await practica.update({
-        key_fragmentos: {
-          "informes": {},
-          "supervisor": {}
-        },
+      await practica.update(
+        {
+          key_fragmentos: {
+            "informes": {},
+            "supervisor": {}
+          }
+        }, {
         where: {
           id: id_practica
         }
-      });
+      }
+      );
 
       res.status(404).json({
         "informes": {},
