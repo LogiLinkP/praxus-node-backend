@@ -156,11 +156,11 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
       include: [
         {
           model: informe,
-          required: false,
+          required: true,
           include: [
             {
               model: config_informe,
-              required: false,
+              required: true,
               include: [
                 {
                   model: pregunta_informe,
@@ -173,7 +173,7 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
         },
         {
           model: respuesta_supervisor,
-          required: false,
+          required: true,
           include: [
             {
               model: pregunta_supervisor,
@@ -185,7 +185,20 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
       ]
     });
     if (!_practica) {
-      res.status(404).json({ error: 'Practica no encontrada o no tiene respuestas abiertas' });
+      await _practica.update({
+        key_fragmentos: {
+          "informes": {},
+          "supervisor": {}
+        },
+        where: {
+          id: id_practica
+        }
+      });
+
+      res.status(404).json({
+        "informes": {},
+        "supervisor": {}
+      });
       return;
     }
     let textos_informes: any = [];
@@ -265,11 +278,11 @@ routerSimilitud.get('/frases_representativas_practica/:id_practica', jsonParser,
       include: [
         {
           model: informe,
-          required: false,
+          required: true,
           include: [
             {
               model: config_informe,
-              required: false,
+              required: true,
               include: [
                 {
                   model: pregunta_informe,
@@ -282,7 +295,7 @@ routerSimilitud.get('/frases_representativas_practica/:id_practica', jsonParser,
         },
         {
           model: respuesta_supervisor,
-          required: false,
+          required: true,
           include: [
             {
               model: pregunta_supervisor,
@@ -294,7 +307,10 @@ routerSimilitud.get('/frases_representativas_practica/:id_practica', jsonParser,
       ]
     });
     if (!_practica) {
-      res.status(404).json({ error: 'Practica no encontrada o no tiene respuestas abiertas' });
+      res.status(200).json({
+        informes: [[], []],
+        supervisor: [[], []]
+      });
       return;
     }
 
