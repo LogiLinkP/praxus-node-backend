@@ -149,7 +149,7 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
     res.status(400).json({ error: 'Practica no especificada' });
     return;
   }
-  console.log(1);
+
   try {
     const _practica = await practica.findOne({
       where: { id: id_practica },
@@ -173,7 +173,7 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
         },
         {
           model: respuesta_supervisor,
-          required: true,
+          required: false,
           include: [
             {
               model: pregunta_supervisor,
@@ -184,6 +184,7 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
         }
       ]
     });
+
     if (!_practica) {
       await practica.update(
         {
@@ -216,19 +217,27 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
     }
 
     let orden_supervisor: string[] = [];
-    let textos_supervisor = _practica.respuesta_supervisors.map((elem: any) => {
+    let textos_supervisor: string[] = _practica.respuesta_supervisors.map((elem: any) => {
       orden_supervisor.push(elem.id.toString());
       return elem.respuesta
     });
 
+    let contador_respuestas_informes = 0;
+    for (let idxInf in _practica.key_fragmentos.informes) {
+      for (let idxPreg in _practica.key_fragmentos.informes[idxInf])
+        if (_practica.key_fragmentos.informes[idxInf][idxPreg].length > 0)
+          contador_respuestas_informes += 1;
+    }
+
     if (
       _practica.key_fragmentos && Object.keys(_practica.key_fragmentos).length > 0 &&
-      textos_informes.length == Object.keys(_practica.key_fragmentos.informes).length &&
+      textos_informes.length == contador_respuestas_informes &&
       textos_supervisor.length == Object.keys(_practica.key_fragmentos.supervisor).length
     ) {
+      // console.log("NO CONSULTANDO PYTHON")
       return res.status(200).json(_practica.key_fragmentos);
     }
-    console.log("HOLA HOLA ESTOY HACIENDO UNA REQUEST AL PYTHON", textos_supervisor)
+    // console.log("HOLA HOLA ESTOY HACIENDO UNA REQUEST AL PYTHON", textos_supervisor)
     const url = `${process.env.URL_PYTHON_BACKEND}/nlp/frases_representativas_multi?cantidad=${req.query.cantidad ?? 10}&textos=`;
 
     const string_textos_informes = textos_informes.join('|||');
