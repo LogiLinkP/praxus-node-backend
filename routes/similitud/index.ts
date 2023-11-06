@@ -210,9 +210,10 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
     for (let informe of _practica.informes) {
       let ids_preguntas_informe = informe.config_informe.pregunta_informes.map((elem: any) => elem.id.toString());
       ids_preguntas_informe.forEach((id_pregunta: string) => {
-        orden_informes.push([informe.id.toString(), id_pregunta]);
-        if (informe.key)
+        if (informe.key) {
+          orden_informes.push([informe.id.toString(), id_pregunta]);
           textos_informes.push(informe.key[id_pregunta])
+        }
       });
     }
 
@@ -223,11 +224,14 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
     });
 
     let contador_respuestas_informes = 0;
-    for (let idxInf in _practica.key_fragmentos.informes) {
-      for (let idxPreg in _practica.key_fragmentos.informes[idxInf])
-        if (_practica.key_fragmentos.informes[idxInf][idxPreg].length > 0)
-          contador_respuestas_informes += 1;
+    if (_practica.key_fragmentos) {
+      for (let idxInf in _practica.key_fragmentos.informes) {
+        for (let idxPreg in _practica.key_fragmentos.informes[idxInf])
+          if (_practica.key_fragmentos.informes[idxInf][idxPreg].length > 0)
+            contador_respuestas_informes += 1;
+      }
     }
+
 
     if (
       _practica.key_fragmentos && Object.keys(_practica.key_fragmentos).length > 0 &&
@@ -248,21 +252,17 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
 
     const [response_informes, response_supervisor] = await Promise.all([_response_informes, _response_supervisor])
 
+
     let _informe: any = {};
-    let contador = 0;
-    _practica.informes.forEach((elem: any) => {
-      _informe[elem.id] = {};
-      elem.config_informe.pregunta_informes.forEach((pregunta: any) => {
-        _informe[elem.id][pregunta.id] = response_informes.data[contador];
-        contador++;
-      });
+    orden_informes.forEach((par_ids_inf_preg: string[], indice) => {
+      let [idx_inf, idx_preg] = par_ids_inf_preg;
+      if (!_informe.hasOwnProperty(idx_inf)) _informe[idx_inf] = {};
+      _informe[idx_inf][idx_preg] = response_informes.data[indice];
     });
 
     let _supervisor: any = {};
-    contador = 0;
-    _practica.respuesta_supervisors.forEach((elem: any) => {
-      _supervisor[elem.id] = response_supervisor.data[contador];
-      contador++;
+    orden_supervisor.forEach((id_resp_supervisor: string, indice) => {
+      _supervisor[id_resp_supervisor] = response_supervisor.data[indice];
     });
 
     await _practica.update({
