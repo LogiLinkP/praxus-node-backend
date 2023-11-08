@@ -244,25 +244,38 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
     // console.log("HOLA HOLA ESTOY HACIENDO UNA REQUEST AL PYTHON", textos_supervisor)
     const url = `${process.env.URL_PYTHON_BACKEND}/nlp/frases_representativas_multi?cantidad=${req.query.cantidad ?? 10}&textos=`;
 
-    const string_textos_informes = textos_informes.join('|||');
-    let _response_informes = axios.get(url + string_textos_informes);
+    const chunk_size = 5;
 
-    const string_textos_supervisor = textos_supervisor.join('|||');
-    let _response_supervisor = axios.get(url + string_textos_supervisor);
+    // procesar informes
+    let response_informes: any = [];
+    for (let i = 0; i < textos_informes.length; i = i + chunk_size) {
+      let informes_a_procesar = textos_informes.slice(i, i + chunk_size);
+      const string_textos_informes = informes_a_procesar.join('|||');
+      let _response_informes = await axios.get(url + string_textos_informes);
+      response_informes.push(..._response_informes.data)
+    }
 
-    const [response_informes, response_supervisor] = await Promise.all([_response_informes, _response_supervisor])
+    // procesar textos supervisor
+    let response_supervisor: any = [];
+    for (let i = 0; i < textos_supervisor.length; i = i + chunk_size) {
+      let informes_sup_a_procesar = textos_supervisor.slice(i, i + chunk_size);
+      const string_textos_supervisor = informes_sup_a_procesar.join('|||');
+      let _response_supervisor = await axios.get(url + string_textos_supervisor);
+      response_supervisor.push(..._response_supervisor.data)
+    }
 
+    // const [response_informes, response_supervisor] = await Promise.all([_response_informes, _response_supervisor])
 
     let _informe: any = {};
     orden_informes.forEach((par_ids_inf_preg: string[], indice) => {
       let [idx_inf, idx_preg] = par_ids_inf_preg;
       if (!_informe.hasOwnProperty(idx_inf)) _informe[idx_inf] = {};
-      _informe[idx_inf][idx_preg] = response_informes.data[indice];
+      _informe[idx_inf][idx_preg] = response_informes[indice];
     });
 
     let _supervisor: any = {};
     orden_supervisor.forEach((id_resp_supervisor: string, indice) => {
-      _supervisor[id_resp_supervisor] = response_supervisor.data[indice];
+      _supervisor[id_resp_supervisor] = response_supervisor[indice];
     });
 
     await _practica.update({
