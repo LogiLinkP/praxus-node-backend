@@ -149,7 +149,7 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
     res.status(400).json({ error: 'Practica no especificada' });
     return;
   }
-  console.log(1);
+
   try {
     const _practica = await practica.findOne({
       where: { id: id_practica },
@@ -173,7 +173,7 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
         },
         {
           model: respuesta_supervisor,
-          required: true,
+          required: false,
           include: [
             {
               model: pregunta_supervisor,
@@ -184,6 +184,7 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
         }
       ]
     });
+
     if (!_practica) {
       await practica.update(
         {
@@ -209,51 +210,72 @@ routerSimilitud.put('/frases_representativas_practica/:id_practica', jsonParser,
     for (let informe of _practica.informes) {
       let ids_preguntas_informe = informe.config_informe.pregunta_informes.map((elem: any) => elem.id.toString());
       ids_preguntas_informe.forEach((id_pregunta: string) => {
-        orden_informes.push([informe.id.toString(), id_pregunta]);
-        if (informe.key)
+        if (informe.key) {
+          orden_informes.push([informe.id.toString(), id_pregunta]);
           textos_informes.push(informe.key[id_pregunta])
+        }
       });
     }
 
     let orden_supervisor: string[] = [];
-    let textos_supervisor = _practica.respuesta_supervisors.map((elem: any) => {
+    let textos_supervisor: string[] = _practica.respuesta_supervisors.map((elem: any) => {
       orden_supervisor.push(elem.id.toString());
       return elem.respuesta
     });
 
+    let contador_respuestas_informes = 0;
+    if (_practica.key_fragmentos) {
+      for (let idxInf in _practica.key_fragmentos.informes) {
+        for (let idxPreg in _practica.key_fragmentos.informes[idxInf])
+          if (_practica.key_fragmentos.informes[idxInf][idxPreg].length > 0)
+            contador_respuestas_informes += 1;
+      }
+    }
+
+
     if (
       _practica.key_fragmentos && Object.keys(_practica.key_fragmentos).length > 0 &&
-      textos_informes.length == Object.keys(_practica.key_fragmentos.informes).length &&
+      textos_informes.length == contador_respuestas_informes &&
       textos_supervisor.length == Object.keys(_practica.key_fragmentos.supervisor).length
     ) {
+      // console.log("NO CONSULTANDO PYTHON")
       return res.status(200).json(_practica.key_fragmentos);
     }
-    console.log("HOLA HOLA ESTOY HACIENDO UNA REQUEST AL PYTHON", textos_supervisor)
+    // console.log("HOLA HOLA ESTOY HACIENDO UNA REQUEST AL PYTHON", textos_supervisor)
     const url = `${process.env.URL_PYTHON_BACKEND}/nlp/frases_representativas_multi?cantidad=${req.query.cantidad ?? 10}&textos=`;
 
-    const string_textos_informes = textos_informes.join('|||');
-    let _response_informes = axios.get(url + string_textos_informes);
+    const chunk_size = 5;
 
-    const string_textos_supervisor = textos_supervisor.join('|||');
-    let _response_supervisor = axios.get(url + string_textos_supervisor);
+    // procesar informes
+    let response_informes: any = [];
+    for (let i = 0; i < textos_informes.length; i = i + chunk_size) {
+      let informes_a_procesar = textos_informes.slice(i, i + chunk_size);
+      const string_textos_informes = informes_a_procesar.join('|||');
+      let _response_informes = await axios.get(url + string_textos_informes);
+      response_informes.push(..._response_informes.data)
+    }
 
-    const [response_informes, response_supervisor] = await Promise.all([_response_informes, _response_supervisor])
+    // procesar textos supervisor
+    let response_supervisor: any = [];
+    for (let i = 0; i < textos_supervisor.length; i = i + chunk_size) {
+      let informes_sup_a_procesar = textos_supervisor.slice(i, i + chunk_size);
+      const string_textos_supervisor = informes_sup_a_procesar.join('|||');
+      let _response_supervisor = await axios.get(url + string_textos_supervisor);
+      response_supervisor.push(..._response_supervisor.data)
+    }
+
+    // const [response_informes, response_supervisor] = await Promise.all([_response_informes, _response_supervisor])
 
     let _informe: any = {};
-    let contador = 0;
-    _practica.informes.forEach((elem: any) => {
-      _informe[elem.id] = {};
-      elem.config_informe.pregunta_informes.forEach((pregunta: any) => {
-        _informe[elem.id][pregunta.id] = response_informes.data[contador];
-        contador++;
-      });
+    orden_informes.forEach((par_ids_inf_preg: string[], indice) => {
+      let [idx_inf, idx_preg] = par_ids_inf_preg;
+      if (!_informe.hasOwnProperty(idx_inf)) _informe[idx_inf] = {};
+      _informe[idx_inf][idx_preg] = response_informes[indice];
     });
 
     let _supervisor: any = {};
-    contador = 0;
-    _practica.respuesta_supervisors.forEach((elem: any) => {
-      _supervisor[elem.id] = response_supervisor.data[contador];
-      contador++;
+    orden_supervisor.forEach((id_resp_supervisor: string, indice) => {
+      _supervisor[id_resp_supervisor] = response_supervisor[indice];
     });
 
     await _practica.update({

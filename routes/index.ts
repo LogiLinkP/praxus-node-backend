@@ -35,6 +35,7 @@ router.use('/documento_encargado', require('./documento_encargado'))
 router.use('/publicacion', require('./publicacion'));
 router.use('/plagio', require('./plagio'));
 router.use("/doc_ent_ext", require("./doc_ent_ext"));
+router.use("/test", require("./test"));
 
 
 module.exports = router;

@@ -19,9 +19,9 @@ routerPlagio.get('', async (req: any, res: any) => {
         } else {
             Data = await plagio.findAll({ where: { id_plagio: +id_plagio } });
         }
-        console.log(Data)
+
         if (!Data || Data.length == 0)
-            return res.status(400).json({ message: "No se pudo encontrar el elemento con id entregado" })
+            return res.status(204).json({ message: "No se pudo encontrar el elemento con id entregado" })
 
         return res.json(Data);
     } catch (error) {
